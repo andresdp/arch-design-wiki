@@ -1,0 +1,12 @@
+# ddspace workspace. Source text is third-party content: keep it out of version control.
+sources/
+corpus.json
+.env
+.ddspace/
+# Run outputs that embed source text (the taxonomy JSON, report and design points are safe to commit).
+runs/*/*_documents_*.json
+runs/*/*_clusters_*.json
+runs/*/*_open_codes_*.json
+runs/*/*_messages_*.json
+runs/*/*_html_report_*.html
+runs/*/corpus*.json

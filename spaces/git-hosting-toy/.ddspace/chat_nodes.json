@@ -1,0 +1,195 @@
+{
+  "run": "20261109_000000",
+  "built_at": "2026-11-11T13:55:35-03:00",
+  "pages": 31,
+  "nodes": 31,
+  "treedex": "0.1.5",
+  "map": {
+    "0001": {
+      "title": "Overview",
+      "path": "wiki/overview.md",
+      "kind": "overview",
+      "graph_id": ""
+    },
+    "0002": {
+      "title": "Approach",
+      "path": "wiki/approach.md",
+      "kind": "reference",
+      "graph_id": ""
+    },
+    "0003": {
+      "title": "Relations between dimensions",
+      "path": "wiki/relations.md",
+      "kind": "reference",
+      "graph_id": ""
+    },
+    "0004": {
+      "title": "Change log",
+      "path": "wiki/log.md",
+      "kind": "reference",
+      "graph_id": ""
+    },
+    "0005": {
+      "title": "Design decisions (dimensions)",
+      "path": "wiki/concepts/index.md",
+      "kind": "folder",
+      "graph_id": ""
+    },
+    "0006": {
+      "title": "Dimension: Source of truth for repository state",
+      "path": "wiki/concepts/source-of-truth-for-repository-state.md",
+      "kind": "dimension",
+      "graph_id": "d:1"
+    },
+    "0007": {
+      "title": "Value: Repository files on server disks (accepted)",
+      "path": "wiki/entities/repository-files-on-server-disks.md",
+      "kind": "value",
+      "graph_id": "v:1.1"
+    },
+    "0008": {
+      "title": "Value: Write-ahead log in object storage (accepted)",
+      "path": "wiki/entities/write-ahead-log-in-object-storage.md",
+      "kind": "value",
+      "graph_id": "v:1.2"
+    },
+    "0009": {
+      "title": "Value: Objects in a distributed hash table (mixed)",
+      "path": "wiki/entities/objects-in-a-distributed-hash-table.md",
+      "kind": "value",
+      "graph_id": "v:1.3"
+    },
+    "0010": {
+      "title": "Value: Blobs plus a relational reference database (rejected)",
+      "path": "wiki/entities/blobs-plus-a-relational-reference-database.md",
+      "kind": "value",
+      "graph_id": "v:1.4"
+    },
+    "0011": {
+      "title": "Dimension: Replication for durability",
+      "path": "wiki/concepts/replication-for-durability.md",
+      "kind": "dimension",
+      "graph_id": "d:2"
+    },
+    "0012": {
+      "title": "Value: Block-level filesystem replication (rejected)",
+      "path": "wiki/entities/block-level-filesystem-replication.md",
+      "kind": "value",
+      "graph_id": "v:2.1"
+    },
+    "0013": {
+      "title": "Value: Three Git replicas with majority writes (accepted)",
+      "path": "wiki/entities/three-git-replicas-with-majority-writes.md",
+      "kind": "value",
+      "graph_id": "v:2.2"
+    },
+    "0014": {
+      "title": "Value: Durability delegated to object storage (accepted)",
+      "path": "wiki/entities/durability-delegated-to-object-storage.md",
+      "kind": "value",
+      "graph_id": "v:2.3"
+    },
+    "0015": {
+      "title": "Value: Single copy on a file server (accepted)",
+      "path": "wiki/entities/single-copy-on-a-file-server.md",
+      "kind": "value",
+      "graph_id": "v:2.4"
+    },
+    "0016": {
+      "title": "Dimension: Reference update coordination",
+      "path": "wiki/concepts/reference-update-coordination.md",
+      "kind": "dimension",
+      "graph_id": "d:3"
+    },
+    "0017": {
+      "title": "Value: Three-phase commit across replicas (accepted)",
+      "path": "wiki/entities/three-phase-commit-across-replicas.md",
+      "kind": "value",
+      "graph_id": "v:3.1"
+    },
+    "0018": {
+      "title": "Value: Compare-and-swap on the log (accepted)",
+      "path": "wiki/entities/compare-and-swap-on-the-log.md",
+      "kind": "value",
+      "graph_id": "v:3.2"
+    },
+    "0019": {
+      "title": "Value: One server serializes the updates (accepted)",
+      "path": "wiki/entities/one-server-serializes-the-updates.md",
+      "kind": "value",
+      "graph_id": "v:3.3"
+    },
+    "0020": {
+      "title": "Dimension: Client data transfer",
+      "path": "wiki/concepts/client-data-transfer.md",
+      "kind": "dimension",
+      "graph_id": "d:4"
+    },
+    "0021": {
+      "title": "Value: Full clone over the Git protocol (accepted)",
+      "path": "wiki/entities/full-clone-over-the-git-protocol.md",
+      "kind": "value",
+      "graph_id": "v:4.1"
+    },
+    "0022": {
+      "title": "Value: Partial clone with sparse checkout (accepted)",
+      "path": "wiki/entities/partial-clone-with-sparse-checkout.md",
+      "kind": "value",
+      "graph_id": "v:4.2"
+    },
+    "0023": {
+      "title": "Value: Virtualized filesystem with on-demand objects (mixed)",
+      "path": "wiki/entities/virtualized-filesystem-with-on-demand-objects.md",
+      "kind": "value",
+      "graph_id": "v:4.3"
+    },
+    "0024": {
+      "title": "Dimension: Serving reads",
+      "path": "wiki/concepts/serving-reads.md",
+      "kind": "dimension",
+      "graph_id": "d:5"
+    },
+    "0025": {
+      "title": "Value: Nearest up-to-date replica (accepted)",
+      "path": "wiki/entities/nearest-up-to-date-replica.md",
+      "kind": "value",
+      "graph_id": "v:5.1"
+    },
+    "0026": {
+      "title": "Value: Cache servers near the clients (accepted)",
+      "path": "wiki/entities/cache-servers-near-the-clients.md",
+      "kind": "value",
+      "graph_id": "v:5.2"
+    },
+    "0027": {
+      "title": "Value: Stateless servers with a local disk cache (accepted)",
+      "path": "wiki/entities/stateless-servers-with-a-local-disk-cache.md",
+      "kind": "value",
+      "graph_id": "v:5.3"
+    },
+    "0028": {
+      "title": "Synthesis",
+      "path": "wiki/synthesis/index.md",
+      "kind": "folder",
+      "graph_id": ""
+    },
+    "0029": {
+      "title": "Run overview",
+      "path": "wiki/synthesis/overview.md",
+      "kind": "synthesis",
+      "graph_id": ""
+    },
+    "0030": {
+      "title": "Contested decisions",
+      "path": "wiki/synthesis/contested.md",
+      "kind": "synthesis",
+      "graph_id": ""
+    },
+    "0031": {
+      "title": "Dropped and unsupported",
+      "path": "wiki/synthesis/dropped.md",
+      "kind": "synthesis",
+      "graph_id": ""
+    }
+  }
+}

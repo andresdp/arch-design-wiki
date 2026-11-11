@@ -1,0 +1,1174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Large-scale document classification · Explainer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="../assets/ddspace-icon.svg" type="image/svg+xml">
+<script>
+  // Theme: the reader's choice (kept in this browser) or the system setting.
+  (function () { try { var t = localStorage.getItem("ddspace-wiki-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {} })();
+</script>
+<style>
+  body { background: var(--bg); }
+  .ex-wrap { display: grid; grid-template-columns: minmax(0, var(--split-left, 1fr)) 8px minmax(0, 1fr); gap: 0; min-height: calc(100vh - 50px); }
+  .ex-text { padding: 22px 28px 60px; overflow-wrap: anywhere; }
+  .ex-side { background: var(--panel); display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh; }
+  #canvas { position: relative; flex: 0 0 var(--split-canvas, 60%); min-height: 160px; overflow: hidden; }
+  .splitter-v { position: sticky; top: 0; height: 100vh; cursor: col-resize; background: var(--border);
+    border-left: 3px solid var(--bg); border-right: 3px solid var(--panel); touch-action: none; }
+  .splitter-h { flex: none; height: 8px; cursor: row-resize; background: var(--border);
+    border-top: 3px solid var(--panel); border-bottom: 3px solid var(--panel); touch-action: none; }
+  .splitter-v:hover, .splitter-h:hover, .splitter-v:focus-visible, .splitter-h:focus-visible, .splitter-v.dragging,
+  .splitter-h.dragging { background: var(--accent); outline: none; }
+  body.resizing { user-select: none; }
+  body.resizing.col { cursor: col-resize; } body.resizing.row { cursor: row-resize; }
+  #svg { width: 100%; height: 100%; display: block; cursor: grab; }
+  #info { flex: 1 1 0; min-height: 80px; overflow-y: auto; padding: 12px 16px; border-top: 1px solid var(--border); font-size: 13.5px; }
+  #info h2 { margin: 4px 0; font-size: 17px; border: none; }
+  #info ul { padding-left: 16px; margin: 4px 0 10px; }
+  #info .info-h { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 14px 0 4px; font-weight: 600; }
+  #info .info-sub { color: var(--muted); margin: 2px 0 8px; line-height: 1.45; }
+  #info p { margin: 4px 0; line-height: 1.45; }
+  #info .info-link { margin-top: 14px; }
+  #info .node-chip { padding: 1px 7px; font-size: 11px; margin: 1px 3px 1px 0; }
+  #info .pair-chip { display: inline-block; margin: 0 8px 4px 0; white-space: nowrap; }
+  .muted, .hint { color: var(--muted); font-size: 12.5px; }
+  h1 { margin: 6px 0 4px; font-size: 24px; }
+  h2.sec { font-size: 16px; margin: 22px 0 8px; border: none; }
+  .banner { background: var(--mixed); color: #fff; padding: 9px 14px; border-radius: 8px; margin: 0 0 14px; font-size: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 6px 0; list-style: none; }
+  .chip { display: inline-flex; gap: 6px; align-items: baseline; border: 1px solid var(--border); background: var(--panel);
+    color: var(--fg); border-radius: 999px; padding: 4px 11px; font: inherit; font-size: 13px; cursor: pointer; text-align: left; }
+  .chip strong { color: var(--accent); }
+  /* in a flex chip, the id and the kind keep their width; only the text wraps */
+  .chip > strong, .chip > .muted { flex: none; white-space: nowrap; }
+  .chip { text-align: left; }
+  .chip.small { padding: 0 7px; font-size: 11.5px; margin-right: 3px; }
+  .chip:hover, .chip.sel { border-color: var(--accent); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--border); margin: 18px 0 0; }
+  .tab { font: inherit; font-size: 14px; padding: 7px 14px; border: 1px solid transparent; border-bottom: none;
+    border-radius: 8px 8px 0 0; background: none; color: var(--muted); cursor: pointer; }
+  .tab[aria-selected="true"] { background: var(--panel); border-color: var(--border); color: var(--fg); font-weight: 600;
+    margin-bottom: -1px; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-top: none; padding: 12px 16px 16px;
+    border-radius: 0 0 8px 8px; }
+  .panel[hidden] { display: none; }
+  .choice { border-top: 1px solid var(--border); padding: 9px 0; }
+  .choice:first-of-type { border-top: none; }
+  .choice .head { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+  .choice .arrow { color: var(--muted); }
+  .choice p { margin: 4px 0; line-height: 1.45; font-size: 14px; }
+  .quote { border-left: 3px solid var(--accent); padding: 2px 10px; margin: 6px 0; font-style: italic; }
+  .ev { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .vref, .dref { cursor: pointer; display: inline-flex; gap: 5px; align-items: center; }
+  .others { font-size: 12.5px; color: var(--muted); }
+  .scroll { overflow-x: auto; }
+  table.compare td.open { color: var(--muted); font-style: italic; }
+  tr.differs th { border-left: 3px solid var(--accent); }
+  .node text { font-size: 15px; fill: var(--fg); paint-order: stroke; stroke: var(--panel); stroke-width: 3px; pointer-events: none; }
+  .node.greyed path.shape { opacity: .35; }
+  .node.greyed text { opacity: .5; }
+  .node.in-point text { font-weight: 600; }
+  .link.explored { stroke: var(--accent); stroke-opacity: .7; stroke-width: 3px; }
+  .link.on-path { stroke-opacity: 1; stroke-width: 4px; }
+  .link.on-path.tree { stroke: var(--accent); }
+  .link.on-path:not(.tree) { stroke-width: 1.8px; stroke-opacity: .85; }
+  .zoom-ctl { position: absolute; top: 8px; right: 10px; display: flex; gap: 4px; z-index: 2; }
+  .zoom-ctl button { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel);
+    color: var(--fg); font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
+  .zoom-ctl button:hover { border-color: var(--accent); }
+  .link.shown { stroke-opacity: .95; stroke-width: 2.4px; }
+  .graph-toggle { position: absolute; top: 8px; left: 10px; font-size: 12px; color: var(--muted); background: var(--panel);
+    padding: 2px 6px; border-radius: 6px; display: flex; gap: 5px; align-items: center; cursor: pointer; }
+  .node.dim-out, .link.dim-out { opacity: .1; }
+  .graph-key { font-size: 11.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 12px; padding: 6px 12px;
+    border-top: 1px solid var(--border); }
+  .graph-key b { color: var(--fg); font-weight: 600; }
+  .traj-wrap { position: relative; }
+  svg.lineage { display: block; width: 100%; height: 46px; overflow: visible; }
+  table.traj { border-collapse: separate; border-spacing: 0; font-size: 12.5px; overflow-wrap: normal; word-break: normal; hyphens: none; }
+  table.traj th, table.traj td { padding: 4px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.traj thead th { position: sticky; top: 0; background: var(--panel); }
+  table.traj th.row-h { text-align: left; font-weight: 500; min-width: 140px; max-width: 220px; }
+  table.traj .step-h { cursor: pointer; text-align: center; min-width: 112px; border-top: 3px solid var(--muted); }
+  table.traj .step-h b { display: block; font-size: 14px; }
+  table.traj .step-h .mv, table.traj .step-h .vd, table.traj .step-h .alt { display: block; font-size: 11px; }
+  .mv-seed, .mv-solution { border-top-color: var(--dimension) !important; } .mv-seed .mv, .mv-solution .mv { color: var(--dimension); }
+  .mv-exploit, .mv-region { border-top-color: var(--accent) !important; } .mv-exploit .mv, .mv-region .mv { color: var(--accent); }
+  .mv-explore, .mv-contrast { border-top-color: var(--novel) !important; } .mv-explore .mv, .mv-contrast .mv { color: var(--novel); }
+  .vd-strong, .vd-grounded { color: var(--accepted); } .vd-mixed, .vd-partial { color: var(--mixed); }
+  .vd-weak, .vd-ungrounded { color: var(--rejected); }
+  table.traj .alt { font-weight: 700; color: var(--fg); }
+  table.traj td.c { text-align: left; min-width: 112px; max-width: 150px; }
+  table.traj td.changed { box-shadow: inset 0 0 0 2px var(--accent); border-radius: 4px; }
+  table.traj td.novel .cell-v { font-weight: 700; }
+  table.traj td.contrast { box-shadow: inset 0 0 0 2px var(--novel); border-radius: 4px; }
+  table.traj td.dropped { opacity: .55; }
+  table.traj .sel { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  table.traj .band-h { text-align: center; font-size: 12px; min-width: 40px; }
+  table.traj td.band span { display: block; height: 18px; border-radius: 3px; background: var(--accepted); opacity: .75; }
+  .cell-v { font-size: 12px; }
+  .legend { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0; }
+  .region { border: 1px solid var(--border); border-left: 4px solid var(--accepted); border-radius: 6px; padding: 8px 12px; margin: 8px 0; }
+  .link.off { display: none; }
+  .mode-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px;
+    margin-bottom: 6px; color: #fff; }
+  .mode-icon.mode-search { background: var(--accent); } .mode-icon.mode-explain { background: var(--mixed); }
+  .lanes-wrap, .qoc-wrap { position: relative; }
+  svg.lane-arrows, svg.qoc-links { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+  table.lanes { border-collapse: separate; border-spacing: 0; font-size: 13px; width: 100%; }
+  table.lanes th, table.lanes td { border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: middle; }
+  table.lanes thead th { font-size: 12px; color: var(--muted); font-weight: 600; }
+  table.lanes tbody th { min-width: 160px; max-width: 240px; font-weight: 400; }
+  table.lanes .idea { display: block; color: var(--muted); font-size: 12px; }
+  table.lanes tr.dropped th, table.lanes tr.dropped td:not(.outcome) { opacity: .7; }
+  table.lanes td.outcome { font-size: 12px; max-width: 220px; }
+  .node-chip { font: inherit; font-size: 12px; border-radius: 12px; padding: 3px 9px; margin: 2px 6px 2px 0; cursor: pointer;
+    border: 2px solid var(--border); background: var(--panel); color: var(--fg); position: relative; z-index: 1; white-space: nowrap; }
+  .node-chip small { color: var(--muted); }
+  .vb-strong, .vb-grounded { border-color: var(--accepted) !important; } .vb-mixed, .vb-partial { border-color: var(--mixed) !important; }
+  .vb-weak, .vb-ungrounded { border-color: var(--rejected) !important; }
+  .node-chip.sel, .story-step.sel, .opt.sel { box-shadow: 0 0 0 3px var(--accent); }
+  table.heat td.h.sel, table.heat th.sel { outline: 2px solid var(--fg); }
+  .alt-chip { font-size: 12px; font-weight: 600; color: var(--accepted); }
+  .dropped-mark { color: var(--rejected); font-weight: 600; }
+  table.heat { border-collapse: separate; border-spacing: 2px; font-size: 11px; width: auto; }
+  table.heat th, table.heat td { white-space: nowrap; }
+  table.heat th { color: var(--muted); font-weight: 600; padding: 0 3px; }
+  table.heat th.heat-r { text-align: left; border-bottom: 1px solid var(--border); }
+  table.heat td.h { width: 26px; height: 18px; border-radius: 3px; cursor: pointer; }
+  table.heat .rb { border-left: 6px solid var(--panel); }
+  .h-meets { background: var(--accepted); } .h-partly { background: var(--mixed); } .h-misses { background: var(--rejected); }
+  .h-none { background: var(--border); opacity: .5; }
+  .sw { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 3px; }
+  .chip-sm { cursor: pointer; }
+  .gaps { margin-top: 28px; border-top: 2px solid var(--border); padding-top: 6px; }
+  .gap-summary { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  .gap-count strong { color: var(--accent); font-size: 1.1em; }
+  .gap-h { font-size: 14px; margin: 16px 0 6px; }
+  .choice.gap .head .chip { margin: 0; }
+  .choice.fit { cursor: pointer; }
+  .choice.fit:hover, .choice.fit:focus { border-color: var(--accent); }
+  .badge.neutral { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .fit-note { font-size: 13px; color: var(--muted); }
+  .tradeoffs { margin: 4px 0; padding-left: 18px; font-size: 13px; }
+  .t-gain, .t-cost { font-size: 11px; border-radius: 9px; padding: 0 6px; border: 1px solid; }
+  .t-gain { color: var(--accepted); } .t-cost { color: var(--rejected); }
+  .own-tradeoff { font-size: 13px; border-left: 3px solid var(--mixed); padding-left: 8px; }
+  .round-head { margin: 18px 0 6px; font-size: 14px; border-bottom: 2px solid var(--border); padding-bottom: 4px; }
+  .round-end { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .story-step { border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 8px 0; cursor: pointer; }
+  .story-step.mv-explore, .story-step.mv-contrast { border-left-color: var(--novel); }
+  .story-step.mv-exploit, .story-step.mv-region { border-left-color: var(--accent); }
+  .story-step.mv-ablate { border-left-style: dotted; border-left-color: var(--accent); }
+  .story-step.mv-seed, .story-step.mv-solution { border-left-color: var(--dimension); }
+  .story-head { font-size: 14px; margin-bottom: 4px; }
+  .story-step p { margin: 4px 0; line-height: 1.45; font-size: 13.5px; }
+  .lbl { display: inline-block; min-width: 68px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+  .lbl-row { display: flex; gap: 0; font-size: 13px; } .lbl-row .lbl { padding-top: 2px; }
+  ul.moves { margin: 0; padding-left: 16px; } ul.moves li { margin: 1px 0; }
+  .vd-chip { font-size: 11px; border: 2px solid var(--border); border-radius: 10px; padding: 0 7px; margin-left: 4px; }
+  .judged { margin: 4px 0; } .j { font-size: 11px; border-radius: 9px; padding: 1px 7px; margin: 2px 4px 2px 0; display: inline-block; color: #fff; cursor: pointer; }
+  .j-meets { background: var(--accepted); } .j-partly { background: var(--mixed); } .j-misses { background: var(--rejected); }
+  .qoc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); column-gap: 90px; font-size: 13px; }
+  .qoc-hdr { display: grid; grid-template-columns: 1fr 1fr; color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+  .qoc-crit .qoc-hdr { grid-template-columns: 1fr; }
+  .qoc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid var(--border); padding: 6px 0; align-items: center; }
+  .opt { border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px; margin: 3px 0; cursor: pointer; background: var(--panel); position: relative; z-index: 1; }
+  .opt-solution { border-left: 4px solid var(--accent); } .opt-contrast { border-left: 4px solid var(--novel); }
+  .crit { border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; margin: 6px 0; cursor: pointer; background: var(--panel); position: relative; z-index: 1; }
+  svg.qoc-links path.traced { stroke-opacity: 1; stroke-width: 3px; }
+  details.grid-details { margin-top: 22px; } details.grid-details summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+  .solution, .option { border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 8px 0; cursor: pointer; }
+  .solution.sel, .option.sel { box-shadow: 0 0 0 2px var(--accent); }
+  .adr { border-top: 1px solid var(--border); margin-top: 18px; padding-top: 8px; }
+  .adr h3 { margin: 6px 0; font-size: 16px; }
+  .option.chosen { border-left: 4px solid var(--accepted); }
+  .option.discarded { border-left: 4px solid var(--rejected); opacity: .9; }
+  .option .values { font-size: 13px; margin: 4px 0; }
+  ul.pc { list-style: none; padding: 0; margin: 4px 0; font-size: 13px; }
+  ul.pc li::before { font-weight: 700; margin-right: 6px; }
+  ul.pc li.pro::before { content: "+"; color: var(--accepted); }
+  ul.pc li.con::before { content: "−"; color: var(--rejected); }
+  ul.parts { margin: 4px 0 6px; padding-left: 18px; font-size: 13px; }
+  ul.parts li { margin: 4px 0; }
+  .pairs { display: block; margin: 2px 0; }
+  .pairs .pair { display: block; padding-left: 10px; font-size: 13px; }
+  .node.unjudged path.shape { fill: var(--panel); stroke: var(--rejected); stroke-dasharray: 2,2; stroke-width: 1.5px; }
+  @media (max-width: 900px) {
+    .ex-wrap { grid-template-columns: 1fr; }
+    .splitter-v, .splitter-h { display: none; }
+    .ex-text { padding: 16px 16px 30px; }
+    .ex-side { position: static; height: auto; border-left: none; border-top: 1px solid var(--border); }
+    #canvas { height: 420px; flex: none; }
+    #info { flex: none; }
+  }
+</style>
+</head>
+<body class="page-explainer">
+<header class="top">
+<span class="brand"><img src="../assets/ddspace-icon.svg" alt="" class="brand-icon" width="32" height="32">Design rationale</span>  <nav></nav>
+  <button class="theme-btn" id="theme-toggle" type="button" title="Switch light / dark mode" aria-label="Switch light / dark mode" style="margin-left:auto">◐</button>
+</header>
+<div class="ex-wrap">
+<main class="ex-text">
+  <div class="mode-icon mode-search" role="img" aria-label="Search: alternative solutions for a problem" title="Search: alternative solutions for a problem">
+<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>  </div>
+  <div class="kind">Search · design rationale · no design space</div>
+  <h1>Large-scale document classification</h1>
+<p>An insurer receives between two and eight million documents a day (scanned forms, e-mails, PDFs) and classifies each one into one of 60 claim types with an LLM-based classifier. Volume varies strongly over the year: storm season brings four times the usual load. Three teams use the results: claims handling, fraud investigation and analytics. The documents contain personal data.</p>
+  <h2 class="sec">Requirements</h2>
+  <ul class="chips" id="requirements">
+    <li><button class="chip" type="button" data-requirement="R1" data-node="r:R1"><strong>R1</strong> Classify every incoming document into a claim type, with a confidence. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="R2" data-node="r:R2"><strong>R2</strong> Deliver the results to the three consuming teams. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="R3" data-node="r:R3"><strong>R3</strong> Send the documents the classifier is unsure about to human review, and use the reviewers&#39; corrections to improve the classifier. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q1" data-node="r:Q1"><strong>Q1</strong> During storm season, at eight million documents a day, every document is classified within two hours of arrival. <span class="muted">quality: throughput and scalability</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q2" data-node="r:Q2"><strong>Q2</strong> When classification quality drops for one claim type (for example, after a form changes its layout), operators see it within one day. <span class="muted">quality: observability</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q3" data-node="r:Q3"><strong>Q3</strong> The classification costs less than 0.2 cents per document on average over the year. <span class="muted">quality: cost</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q4" data-node="r:Q4"><strong>Q4</strong> A consuming team can change how it processes the results without the other teams or the classifier having to change. <span class="muted">quality: loose coupling</span></button></li>
+    <li><button class="chip" type="button" data-requirement="C1" data-node="r:C1"><strong>C1</strong> The documents contain personal data and may not leave the EU. <span class="muted">constraint</span></button></li>
+    <li><button class="chip" type="button" data-requirement="C2" data-node="r:C2"><strong>C2</strong> The classifier uses an LLM from the insurer&#39;s approved provider, in its EU region. <span class="muted">constraint</span></button></li>
+  </ul>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" type="button" role="tab" data-tab="adrs" aria-selected="true">Decisions (ADRs)</button>
+    <button class="tab" type="button" role="tab" data-tab="compare" aria-selected="false">Comparison</button>
+<button class="tab" type="button" role="tab" data-tab="trajectory" aria-selected="false">Trajectory</button>  </div>
+
+  <section class="panel" data-panel="adrs">
+    <p class="hint">The alternatives the agent proposes, then its decisions as architecture decision records: each ADR addresses a few related requirements and weighs options (partial design points), chosen by one or more alternatives or discarded. Select an alternative or an option to see it in the graph.</p>
+    <h2 class="sec">Alternatives</h2>
+    <div class="solution" data-alt="A1" tabindex="0"><strong>A1 · Confidence-gated queue</strong>
+<p>Use an EU compact model for confident cases and the approved EU LLM for uncertain cases, with queued priority processing, event-based team delivery, and a rapid correction loop.</p>      <p class="muted">Composed of 3 partial design points, one per ADR:</p>
+      <ul class="parts">
+        <li><a href="#adr-ADR1" class="adr-link">ADR1</a> · Confidence-gated cascade with queued priority workers <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:C1">C1</span><span class="chip small" data-node="r:C2">C2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:1">Inference routing</span> → <span class="vref" data-node="z:1.1">Confidence-gated cascade (EU compact model then approved LLM EU endpoint)</span></span><span class="pair"><span class="dref" data-node="z:2">Work orchestration</span> → <span class="vref" data-node="z:2.6">Autoscaled queue workers with backpressure and priority lanes</span></span></span></li>
+        <li><a href="#adr-ADR2" class="adr-link">ADR2</a> · Versioned claim-type event topics <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q4">Q4</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:3">Result delivery</span> → <span class="vref" data-node="z:3.1">Versioned claim-type event topics for each team</span></span></span></li>
+        <li><a href="#adr-ADR3" class="adr-link">ADR3</a> · Confidence-threshold review and rapid versioned corrections <span class="chip small" data-node="r:R3">R3</span><span class="chip small" data-node="r:Q2">Q2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:4">Review and learning</span> → <span class="vref" data-node="z:4.6">Confidence-threshold review with versioned correction feedback</span></span><span class="pair"><span class="dref" data-node="z:5">Quality monitoring</span> → <span class="vref" data-node="z:5.4">Per-claim-type drift alerts and outcome dashboards</span></span></span></li>
+      </ul>
+<p class="muted">As a whole: The system first routes documents to an EU compact model and escalates low-confidence cases to an approved EU-hosted LLM. Autoscaled, backpressured workers prioritize processing, publish versioned claim-type events to team-specific topics, and feed confidence-based reviews and corrections into monitoring and future learning.</p>    </div>
+    <div class="solution" data-alt="B1" tabindex="0"><strong>B1 · Deadline-aware direct inference</strong>
+<p>Send every document to the approved EU LLM in elastic deadline-aware micro-batches, then publish versioned team events and use per-type review and monitoring.</p>      <p class="muted">Composed of 3 partial design points, one per ADR:</p>
+      <ul class="parts">
+        <li><a href="#adr-ADR1" class="adr-link">ADR1</a> · Direct approved-LLM deadline batches <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:C1">C1</span><span class="chip small" data-node="r:C2">C2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:1">Inference routing</span> → <span class="vref" data-node="z:1.2">Approved LLM EU endpoint for every document</span></span><span class="pair"><span class="dref" data-node="z:2">Work orchestration</span> → <span class="vref" data-node="z:2.7">Elastic deadline-aware micro-batches</span></span></span></li>
+        <li><a href="#adr-ADR2" class="adr-link">ADR2</a> · Versioned claim-type event topics <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q4">Q4</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:3">Result delivery</span> → <span class="vref" data-node="z:3.1">Versioned claim-type event topics for each team</span></span></span></li>
+        <li><a href="#adr-ADR3" class="adr-link">ADR3</a> · Confidence-threshold review and rapid versioned corrections <span class="chip small" data-node="r:R3">R3</span><span class="chip small" data-node="r:Q2">Q2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:4">Review and learning</span> → <span class="vref" data-node="z:4.6">Confidence-threshold review with versioned correction feedback</span></span><span class="pair"><span class="dref" data-node="z:5">Quality monitoring</span> → <span class="vref" data-node="z:5.4">Per-claim-type drift alerts and outcome dashboards</span></span></span></li>
+      </ul>
+<p class="muted">As a whole: Documents are sent to an approved EU LLM endpoint, processed in elastic, deadline-aware micro-batches, and emitted as versioned claim-type events to each team’s topic. Low-confidence claims enter review, whose versioned corrections support learning, while per-claim-type drift alerts and outcome dashboards monitor quality over time.</p>    </div>
+    <div class="solution" data-alt="D1" tabindex="0"><strong>D1 · Class-specific priority pipeline</strong>
+<p>Specialize compact-model and approved-LLM routing by claim type, prioritize work against deadlines, and target review and monitoring by type.</p>      <p class="muted">Composed of 3 partial design points, one per ADR:</p>
+      <ul class="parts">
+        <li><a href="#adr-ADR1" class="adr-link">ADR1</a> · Claim-specific cascade with priority backpressure <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:C1">C1</span><span class="chip small" data-node="r:C2">C2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:1">Inference routing</span> → <span class="vref" data-node="z:1.3">Class-specific cascade using compact EU model and approved LLM EU endpoint</span></span><span class="pair"><span class="dref" data-node="z:2">Work orchestration</span> → <span class="vref" data-node="z:2.8">Autoscaled priority lanes with deadline backpressure</span></span></span></li>
+        <li><a href="#adr-ADR2" class="adr-link">ADR2</a> · Versioned claim-type event topics <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q4">Q4</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:3">Result delivery</span> → <span class="vref" data-node="z:3.1">Versioned claim-type event topics for each team</span></span></span></li>
+        <li><a href="#adr-ADR3" class="adr-link">ADR3</a> · Targeted review and versioned corrections <span class="chip small" data-node="r:R3">R3</span><span class="chip small" data-node="r:Q2">Q2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:4">Review and learning</span> → <span class="vref" data-node="z:4.7">Targeted human review with versioned correction feedback</span></span><span class="pair"><span class="dref" data-node="z:5">Quality monitoring</span> → <span class="vref" data-node="z:5.4">Per-claim-type drift alerts and outcome dashboards</span></span></span></li>
+      </ul>
+<p class="muted">As a whole: Documents are routed by claim class through a compact EU model and, where selected, an approved EU LLM endpoint, while autoscaled priority lanes use deadline backpressure to manage work. Results are published to versioned claim-type topics for team consumption; targeted human corrections support learning, while per-claim-type drift alerts and outcome dashboards monitor quality.</p>    </div>
+    <article class="adr" id="adr-ADR1">
+      <h3>ADR1 · Route documents through EU inference capacity <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:C1">C1</span><span class="chip small" data-node="r:C2">C2</span></h3>
+<p><strong>Context.</strong> The classifier must return a claim type and confidence for every document while respecting EU residency and the approved provider. Seasonal peaks make elastic capacity important, and the average cost target favors controlling expensive inference. The problem supplies neither endpoint prices nor measured throughput, so cost and deadline claims remain candidates for benchmarking.</p>      <p><strong>Decision.</strong> Confidence-gated cascade with queued priority workers <span class="muted">(A1)</span>; Direct approved-LLM deadline batches <span class="muted">(B1)</span>; Claim-specific cascade with priority backpressure <span class="muted">(D1)</span>.</p>
+      <div class="option chosen" data-option="ADR1:O1" tabindex="0">
+        <div class="head"><strong>Confidence-gated cascade with queued priority workers</strong> <span class="badge accepted">chosen in A1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:1">Inference routing</span> → <span class="vref" data-node="z:1.1">Confidence-gated cascade (EU compact model then approved LLM EU endpoint)</span></span><span class="pair"><span class="dref" data-node="z:2">Work orchestration</span> → <span class="vref" data-node="z:2.6">Autoscaled queue workers with backpressure and priority lanes</span></span></p>
+<ul class="pc"><li class="pro">Uses the approved EU LLM for uncertain cases and can reserve its capacity for them.</li><li class="pro">Queue autoscaling and priority lanes support variable volume.</li><li class="con">A second inference stage adds latency and confidence calibration work.</li><li class="con">Measured throughput and average cost are still needed.</li></ul><p>This balances reduced LLM volume with asynchronous burst handling while keeping the approved endpoint in the classification path.</p>      </div>
+      <div class="option chosen" data-option="ADR1:O2" tabindex="0">
+        <div class="head"><strong>Direct approved-LLM deadline batches</strong> <span class="badge accepted">chosen in B1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:1">Inference routing</span> → <span class="vref" data-node="z:1.2">Approved LLM EU endpoint for every document</span></span><span class="pair"><span class="dref" data-node="z:2">Work orchestration</span> → <span class="vref" data-node="z:2.7">Elastic deadline-aware micro-batches</span></span></p>
+<ul class="pc"><li class="pro">Uses one direct approved-provider inference path.</li><li class="pro">Elastic micro-batches can schedule work against deadlines.</li><li class="con">Every document incurs approved-endpoint inference, leaving the cost target unverified.</li><li class="con">Endpoint capacity and response times need peak-load validation.</li></ul><p>This favors a uniform classification path and deadline-based batch scheduling over cascade specialization.</p>      </div>
+      <div class="option chosen" data-option="ADR1:O3" tabindex="0">
+        <div class="head"><strong>Claim-specific cascade with priority backpressure</strong> <span class="badge accepted">chosen in D1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:1">Inference routing</span> → <span class="vref" data-node="z:1.3">Class-specific cascade using compact EU model and approved LLM EU endpoint</span></span><span class="pair"><span class="dref" data-node="z:2">Work orchestration</span> → <span class="vref" data-node="z:2.8">Autoscaled priority lanes with deadline backpressure</span></span></p>
+<ul class="pc"><li class="pro">Routing and priority can reflect differences among claim types.</li><li class="pro">Backpressure helps expose overload before it silently accumulates.</li><li class="con">Per-class routing policies require calibration and maintenance.</li><li class="con">Additional routing can add latency; numerical cost and deadline targets need validation.</li></ul><p>This makes classification and workload control class-aware, with the cost of more policy and operational complexity.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR2">
+      <h3>ADR2 · Deliver independent result feeds to consuming teams <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q4">Q4</span></h3>
+<p><strong>Context.</strong> Claims handling, fraud investigation and analytics all need results, and each team must be able to change its processing without coordinating changes with the classifier or other consumers. A shared polled database offers a central handoff but makes consumers share an interface and operational dependency.</p>      <p><strong>Decision.</strong> Versioned claim-type event topics <span class="muted">(A1, B1, D1)</span>.</p>
+      <div class="option chosen" data-option="ADR2:O1" tabindex="0">
+        <div class="head"><strong>Versioned claim-type event topics</strong> <span class="badge accepted">chosen in A1, B1, D1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:3">Result delivery</span> → <span class="vref" data-node="z:3.1">Versioned claim-type event topics for each team</span></span></p>
+<ul class="pc"><li class="pro">Each consumer has an independent feed and can evolve its processing separately.</li><li class="pro">Versioning makes result schema changes explicit.</li><li class="con">Topic and schema lifecycle management adds operational work.</li></ul><p>All three alternatives use independently consumed, versioned outputs to meet delivery and loose-coupling needs.</p>      </div>
+      <div class="option discarded" data-option="ADR2:O2" tabindex="0">
+        <div class="head"><strong>Shared relational polling</strong> <span class="badge rejected">discarded</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:3">Result delivery</span> → <span class="vref" data-node="z:3.3">Shared relational results database polled by teams</span></span></p>
+<ul class="pc"><li class="pro">Provides one familiar, centralized place for results.</li><li class="con">Consumers share the database contract and polling load, undermining independent change.</li></ul><p>The shared interface conflicts with the loose-coupling requirement.</p>      </div>
+      <div class="option discarded" data-option="ADR2:O3" tabindex="0">
+        <div class="head"><strong>Durable lake with team exports</strong> <span class="badge rejected">discarded</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:3">Result delivery</span> → <span class="vref" data-node="z:3.2">Durable result lake with team-specific exports</span></span></p>
+<ul class="pc"><li class="pro">Preserves a durable record and allows different team export formats.</li><li class="con">Scheduled exports can delay delivery and require per-team handoff management.</li></ul><p>This is a viable batch-oriented handoff but less direct and independently consumable than versioned team feeds.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR3">
+      <h3>ADR3 · Close the human correction and quality feedback loop <span class="chip small" data-node="r:R3">R3</span><span class="chip small" data-node="r:Q2">Q2</span></h3>
+<p><strong>Context.</strong> Uncertain documents need human review, corrections must improve the classifier, and operators must see when an individual claim type degrades within a day. Broad periodic sampling and aggregate metrics reduce review and monitoring effort but may delay or conceal category-specific problems.</p>      <p><strong>Decision.</strong> Confidence-threshold review and rapid versioned corrections <span class="muted">(A1, B1)</span>; Targeted review and versioned corrections <span class="muted">(D1)</span>.</p>
+      <div class="option chosen" data-option="ADR3:O1" tabindex="0">
+        <div class="head"><strong>Confidence-threshold review and rapid versioned corrections</strong> <span class="badge accepted">chosen in A1, B1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:4">Review and learning</span> → <span class="vref" data-node="z:4.6">Confidence-threshold review with versioned correction feedback</span></span><span class="pair"><span class="dref" data-node="z:5">Quality monitoring</span> → <span class="vref" data-node="z:5.4">Per-claim-type drift alerts and outcome dashboards</span></span></p>
+<ul class="pc"><li class="pro">Routes uncertain cases for review and makes correction inputs traceable.</li><li class="pro">Per-type alerts match the specified quality-drop scenario.</li><li class="con">Review thresholds and alert signals need calibration and ongoing operation.</li></ul><p>This combines case selection and traceable learning with day-level, category-specific visibility.</p>      </div>
+      <div class="option chosen" data-option="ADR3:O2" tabindex="0">
+        <div class="head"><strong>Targeted review and versioned corrections</strong> <span class="badge accepted">chosen in D1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:4">Review and learning</span> → <span class="vref" data-node="z:4.7">Targeted human review with versioned correction feedback</span></span><span class="pair"><span class="dref" data-node="z:5">Quality monitoring</span> → <span class="vref" data-node="z:5.4">Per-claim-type drift alerts and outcome dashboards</span></span></p>
+<ul class="pc"><li class="pro">Focuses human work on the claim types and cases most in need of attention.</li><li class="pro">Versioned corrections and per-type alerts support investigation and improvement.</li><li class="con">Targeting policy and correction-set maintenance require ownership.</li></ul><p>This aligns review allocation and monitoring with the 60 claim-type taxonomy.</p>      </div>
+      <div class="option discarded" data-option="ADR3:O3" tabindex="0">
+        <div class="head"><strong>Sampled review with periodic updates</strong> <span class="badge rejected">discarded</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:4">Review and learning</span> → <span class="vref" data-node="z:4.2">Sampled human review with periodic model updates</span></span><span class="pair"><span class="dref" data-node="z:5">Quality monitoring</span> → <span class="vref" data-node="z:5.2">Daily aggregate quality and volume reports</span></span></p>
+<ul class="pc"><li class="pro">Bounds routine review effort and gives a regular summary of overall quality.</li><li class="con">Aggregate daily reports can hide one claim type&#39;s quality drop, and periodic updates slow the correction loop.</li></ul><p>It cannot reliably surface localized degradation and act on corrections at the required pace.</p>      </div>
+    </article>
+    <h2 class="sec">Requirements not addressed</h2>
+    <p>Every requirement is addressed by an ADR.</p>
+  </section>
+
+  <section class="panel" data-panel="trajectory" hidden>
+    <p class="hint">How the agent searched the space: 9 design points evaluated of a budget of 12, in 3 rounds over 4 approaches. The lanes give the overview; the strip shows how each point met each requirement; the story below follows the agent's thinking round by round. Select a point anywhere to see it in the graph.</p>
+
+    <h2 class="sec">Approaches and rounds</h2>
+    <div class="scroll lanes-wrap">
+      <svg class="lane-arrows" aria-hidden="true"></svg>
+      <table class="lanes">
+        <thead><tr><th>Approach</th><th>Round 1</th><th>Round 2</th><th>Round 3</th><th>Outcome</th></tr></thead>
+        <tbody>
+          <tr class="lane live">
+            <th><b>A</b> <span class="idea">What if a confidence-gated cascade and an asynchronous queue keep the approved LLM for uncertain documents while scaling the overall flow?</span></th>
+<td><button type="button" class="node-chip vb-strong" data-step="1" title="A queue and confidence-gated cascade should scale the LLM workload, route uncertain cases for correction, and separate the three consumers. Per-type monitoring should expose category-specific drops. The two-hour and per-document cost targets remain partly dependent on unprovided throughput and pricing evidence.">#1 <small>seed</small></button></td><td><button type="button" class="node-chip vb-strong" data-step="4" title="Keeping the queue, cascade and team topics while shortening correction feedback and adding alerts should improve R3 and make Q2 actionable within one day. The numerical throughput and annual cost targets still need measurement.">#4 <small>exploit</small></button></td><td><button type="button" class="node-chip vb-strong" data-step="7" title="Adding priority lanes and versioned correction feedback to the strong cascade point should help the burst path and make changes from review auditable without reducing category-level visibility or team isolation.">#7 <small>exploit</small></button></td>            <td class="outcome"><span class="alt-chip">→ A1</span></td>
+          </tr>
+          <tr class="lane live">
+            <th><b>B</b> <span class="idea">What if direct approved-LLM inference in elastic batches emphasizes uniform results and durable data delivery?</span></th>
+<td><button type="button" class="node-chip vb-mixed" data-step="2" title="Elastic batches and a durable store should absorb seasonal volume and distribute results, while sampled corrections improve the model. Aggregate reporting may not identify a claim-type drop within a day, and capacity and price targets need measurement.">#2 <small>seed</small></button></td><td><button type="button" class="node-chip vb-strong" data-step="5" title="Deadline-aware micro-batches, event topics and per-type monitoring preserve the direct-LLM batch approach while addressing the missed observability need and improving consumer isolation and uncertain-case handling.">#5 <small>exploit</small></button></td><td><button type="button" class="node-chip vb-strong" data-step="8" title="Removing scheduled batch cadence in favor of elastic deadline-aware micro-batches and retaining fine-grained alerts should reduce wait time while keeping direct approved-provider inference and independently consumable outputs.">#8 <small>exploit</small></button></td>            <td class="outcome"><span class="alt-chip">→ B1</span></td>
+          </tr>
+          <tr class="lane dropped">
+            <th><b>C</b> <span class="idea">What if a synchronous service and shared database keep the implementation centralized and simple?</span></th>
+<td><button type="button" class="node-chip vb-weak" data-step="3" title="A centralized synchronous service should be straightforward to operate, but serial request handling, shared polling, monthly review and global-only monitoring are likely to fail the burst, loose-coupling and quality-response requirements.">#3 <small>seed</small></button></td><td></td><td></td>            <td class="outcome"><span class="dropped-mark">✕ dropped</span> <span class="muted">Synchronous per-document calls, shared polling and monthly correction review cannot support the burst deadline, day-level claim-type visibility, or independent team processing at this volume.</span></td>
+          </tr>
+          <tr class="lane live">
+            <th><b>D</b> <span class="idea">What if routing and review are specialized by claim type, with priority lanes and versioned corrections?</span></th>
+<td></td><td><button type="button" class="node-chip vb-strong" data-step="6" title="Claim-class-specific routing and targeted correction sets may focus model capacity and review effort where they matter, while priority lanes address storm volume. Per-type dashboards and topics should retain monitoring and consumer independence.">#6 <small>explore</small></button></td><td><button type="button" class="node-chip vb-strong" data-step="9" title="Adding deadline backpressure, versioned correction feedback and drift alerts should strengthen the class-specific approach&#39;s burst handling, auditability and one-day response while preserving targeted review.">#9 <small>exploit</small></button></td>            <td class="outcome"><span class="alt-chip">→ D1</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="legend"><span><b style="color:var(--accepted)">strong</b> · <b style="color:var(--mixed)">mixed</b> · <b style="color:var(--rejected)">weak</b> points</span><span>— refine, on its lane</span><span>- - a new approach started from a point</span><span>··· an ablation</span></div>
+
+    <h2 class="sec">Requirements, point by point</h2>
+    <div class="scroll"><table class="heat">
+      <thead>
+        <tr><th></th><th class="heat-r" colspan="3">Round 1</th><th class="heat-r" colspan="3">Round 2</th><th class="heat-r" colspan="3">Round 3</th></tr>
+        <tr><th></th><th class="heat-h" data-step="1" title="strong">#1</th><th class="heat-h" data-step="2" title="mixed">#2</th><th class="heat-h" data-step="3" title="weak">#3</th><th class="heat-h rb" data-step="4" title="strong">#4</th><th class="heat-h" data-step="5" title="strong">#5</th><th class="heat-h" data-step="6" title="strong">#6</th><th class="heat-h rb" data-step="7" title="strong">#7</th><th class="heat-h" data-step="8" title="strong">#8</th><th class="heat-h" data-step="9" title="strong">#9</th></tr>
+      </thead>
+      <tbody>
+        <tr><th><span class="chip-sm" data-node="r:R1" title="Classify every incoming document into a claim type, with a confidence.">R1</span></th>
+<td class="h h-meets" data-step="1" title="#1 · R1: meets"></td><td class="h h-meets" data-step="2" title="#2 · R1: meets"></td><td class="h h-meets" data-step="3" title="#3 · R1: meets"></td><td class="h h-meets rb" data-step="4" title="#4 · R1: meets"></td><td class="h h-meets" data-step="5" title="#5 · R1: meets"></td><td class="h h-meets" data-step="6" title="#6 · R1: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · R1: meets"></td><td class="h h-meets" data-step="8" title="#8 · R1: meets"></td><td class="h h-meets" data-step="9" title="#9 · R1: meets"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:R2" title="Deliver the results to the three consuming teams.">R2</span></th>
+<td class="h h-meets" data-step="1" title="#1 · R2: meets"></td><td class="h h-meets" data-step="2" title="#2 · R2: meets"></td><td class="h h-partly" data-step="3" title="#3 · R2: partly"></td><td class="h h-meets rb" data-step="4" title="#4 · R2: meets"></td><td class="h h-meets" data-step="5" title="#5 · R2: meets"></td><td class="h h-meets" data-step="6" title="#6 · R2: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · R2: meets"></td><td class="h h-meets" data-step="8" title="#8 · R2: meets"></td><td class="h h-meets" data-step="9" title="#9 · R2: meets"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:R3" title="Send the documents the classifier is unsure about to human review, and use the reviewers&#39; corrections to improve the classifier.">R3</span></th>
+<td class="h h-meets" data-step="1" title="#1 · R3: meets"></td><td class="h h-partly" data-step="2" title="#2 · R3: partly"></td><td class="h h-partly" data-step="3" title="#3 · R3: partly"></td><td class="h h-meets rb" data-step="4" title="#4 · R3: meets"></td><td class="h h-meets" data-step="5" title="#5 · R3: meets"></td><td class="h h-meets" data-step="6" title="#6 · R3: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · R3: meets"></td><td class="h h-meets" data-step="8" title="#8 · R3: meets"></td><td class="h h-meets" data-step="9" title="#9 · R3: meets"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:Q1" title="During storm season, at eight million documents a day, every document is classified within two hours of arrival.">Q1</span></th>
+<td class="h h-partly" data-step="1" title="#1 · Q1: partly"></td><td class="h h-partly" data-step="2" title="#2 · Q1: partly"></td><td class="h h-misses" data-step="3" title="#3 · Q1: misses"></td><td class="h h-partly rb" data-step="4" title="#4 · Q1: partly"></td><td class="h h-partly" data-step="5" title="#5 · Q1: partly"></td><td class="h h-partly" data-step="6" title="#6 · Q1: partly"></td><td class="h h-partly rb" data-step="7" title="#7 · Q1: partly"></td><td class="h h-partly" data-step="8" title="#8 · Q1: partly"></td><td class="h h-partly" data-step="9" title="#9 · Q1: partly"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:Q2" title="When classification quality drops for one claim type (for example, after a form changes its layout), operators see it within one day.">Q2</span></th>
+<td class="h h-meets" data-step="1" title="#1 · Q2: meets"></td><td class="h h-misses" data-step="2" title="#2 · Q2: misses"></td><td class="h h-misses" data-step="3" title="#3 · Q2: misses"></td><td class="h h-meets rb" data-step="4" title="#4 · Q2: meets"></td><td class="h h-meets" data-step="5" title="#5 · Q2: meets"></td><td class="h h-meets" data-step="6" title="#6 · Q2: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · Q2: meets"></td><td class="h h-meets" data-step="8" title="#8 · Q2: meets"></td><td class="h h-meets" data-step="9" title="#9 · Q2: meets"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:Q3" title="The classification costs less than 0.2 cents per document on average over the year.">Q3</span></th>
+<td class="h h-partly" data-step="1" title="#1 · Q3: partly"></td><td class="h h-partly" data-step="2" title="#2 · Q3: partly"></td><td class="h h-misses" data-step="3" title="#3 · Q3: misses"></td><td class="h h-partly rb" data-step="4" title="#4 · Q3: partly"></td><td class="h h-partly" data-step="5" title="#5 · Q3: partly"></td><td class="h h-partly" data-step="6" title="#6 · Q3: partly"></td><td class="h h-partly rb" data-step="7" title="#7 · Q3: partly"></td><td class="h h-partly" data-step="8" title="#8 · Q3: partly"></td><td class="h h-partly" data-step="9" title="#9 · Q3: partly"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:Q4" title="A consuming team can change how it processes the results without the other teams or the classifier having to change.">Q4</span></th>
+<td class="h h-meets" data-step="1" title="#1 · Q4: meets"></td><td class="h h-meets" data-step="2" title="#2 · Q4: meets"></td><td class="h h-misses" data-step="3" title="#3 · Q4: misses"></td><td class="h h-meets rb" data-step="4" title="#4 · Q4: meets"></td><td class="h h-meets" data-step="5" title="#5 · Q4: meets"></td><td class="h h-meets" data-step="6" title="#6 · Q4: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · Q4: meets"></td><td class="h h-meets" data-step="8" title="#8 · Q4: meets"></td><td class="h h-meets" data-step="9" title="#9 · Q4: meets"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:C1" title="The documents contain personal data and may not leave the EU.">C1</span></th>
+<td class="h h-meets" data-step="1" title="#1 · C1: meets"></td><td class="h h-meets" data-step="2" title="#2 · C1: meets"></td><td class="h h-meets" data-step="3" title="#3 · C1: meets"></td><td class="h h-meets rb" data-step="4" title="#4 · C1: meets"></td><td class="h h-meets" data-step="5" title="#5 · C1: meets"></td><td class="h h-meets" data-step="6" title="#6 · C1: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · C1: meets"></td><td class="h h-meets" data-step="8" title="#8 · C1: meets"></td><td class="h h-meets" data-step="9" title="#9 · C1: meets"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:C2" title="The classifier uses an LLM from the insurer&#39;s approved provider, in its EU region.">C2</span></th>
+<td class="h h-meets" data-step="1" title="#1 · C2: meets"></td><td class="h h-meets" data-step="2" title="#2 · C2: meets"></td><td class="h h-meets" data-step="3" title="#3 · C2: meets"></td><td class="h h-meets rb" data-step="4" title="#4 · C2: meets"></td><td class="h h-meets" data-step="5" title="#5 · C2: meets"></td><td class="h h-meets" data-step="6" title="#6 · C2: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · C2: meets"></td><td class="h h-meets" data-step="8" title="#8 · C2: meets"></td><td class="h h-meets" data-step="9" title="#9 · C2: meets"></td>        </tr>
+      </tbody>
+    </table></div>
+    <div class="legend"><span><i class="sw h-meets"></i> meets</span><span><i class="sw h-partly"></i> partly</span><span><i class="sw h-misses"></i> misses</span><span><i class="sw h-none"></i> not judged by that point</span></div>
+
+
+    <h2 class="sec">The search, round by round</h2>
+    <div class="round-head"><b>Round 1</b> · 3 points: seed A, seed B, seed C</div>
+    <article class="story-step mv-seed" data-step="1">
+      <div class="story-head"><b>#1</b> Seed of approach A <span class="vd-chip vb-strong">strong</span></div>
+<p><span class="lbl">Thought</span> A queue and confidence-gated cascade should scale the LLM workload, route uncertain cases for correction, and separate the three consumers. Per-type monitoring should expose category-specific drops. The two-hour and per-document cost targets remain partly dependent on unprovided throughput and pricing evidence.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Inference routing</span> → <span class="vref" data-node="z:1.1">Confidence-gated cascade (EU compact model then approved LLM EU endpoint)</span></li><li><span class="dref" data-node="z:2">Work orchestration</span> → <span class="vref" data-node="z:2.1">Autoscaled queue workers with backpressure</span></li><li><span class="dref" data-node="z:3">Result delivery</span> → <span class="vref" data-node="z:3.1">Versioned claim-type event topics for each team</span></li><li><span class="dref" data-node="z:4">Review and learning</span> → <span class="vref" data-node="z:4.1">Confidence-threshold human review with correction feedback</span></li><li><span class="dref" data-node="z:5">Quality monitoring</span> → <span class="vref" data-node="z:5.1">Per-claim-type drift and outcome dashboards</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The queue and topic-based output cover the volume and team-boundary concerns structurally, and per-type dashboards address the required visibility. The actual two-hour throughput and 0.2-cent average cannot be verified without workload benchmarks, model behavior, and endpoint pricing.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:R3">R3 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-meets" data-node="r:Q2">Q2 meets</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:1.1">Confidence-gated cascade (EU compact model then approved LLM EU endpoint)</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q1">Q1</span>: <span class="muted">Using a compact model for confident cases may lower LLM spend, while the extra routing stage can add latency to the two-hour path.</span></li></ul><p class="muted">A queue-based pipeline uses autoscaled workers with backpressure to run an EU compact model first and route low-confidence cases to an approved EU LLM endpoint. It publishes versioned claim-type events for teams, while human corrections feed learning and dashboards track drift and outcomes by claim type.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This gains scalable processing, controlled escalation, team-specific delivery, and measurable improvement. It gives up simplicity and some speed and cost efficiency because it requires cascade management, human review, versioned topics, and per-claim-type monitoring.</p>    </article>
+    <article class="story-step mv-seed" data-step="2">
+      <div class="story-head"><b>#2</b> Seed of approach B <span class="vd-chip vb-mixed">mixed</span></div>
+<p><span class="lbl">Thought</span> Elastic batches and a durable store should absorb seasonal volume and distribute results, while sampled corrections improve the model. Aggregate reporting may not identify a claim-type drop within a day, and capacity and price targets need measurement.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Inference routing</span> → <span class="vref" data-node="z:1.2">Approved LLM EU endpoint for every document</span></li><li><span class="dref" data-node="z:2">Work orchestration</span> → <span class="vref" data-node="z:2.2">Elastic scheduled micro-batches</span></li><li><span class="dref" data-node="z:3">Result delivery</span> → <span class="vref" data-node="z:3.2">Durable result lake with team-specific exports</span></li><li><span class="dref" data-node="z:4">Review and learning</span> → <span class="vref" data-node="z:4.2">Sampled human review with periodic model updates</span></li><li><span class="dref" data-node="z:5">Quality monitoring</span> → <span class="vref" data-node="z:5.2">Daily aggregate quality and volume reports</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Durable exports give each team a stable handoff, but daily aggregate reports lack the granularity required by the observability scenario. Scheduled batching supports scale in principle, though the two-hour deadline needs sizing evidence; full-volume approved-LLM pricing is also unknown.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-partly" data-node="r:R3">R3 partly</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-misses" data-node="r:Q2">Q2 misses</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:5.2">Daily aggregate quality and volume reports</span>, <span class="vref" data-node="z:4.2">Sampled human review with periodic model updates</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R3">R3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q2">Q2</span>: <span class="muted">Sampling and periodic updates keep correction work bounded, but aggregate reporting can mask a quality drop isolated to one claim type.</span></li></ul><p class="muted">Documents are queued into elastic scheduled micro-batches and sent to the approved EU LLM endpoint for inference. Results are stored durably, exported for individual teams, reviewed through sampling, and used for periodic model updates, with daily aggregate quality and volume reports.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides centralized, durable outputs and controlled learning with consistent endpoint usage, but gives up immediate processing, fine-grained quality visibility, and rapid adaptation between review cycles.</p>    </article>
+    <article class="story-step mv-seed" data-step="3">
+      <div class="story-head"><b>#3</b> Seed of approach C <span class="vd-chip vb-weak">weak</span></div>
+<p><span class="lbl">Thought</span> A centralized synchronous service should be straightforward to operate, but serial request handling, shared polling, monthly review and global-only monitoring are likely to fail the burst, loose-coupling and quality-response requirements.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Inference routing</span> → <span class="vref" data-node="z:1.2">Approved LLM EU endpoint for every document</span></li><li><span class="dref" data-node="z:2">Work orchestration</span> → <span class="vref" data-node="z:2.3">Synchronous per-document service calls</span></li><li><span class="dref" data-node="z:3">Result delivery</span> → <span class="vref" data-node="z:3.3">Shared relational results database polled by teams</span></li><li><span class="dref" data-node="z:4">Review and learning</span> → <span class="vref" data-node="z:4.3">Manual exception queue with monthly correction review</span></li><li><span class="dref" data-node="z:5">Quality monitoring</span> → <span class="vref" data-node="z:5.3">Global success-rate dashboard</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The approach violates the two-hour burst target by construction at this volume and its global dashboard cannot show a category-specific drop. Shared polling couples consumers, monthly correction review delays learning, and full-volume LLM spend has no cost control; this is the deliberately less promising centralized approach.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-partly" data-node="r:R2">R2 partly</span><span class="j j-partly" data-node="r:R3">R3 partly</span><span class="j j-misses" data-node="r:Q1">Q1 misses</span><span class="j j-misses" data-node="r:Q2">Q2 misses</span><span class="j j-misses" data-node="r:Q3">Q3 misses</span><span class="j j-misses" data-node="r:Q4">Q4 misses</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:2.3">Synchronous per-document service calls</span>, <span class="vref" data-node="z:3.3">Shared relational results database polled by teams</span>, <span class="vref" data-node="z:4.3">Manual exception queue with monthly correction review</span>, <span class="vref" data-node="z:5.3">Global success-rate dashboard</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R1">R1</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q1">Q1</span>, <span class="vref" data-node="r:Q2">Q2</span>, <span class="vref" data-node="r:Q3">Q3</span>, <span class="vref" data-node="r:Q4">Q4</span>, <span class="vref" data-node="r:R2">R2</span>, <span class="vref" data-node="r:R3">R3</span>: <span class="muted">Central synchronous handling simplifies the service shape, but serial processing, shared polling and monthly feedback cannot satisfy the specified volume, team isolation, category monitoring or rapid correction loop.</span></li></ul><p class="muted">Each document is synchronously sent to the approved EU LLM endpoint, with its result written to a shared relational database for teams to poll. Exceptions enter a manual queue reviewed monthly for corrections, while a global dashboard reports overall success rates.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides centralized routing, shared results, and simple aggregate oversight, but sacrifices throughput and responsiveness at large scale, delays learning from errors, and can hide team-, document-, or category-specific quality problems.</p>    </article>
+    <div class="round-head"><b>Round 2</b> · 3 points: refine A, refine B, new approach D</div>
+    <article class="story-step mv-exploit" data-step="4">
+      <div class="story-head"><b>#4</b> Refined #1 (approach A) <span class="vd-chip vb-strong">strong</span></div>
+<p><span class="lbl">Thought</span> Keeping the queue, cascade and team topics while shortening correction feedback and adding alerts should improve R3 and make Q2 actionable within one day. The numerical throughput and annual cost targets still need measurement.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:4">Review and learning</span>: <span class="vref" data-node="z:4.1">Confidence-threshold human review with correction feedback</span> → <span class="vref" data-node="z:4.4">Confidence-threshold review with rapid correction feedback</span></li><li>change <span class="dref" data-node="z:5">Quality monitoring</span>: <span class="vref" data-node="z:5.1">Per-claim-type drift and outcome dashboards</span> → <span class="vref" data-node="z:5.4">Per-claim-type drift alerts and outcome dashboards</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Alerts by claim type and quicker correction handling make the day-level response more direct. No production benchmark establishes the deadline, and no endpoint tariff or document token profile establishes the cost threshold.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:R3">R3 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-meets" data-node="r:Q2">Q2 meets</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:1.1">Confidence-gated cascade (EU compact model then approved LLM EU endpoint)</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q1">Q1</span>: <span class="muted">The cascade may reduce paid LLM calls, but the additional inference decision can add processing latency.</span></li></ul><p class="muted">The system processes documents through autoscaled queue workers with backpressure, routing confident cases to an EU compact model and uncertain cases to an approved EU LLM endpoint. It publishes versioned claim-type events to team-specific topics, while threshold-based review supplies corrections and per-claim-type monitoring tracks drift and outcomes.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This gains scalable processing, EU-constrained fallback, targeted delivery, and actionable quality improvement. It gives up simplicity and potentially incurs extra latency, LLM cost, topic-version coordination, and errors from imperfect confidence thresholds.</p>    </article>
+    <article class="story-step mv-exploit" data-step="5">
+      <div class="story-head"><b>#5</b> Refined #2 (approach B) <span class="vd-chip vb-strong">strong</span></div>
+<p><span class="lbl">Thought</span> Deadline-aware micro-batches, event topics and per-type monitoring preserve the direct-LLM batch approach while addressing the missed observability need and improving consumer isolation and uncertain-case handling.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:2">Work orchestration</span>: <span class="vref" data-node="z:2.2">Elastic scheduled micro-batches</span> → <span class="vref" data-node="z:2.4">Elastic scheduled micro-batches with deadline-aware priority</span></li><li>change <span class="dref" data-node="z:3">Result delivery</span>: <span class="vref" data-node="z:3.2">Durable result lake with team-specific exports</span> → <span class="vref" data-node="z:3.1">Versioned claim-type event topics for each team</span></li><li>change <span class="dref" data-node="z:4">Review and learning</span>: <span class="vref" data-node="z:4.2">Sampled human review with periodic model updates</span> → <span class="vref" data-node="z:4.1">Confidence-threshold human review with correction feedback</span></li><li>change <span class="dref" data-node="z:5">Quality monitoring</span>: <span class="vref" data-node="z:5.2">Daily aggregate quality and volume reports</span> → <span class="vref" data-node="z:5.1">Per-claim-type drift and outcome dashboards</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> This corrects the seed&#39;s weak monitoring and review choices while retaining scalable batch scheduling and durable event delivery. Whether the approved endpoint meets either numerical target remains unproven without capacity and price data.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:R3">R3 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-meets" data-node="r:Q2">Q2 meets</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:1.2">Approved LLM EU endpoint for every document</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R1">R1</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Uniform use of the approved LLM keeps inference behavior direct, but sending every document to it may consume more of the per-document budget than a cascade.</span></li></ul><p class="muted">The system sends every document to the approved EU LLM endpoint, using elastic, deadline-aware scheduled micro-batches to manage throughput. It publishes versioned claim-type events to each team, while confidence thresholds route uncertain claims to human reviewers whose corrections feed learning; dashboards track drift and outcomes by claim type.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This gains controlled residency, scalable prioritization, traceable team-specific delivery, and measurable improvement, but gives up potentially lower latency or cost from alternative routing and incurs batching, review, and event-versioning overhead.</p>    </article>
+    <article class="story-step mv-explore" data-step="6">
+      <div class="story-head"><b>#6</b> New approach D <span class="vd-chip vb-strong">strong</span></div>
+<p><span class="lbl">Thought</span> Claim-class-specific routing and targeted correction sets may focus model capacity and review effort where they matter, while priority lanes address storm volume. Per-type dashboards and topics should retain monitoring and consumer independence.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Inference routing</span> → <span class="vref" data-node="z:1.3">Class-specific cascade using compact EU model and approved LLM EU endpoint</span></li><li><span class="dref" data-node="z:2">Work orchestration</span> → <span class="vref" data-node="z:2.5">Autoscaled queue workers with priority lanes</span></li><li><span class="dref" data-node="z:3">Result delivery</span> → <span class="vref" data-node="z:3.1">Versioned claim-type event topics for each team</span></li><li><span class="dref" data-node="z:4">Review and learning</span> → <span class="vref" data-node="z:4.5">Targeted human review with versioned correction set</span></li><li><span class="dref" data-node="z:5">Quality monitoring</span> → <span class="vref" data-node="z:5.1">Per-claim-type drift and outcome dashboards</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The specialization gives operators a natural unit for monitoring and targeted review, while the EU compact model and EU provider endpoint preserve the stated boundary. Cost and deadline outcomes remain partly supported because no class-level benchmark or price data is supplied.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:R3">R3 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-meets" data-node="r:Q2">Q2 meets</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:1.3">Class-specific cascade using compact EU model and approved LLM EU endpoint</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q1">Q1</span>: <span class="muted">Class specialization may reduce unnecessary LLM work, but its extra routing and model-selection logic adds operational and latency overhead.</span></li></ul><p class="muted">The system routes each claim type through either a compact EU model or an approved EU-hosted LLM, with autoscaled queue workers and priority lanes managing processing. It publishes versioned results to team-specific claim-type topics, while targeted human corrections feed a versioned learning set and per-type drift and outcome dashboards.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This improves jurisdictional control, prioritization, traceability, and targeted quality improvement, but increases routing, topic, monitoring, and model-versioning complexity while requiring ongoing human review and correction maintenance.</p>    </article>
+    <div class="round-head"><b>Round 3</b> · 3 points: refine A, refine B, refine D</div>
+    <article class="story-step mv-exploit" data-step="7">
+      <div class="story-head"><b>#7</b> Refined #4 (approach A) <span class="vd-chip vb-strong">strong</span> <span class="alt-chip">→ A1</span></div>
+<p><span class="lbl">Thought</span> Adding priority lanes and versioned correction feedback to the strong cascade point should help the burst path and make changes from review auditable without reducing category-level visibility or team isolation.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:2">Work orchestration</span>: <span class="vref" data-node="z:2.1">Autoscaled queue workers with backpressure</span> → <span class="vref" data-node="z:2.6">Autoscaled queue workers with backpressure and priority lanes</span></li><li>change <span class="dref" data-node="z:4">Review and learning</span>: <span class="vref" data-node="z:4.4">Confidence-threshold review with rapid correction feedback</span> → <span class="vref" data-node="z:4.6">Confidence-threshold review with versioned correction feedback</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Priority lanes make the asynchronous design more responsive to urgent work and versioned corrections help track learning inputs. The architecture addresses all requirements at least partly; the two numeric service targets still require deployment measurements.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:R3">R3 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-meets" data-node="r:Q2">Q2 meets</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:1.1">Confidence-gated cascade (EU compact model then approved LLM EU endpoint)</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q1">Q1</span>: <span class="muted">Routing confident documents to the compact model may reduce LLM spend, though cascade latency remains in the path.</span></li></ul><p class="muted">The system first routes documents to an EU compact model and escalates low-confidence cases to an approved EU-hosted LLM. Autoscaled, backpressured workers prioritize processing, publish versioned claim-type events to team-specific topics, and feed confidence-based reviews and corrections into monitoring and future learning.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This gains scalable, traceable, claim-specific delivery and targeted quality control, but incurs cascade latency, queueing and operational complexity, while threshold-based review and model drift alerts can miss errors outside monitored outcomes.</p>    </article>
+    <article class="story-step mv-exploit" data-step="8">
+      <div class="story-head"><b>#8</b> Refined #5 (approach B) <span class="vd-chip vb-strong">strong</span> <span class="alt-chip">→ B1</span></div>
+<p><span class="lbl">Thought</span> Removing scheduled batch cadence in favor of elastic deadline-aware micro-batches and retaining fine-grained alerts should reduce wait time while keeping direct approved-provider inference and independently consumable outputs.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:2">Work orchestration</span>: <span class="vref" data-node="z:2.4">Elastic scheduled micro-batches with deadline-aware priority</span> → <span class="vref" data-node="z:2.7">Elastic deadline-aware micro-batches</span></li><li>change <span class="dref" data-node="z:4">Review and learning</span>: <span class="vref" data-node="z:4.1">Confidence-threshold human review with correction feedback</span> → <span class="vref" data-node="z:4.6">Confidence-threshold review with versioned correction feedback</span></li><li>change <span class="dref" data-node="z:5">Quality monitoring</span>: <span class="vref" data-node="z:5.1">Per-claim-type drift and outcome dashboards</span> → <span class="vref" data-node="z:5.4">Per-claim-type drift alerts and outcome dashboards</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Deadline-aware micro-batches directly target arrival-to-result time, and per-type alerts plus versioned feedback address observability and learning. Endpoint throughput and price still prevent a claim that the numerical thresholds are met.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:R3">R3 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-meets" data-node="r:Q2">Q2 meets</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:1.2">Approved LLM EU endpoint for every document</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R1">R1</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Direct inference avoids cascade routing uncertainty but exposes every document to the approved endpoint&#39;s per-call cost.</span></li></ul><p class="muted">Documents are sent to an approved EU LLM endpoint, processed in elastic, deadline-aware micro-batches, and emitted as versioned claim-type events to each team’s topic. Low-confidence claims enter review, whose versioned corrections support learning, while per-claim-type drift alerts and outcome dashboards monitor quality over time.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This combines EU governance, scalable scheduling, team-specific delivery, and traceable improvement, but routing every document through one approved endpoint can constrain capacity, latency, model choice, or cost. Separate versioned topics and claim-level monitoring improve accountability but add operational and integration overhead.</p>    </article>
+    <article class="story-step mv-exploit" data-step="9">
+      <div class="story-head"><b>#9</b> Refined #6 (approach D) <span class="vd-chip vb-strong">strong</span> <span class="alt-chip">→ D1</span></div>
+<p><span class="lbl">Thought</span> Adding deadline backpressure, versioned correction feedback and drift alerts should strengthen the class-specific approach&#39;s burst handling, auditability and one-day response while preserving targeted review.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:2">Work orchestration</span>: <span class="vref" data-node="z:2.5">Autoscaled queue workers with priority lanes</span> → <span class="vref" data-node="z:2.8">Autoscaled priority lanes with deadline backpressure</span></li><li>change <span class="dref" data-node="z:4">Review and learning</span>: <span class="vref" data-node="z:4.5">Targeted human review with versioned correction set</span> → <span class="vref" data-node="z:4.7">Targeted human review with versioned correction feedback</span></li><li>change <span class="dref" data-node="z:5">Quality monitoring</span>: <span class="vref" data-node="z:5.1">Per-claim-type drift and outcome dashboards</span> → <span class="vref" data-node="z:5.4">Per-claim-type drift alerts and outcome dashboards</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Specialization, priority handling, and per-type alerts align the control loop to the 60 claim types. The point is a strong architectural candidate, but actual classification latency, endpoint prices and compact-model accuracy must be measured before claiming Q1 or Q3 fully.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:R3">R3 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-meets" data-node="r:Q2">Q2 meets</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:1.3">Class-specific cascade using compact EU model and approved LLM EU endpoint</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q1">Q1</span>: <span class="muted">Class-specific routing can concentrate LLM calls on harder categories, while model selection and the cascade add latency and operational work.</span></li></ul><p class="muted">Documents are routed by claim class through a compact EU model and, where selected, an approved EU LLM endpoint, while autoscaled priority lanes use deadline backpressure to manage work. Results are published to versioned claim-type topics for team consumption; targeted human corrections support learning, while per-claim-type drift alerts and outcome dashboards monitor quality.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This gains jurisdiction-aware routing, scalable deadline handling, team-specific integration, and focused improvement, but increases routing, versioning, and operational complexity and may weaken cross-team consistency and end-to-end simplicity.</p>    </article>
+    <p class="round-end">Stopped after round 3: 9 of 12 points used.</p>
+
+
+    <details class="grid-details"><summary>Dimension grid: every point, dimension by dimension</summary>
+    <div class="legend">
+<span><b class="mv-seed" style="color:var(--dimension)">seed</b> a starting point</span><span><b style="color:var(--accent)">exploit</b> options added or changed against the step it starts from (outlined)</span><span><b style="color:var(--novel)">explore</b> a new part of the space (new options in bold)</span>
+    </div>
+    <div class="scroll traj-wrap">
+      <svg class="lineage" aria-hidden="true"></svg>
+      <table class="traj">
+        <thead><tr><th class="row-h">Dimension</th>
+<th class="step-h mv-seed" data-step="1" title="A queue and confidence-gated cascade should scale the LLM workload, route uncertain cases for correction, and separate the three consumers. Per-type monitoring should expose category-specific drops. The two-hour and per-document cost targets remain partly dependent on unprovided throughput and pricing evidence."><b>1</b><span class="mv">seed</span><span class="vd vd-strong">strong</span></th><th class="step-h mv-seed" data-step="2" title="Elastic batches and a durable store should absorb seasonal volume and distribute results, while sampled corrections improve the model. Aggregate reporting may not identify a claim-type drop within a day, and capacity and price targets need measurement."><b>2</b><span class="mv">seed</span><span class="vd vd-mixed">mixed</span></th><th class="step-h mv-seed" data-step="3" title="A centralized synchronous service should be straightforward to operate, but serial request handling, shared polling, monthly review and global-only monitoring are likely to fail the burst, loose-coupling and quality-response requirements."><b>3</b><span class="mv">seed</span><span class="vd vd-weak">weak</span></th><th class="step-h mv-exploit" data-step="4" title="Keeping the queue, cascade and team topics while shortening correction feedback and adding alerts should improve R3 and make Q2 actionable within one day. The numerical throughput and annual cost targets still need measurement."><b>4</b><span class="mv">exploit</span><span class="vd vd-strong">strong</span></th><th class="step-h mv-exploit" data-step="5" title="Deadline-aware micro-batches, event topics and per-type monitoring preserve the direct-LLM batch approach while addressing the missed observability need and improving consumer isolation and uncertain-case handling."><b>5</b><span class="mv">exploit</span><span class="vd vd-strong">strong</span></th><th class="step-h mv-explore" data-step="6" title="Claim-class-specific routing and targeted correction sets may focus model capacity and review effort where they matter, while priority lanes address storm volume. Per-type dashboards and topics should retain monitoring and consumer independence."><b>6</b><span class="mv">explore</span><span class="vd vd-strong">strong</span></th><th class="step-h mv-exploit" data-step="7" title="Adding priority lanes and versioned correction feedback to the strong cascade point should help the burst path and make changes from review auditable without reducing category-level visibility or team isolation."><b>7</b><span class="mv">exploit</span><span class="vd vd-strong">strong</span><span class="alt">→ A1</span></th><th class="step-h mv-exploit" data-step="8" title="Removing scheduled batch cadence in favor of elastic deadline-aware micro-batches and retaining fine-grained alerts should reduce wait time while keeping direct approved-provider inference and independently consumable outputs."><b>8</b><span class="mv">exploit</span><span class="vd vd-strong">strong</span><span class="alt">→ B1</span></th><th class="step-h mv-exploit" data-step="9" title="Adding deadline backpressure, versioned correction feedback and drift alerts should strengthen the class-specific approach&#39;s burst handling, auditability and one-day response while preserving targeted review."><b>9</b><span class="mv">exploit</span><span class="vd vd-strong">strong</span><span class="alt">→ D1</span></th>        </tr></thead>
+        <tbody>
+          <tr><th class="row-h"><span class="dref" data-node="z:1">Inference routing</span></th>
+            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:1.1" title="Confidence-gated cascade (EU compact model then approved LLM EU endpoint)">Confidence-gated cascade …</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:1.2" title="Approved LLM EU endpoint for every document">Approved LLM EU endpoint …</span></td>
+            <td class="c dropped" data-step="3"><span class="vref cell-v " data-node="z:1.2" title="Approved LLM EU endpoint for every document">Approved LLM EU endpoint …</span></td>
+            <td class="c" data-step="4"><span class="vref cell-v " data-node="z:1.1" title="Confidence-gated cascade (EU compact model then approved LLM EU endpoint)">Confidence-gated cascade …</span></td>
+            <td class="c" data-step="5"><span class="vref cell-v " data-node="z:1.2" title="Approved LLM EU endpoint for every document">Approved LLM EU endpoint …</span></td>
+            <td class="c novel" data-step="6"><span class="vref cell-v " data-node="z:1.3" title="Class-specific cascade using compact EU model and approved LLM EU endpoint">Class-specific cascade us…</span></td>
+            <td class="c" data-step="7"><span class="vref cell-v " data-node="z:1.1" title="Confidence-gated cascade (EU compact model then approved LLM EU endpoint)">Confidence-gated cascade …</span></td>
+            <td class="c" data-step="8"><span class="vref cell-v " data-node="z:1.2" title="Approved LLM EU endpoint for every document">Approved LLM EU endpoint …</span></td>
+            <td class="c" data-step="9"><span class="vref cell-v " data-node="z:1.3" title="Class-specific cascade using compact EU model and approved LLM EU endpoint">Class-specific cascade us…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:2">Work orchestration</span></th>
+            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:2.1" title="Autoscaled queue workers with backpressure">Autoscaled queue workers …</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:2.2" title="Elastic scheduled micro-batches">Elastic scheduled micro-batches</span></td>
+            <td class="c dropped" data-step="3"><span class="vref cell-v " data-node="z:2.3" title="Synchronous per-document service calls">Synchronous per-document …</span></td>
+            <td class="c" data-step="4"><span class="vref cell-v " data-node="z:2.1" title="Autoscaled queue workers with backpressure">Autoscaled queue workers …</span></td>
+            <td class="c changed" data-step="5"><span class="vref cell-v " data-node="z:2.4" title="Elastic scheduled micro-batches with deadline-aware priority">Elastic scheduled micro-b…</span></td>
+            <td class="c novel" data-step="6"><span class="vref cell-v " data-node="z:2.5" title="Autoscaled queue workers with priority lanes">Autoscaled queue workers …</span></td>
+            <td class="c changed" data-step="7"><span class="vref cell-v " data-node="z:2.6" title="Autoscaled queue workers with backpressure and priority lanes">Autoscaled queue workers …</span></td>
+            <td class="c changed" data-step="8"><span class="vref cell-v " data-node="z:2.7" title="Elastic deadline-aware micro-batches">Elastic deadline-aware mi…</span></td>
+            <td class="c changed" data-step="9"><span class="vref cell-v " data-node="z:2.8" title="Autoscaled priority lanes with deadline backpressure">Autoscaled priority lanes…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:3">Result delivery</span></th>
+            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:3.1" title="Versioned claim-type event topics for each team">Versioned claim-type even…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:3.2" title="Durable result lake with team-specific exports">Durable result lake with …</span></td>
+            <td class="c dropped" data-step="3"><span class="vref cell-v " data-node="z:3.3" title="Shared relational results database polled by teams">Shared relational results…</span></td>
+            <td class="c" data-step="4"><span class="vref cell-v " data-node="z:3.1" title="Versioned claim-type event topics for each team">Versioned claim-type even…</span></td>
+            <td class="c changed" data-step="5"><span class="vref cell-v " data-node="z:3.1" title="Versioned claim-type event topics for each team">Versioned claim-type even…</span></td>
+            <td class="c" data-step="6"><span class="vref cell-v " data-node="z:3.1" title="Versioned claim-type event topics for each team">Versioned claim-type even…</span></td>
+            <td class="c" data-step="7"><span class="vref cell-v " data-node="z:3.1" title="Versioned claim-type event topics for each team">Versioned claim-type even…</span></td>
+            <td class="c" data-step="8"><span class="vref cell-v " data-node="z:3.1" title="Versioned claim-type event topics for each team">Versioned claim-type even…</span></td>
+            <td class="c" data-step="9"><span class="vref cell-v " data-node="z:3.1" title="Versioned claim-type event topics for each team">Versioned claim-type even…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:4">Review and learning</span></th>
+            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:4.1" title="Confidence-threshold human review with correction feedback">Confidence-threshold huma…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:4.2" title="Sampled human review with periodic model updates">Sampled human review with…</span></td>
+            <td class="c dropped" data-step="3"><span class="vref cell-v " data-node="z:4.3" title="Manual exception queue with monthly correction review">Manual exception queue wi…</span></td>
+            <td class="c changed" data-step="4"><span class="vref cell-v " data-node="z:4.4" title="Confidence-threshold review with rapid correction feedback">Confidence-threshold revi…</span></td>
+            <td class="c changed" data-step="5"><span class="vref cell-v " data-node="z:4.1" title="Confidence-threshold human review with correction feedback">Confidence-threshold huma…</span></td>
+            <td class="c novel" data-step="6"><span class="vref cell-v " data-node="z:4.5" title="Targeted human review with versioned correction set">Targeted human review wit…</span></td>
+            <td class="c changed" data-step="7"><span class="vref cell-v " data-node="z:4.6" title="Confidence-threshold review with versioned correction feedback">Confidence-threshold revi…</span></td>
+            <td class="c changed" data-step="8"><span class="vref cell-v " data-node="z:4.6" title="Confidence-threshold review with versioned correction feedback">Confidence-threshold revi…</span></td>
+            <td class="c changed" data-step="9"><span class="vref cell-v " data-node="z:4.7" title="Targeted human review with versioned correction feedback">Targeted human review wit…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:5">Quality monitoring</span></th>
+            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:5.1" title="Per-claim-type drift and outcome dashboards">Per-claim-type drift and …</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:5.2" title="Daily aggregate quality and volume reports">Daily aggregate quality a…</span></td>
+            <td class="c dropped" data-step="3"><span class="vref cell-v " data-node="z:5.3" title="Global success-rate dashboard">Global success-rate dashboard</span></td>
+            <td class="c changed" data-step="4"><span class="vref cell-v " data-node="z:5.4" title="Per-claim-type drift alerts and outcome dashboards">Per-claim-type drift aler…</span></td>
+            <td class="c changed" data-step="5"><span class="vref cell-v " data-node="z:5.1" title="Per-claim-type drift and outcome dashboards">Per-claim-type drift and …</span></td>
+            <td class="c" data-step="6"><span class="vref cell-v " data-node="z:5.1" title="Per-claim-type drift and outcome dashboards">Per-claim-type drift and …</span></td>
+            <td class="c" data-step="7"><span class="vref cell-v " data-node="z:5.4" title="Per-claim-type drift alerts and outcome dashboards">Per-claim-type drift aler…</span></td>
+            <td class="c changed" data-step="8"><span class="vref cell-v " data-node="z:5.4" title="Per-claim-type drift alerts and outcome dashboards">Per-claim-type drift aler…</span></td>
+            <td class="c changed" data-step="9"><span class="vref cell-v " data-node="z:5.4" title="Per-claim-type drift alerts and outcome dashboards">Per-claim-type drift aler…</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </details>
+  </section>
+  <section class="panel" data-panel="compare" hidden>
+    <p class="hint">One row per dimension involved; the rows where the alternatives differ come first.</p>
+    <div class="scroll"><table class="compare">
+      <thead><tr><th>Dimension</th><th>A1 · Confidence-gated queue</th><th>B1 · Deadline-aware direct inference</th><th>D1 · Class-specific priority pipeline</th></tr></thead>
+      <tbody>
+        <tr class="row differs" data-dimension="z:1">
+          <th><span class="dref" data-node="z:1">Inference routing</span></th>
+<td><span class="vref" data-node="z:1.1">Confidence-gated cascade (EU compact model then approved LLM EU endpoint)</span></td><td><span class="vref" data-node="z:1.2">Approved LLM EU endpoint for every document</span></td><td><span class="vref" data-node="z:1.3">Class-specific cascade using compact EU model and approved LLM EU endpoint</span></td>        </tr>
+        <tr class="row differs" data-dimension="z:2">
+          <th><span class="dref" data-node="z:2">Work orchestration</span></th>
+<td><span class="vref" data-node="z:2.6">Autoscaled queue workers with backpressure and priority lanes</span></td><td><span class="vref" data-node="z:2.7">Elastic deadline-aware micro-batches</span></td><td><span class="vref" data-node="z:2.8">Autoscaled priority lanes with deadline backpressure</span></td>        </tr>
+        <tr class="row differs" data-dimension="z:4">
+          <th><span class="dref" data-node="z:4">Review and learning</span></th>
+<td><span class="vref" data-node="z:4.6">Confidence-threshold review with versioned correction feedback</span></td><td><span class="vref" data-node="z:4.6">Confidence-threshold review with versioned correction feedback</span></td><td><span class="vref" data-node="z:4.7">Targeted human review with versioned correction feedback</span></td>        </tr>
+        <tr class="row" data-dimension="z:3">
+          <th><span class="dref" data-node="z:3">Result delivery</span></th>
+<td><span class="vref" data-node="z:3.1">Versioned claim-type event topics for each team</span></td><td><span class="vref" data-node="z:3.1">Versioned claim-type event topics for each team</span></td><td><span class="vref" data-node="z:3.1">Versioned claim-type event topics for each team</span></td>        </tr>
+        <tr class="row" data-dimension="z:5">
+          <th><span class="dref" data-node="z:5">Quality monitoring</span></th>
+<td><span class="vref" data-node="z:5.4">Per-claim-type drift alerts and outcome dashboards</span></td><td><span class="vref" data-node="z:5.4">Per-claim-type drift alerts and outcome dashboards</span></td><td><span class="vref" data-node="z:5.4">Per-claim-type drift alerts and outcome dashboards</span></td>        </tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="gaps" id="gaps">
+  <h2 class="sec">Gaps in the space</h2>
+  <p>No space was provided: the agent worked zero-shot, naming dimensions and values from its own knowledge, so nothing can fall short of a space.</p>
+  </section>
+</main>
+<div class="splitter-v" role="separator" aria-orientation="vertical" aria-label="Resize the text and the graph" tabindex="0" title="Drag to resize (double-click to reset)"></div>
+<aside class="ex-side">
+  <div id="canvas"><svg id="svg" role="img" aria-label="The dimensions this rationale involves"></svg>
+    <label class="graph-toggle"><input type="checkbox" id="show-all"> Show every value the agent named</label>
+    <div class="zoom-ctl"><button type="button" data-zoom="in" title="Zoom in" aria-label="Zoom in">+</button><button type="button" data-zoom="out" title="Zoom out" aria-label="Zoom out">−</button><button type="button" data-zoom="fit" title="Fit the graph" aria-label="Fit the graph">⤢</button></div></div>
+  <div class="splitter-h" role="separator" aria-orientation="horizontal" aria-label="Resize the graph and its details" tabindex="0" title="Drag to resize (double-click to reset)"></div>
+  <div class="graph-key"><span>from the centre: dimensions, values, <b>design points</b> (▲, one per step, coloured by its rating), requirements (■, linked by how each point meets them)</span><span><b>blue</b>: explored paths</span><span><b>outlined</b>: the design point shown</span><span>select a node: its path to the centre and the paths from it to design points and requirements</span></div>
+  <div id="info"><p class="hint">Select a dimension, value or requirement (in the graph or the text) to see its details.</p></div>
+</aside>
+</div>
+<script type="application/json" id="explainer-data">{"adrs": [{"consequences": "", "context": "The classifier must return a claim type and confidence for every document while respecting EU residency and the approved provider. Seasonal peaks make elastic capacity important, and the average cost target favors controlling expensive inference. The problem supplies neither endpoint prices nor measured throughput, so cost and deadline claims remain candidates for benchmarking.", "drivers": ["R1", "Q1", "Q3", "C1", "C2"], "id": "ADR1", "options": [{"cons": ["A second inference stage adds latency and confidence calibration work.", "Measured throughput and average cost are still needed."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["A1"], "key": "ADR1:O1", "name": "Confidence-gated cascade with queued priority workers", "point": {"z:1": "z:1.1", "z:2": "z:2.6"}, "pros": ["Uses the approved EU LLM for uncertain cases and can reserve its capacity for them.", "Queue autoscaling and priority lanes support variable volume."], "quotes": [], "reason": "This balances reduced LLM volume with asynchronous burst handling while keeping the approved endpoint in the classification path.", "status": "chosen", "step": 7}, {"cons": ["Every document incurs approved-endpoint inference, leaving the cost target unverified.", "Endpoint capacity and response times need peak-load validation."], "fit": "exact", "fit_note": "", "id": "O2", "in": ["B1"], "key": "ADR1:O2", "name": "Direct approved-LLM deadline batches", "point": {"z:1": "z:1.2", "z:2": "z:2.7"}, "pros": ["Uses one direct approved-provider inference path.", "Elastic micro-batches can schedule work against deadlines."], "quotes": [], "reason": "This favors a uniform classification path and deadline-based batch scheduling over cascade specialization.", "status": "chosen", "step": 8}, {"cons": ["Per-class routing policies require calibration and maintenance.", "Additional routing can add latency; numerical cost and deadline targets need validation."], "fit": "exact", "fit_note": "", "id": "O3", "in": ["D1"], "key": "ADR1:O3", "name": "Claim-specific cascade with priority backpressure", "point": {"z:1": "z:1.3", "z:2": "z:2.8"}, "pros": ["Routing and priority can reflect differences among claim types.", "Backpressure helps expose overload before it silently accumulates."], "quotes": [], "reason": "This makes classification and workload control class-aware, with the cost of more policy and operational complexity.", "status": "chosen", "step": 9}], "title": "Route documents through EU inference capacity"}, {"consequences": "", "context": "Claims handling, fraud investigation and analytics all need results, and each team must be able to change its processing without coordinating changes with the classifier or other consumers. A shared polled database offers a central handoff but makes consumers share an interface and operational dependency.", "drivers": ["R2", "Q4"], "id": "ADR2", "options": [{"cons": ["Topic and schema lifecycle management adds operational work."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["A1", "B1", "D1"], "key": "ADR2:O1", "name": "Versioned claim-type event topics", "point": {"z:3": "z:3.1"}, "pros": ["Each consumer has an independent feed and can evolve its processing separately.", "Versioning makes result schema changes explicit."], "quotes": [], "reason": "All three alternatives use independently consumed, versioned outputs to meet delivery and loose-coupling needs.", "status": "chosen", "step": 7}, {"cons": ["Consumers share the database contract and polling load, undermining independent change."], "fit": "exact", "fit_note": "", "id": "O2", "in": [], "key": "ADR2:O2", "name": "Shared relational polling", "point": {"z:3": "z:3.3"}, "pros": ["Provides one familiar, centralized place for results."], "quotes": [], "reason": "The shared interface conflicts with the loose-coupling requirement.", "status": "discarded", "step": 3}, {"cons": ["Scheduled exports can delay delivery and require per-team handoff management."], "fit": "exact", "fit_note": "", "id": "O3", "in": [], "key": "ADR2:O3", "name": "Durable lake with team exports", "point": {"z:3": "z:3.2"}, "pros": ["Preserves a durable record and allows different team export formats."], "quotes": [], "reason": "This is a viable batch-oriented handoff but less direct and independently consumable than versioned team feeds.", "status": "discarded", "step": 2}], "title": "Deliver independent result feeds to consuming teams"}, {"consequences": "", "context": "Uncertain documents need human review, corrections must improve the classifier, and operators must see when an individual claim type degrades within a day. Broad periodic sampling and aggregate metrics reduce review and monitoring effort but may delay or conceal category-specific problems.", "drivers": ["R3", "Q2"], "id": "ADR3", "options": [{"cons": ["Review thresholds and alert signals need calibration and ongoing operation."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["A1", "B1"], "key": "ADR3:O1", "name": "Confidence-threshold review and rapid versioned corrections", "point": {"z:4": "z:4.6", "z:5": "z:5.4"}, "pros": ["Routes uncertain cases for review and makes correction inputs traceable.", "Per-type alerts match the specified quality-drop scenario."], "quotes": [], "reason": "This combines case selection and traceable learning with day-level, category-specific visibility.", "status": "chosen", "step": 7}, {"cons": ["Targeting policy and correction-set maintenance require ownership."], "fit": "exact", "fit_note": "", "id": "O2", "in": ["D1"], "key": "ADR3:O2", "name": "Targeted review and versioned corrections", "point": {"z:4": "z:4.7", "z:5": "z:5.4"}, "pros": ["Focuses human work on the claim types and cases most in need of attention.", "Versioned corrections and per-type alerts support investigation and improvement."], "quotes": [], "reason": "This aligns review allocation and monitoring with the 60 claim-type taxonomy.", "status": "chosen", "step": 9}, {"cons": ["Aggregate daily reports can hide one claim type's quality drop, and periodic updates slow the correction loop."], "fit": "exact", "fit_note": "", "id": "O3", "in": [], "key": "ADR3:O3", "name": "Sampled review with periodic updates", "point": {"z:4": "z:4.2", "z:5": "z:5.2"}, "pros": ["Bounds routine review effort and gives a regular summary of overall quality."], "quotes": [], "reason": "It cannot reliably surface localized degradation and act on corrections at the required pace.", "status": "discarded", "step": 2}], "title": "Close the human correction and quality feedback loop"}], "alternatives": [{"approach": "A", "choices": [{"dimension": "z:1", "drivers": ["R1", "C1", "C2", "Q3"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Retains the approved provider for uncertain cases while using the EU compact model to control LLM volume.", "value": "z:1.1"}, {"dimension": "z:2", "drivers": ["Q1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Asynchronous autoscaling and priority lanes give the storm-season workload room to expand and favor deadline-bound items.", "value": "z:2.6"}, {"dimension": "z:3", "drivers": ["R2", "Q4"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Each team consumes a versioned feed independently of classifier changes and other consumers.", "value": "z:3.1"}, {"dimension": "z:4", "drivers": ["R3"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Low-confidence items reach people and corrections are traceable as learning inputs.", "value": "z:4.6"}, {"dimension": "z:5", "drivers": ["Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Category-level alerts let operators identify a localized drop within the required window.", "value": "z:5.4"}], "considered": [], "id": "A1", "name": "Confidence-gated queue", "open": [], "parts": [{"adr": "ADR1", "drivers": ["R1", "Q1", "Q3", "C1", "C2"], "name": "Confidence-gated cascade with queued priority workers", "option": "O1", "point": {"z:1": "z:1.1", "z:2": "z:2.6"}, "title": "Route documents through EU inference capacity"}, {"adr": "ADR2", "drivers": ["R2", "Q4"], "name": "Versioned claim-type event topics", "option": "O1", "point": {"z:3": "z:3.1"}, "title": "Deliver independent result feeds to consuming teams"}, {"adr": "ADR3", "drivers": ["R3", "Q2"], "name": "Confidence-threshold review and rapid versioned corrections", "option": "O1", "point": {"z:4": "z:4.6", "z:5": "z:5.4"}, "title": "Close the human correction and quality feedback loop"}], "point": "The system first routes documents to an EU compact model and escalates low-confidence cases to an approved EU-hosted LLM. Autoscaled, backpressured workers prioritize processing, publish versioned claim-type events to team-specific topics, and feed confidence-based reviews and corrections into monitoring and future learning.", "relations": [], "step": 7, "summary": "Use an EU compact model for confident cases and the approved EU LLM for uncertain cases, with queued priority processing, event-based team delivery, and a rapid correction loop."}, {"approach": "B", "choices": [{"dimension": "z:1", "drivers": ["R1", "C1", "C2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "A uniform approved-provider path keeps the classifier behavior direct and the processing within the EU.", "value": "z:1.2"}, {"dimension": "z:2", "drivers": ["Q1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Elastic batches make capacity schedulable around arrival deadlines and seasonal volume.", "value": "z:2.7"}, {"dimension": "z:3", "drivers": ["R2", "Q4"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Independent versioned topics decouple each team's processing from the classifier and peers.", "value": "z:3.1"}, {"dimension": "z:4", "drivers": ["R3"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Confidence thresholds select review cases and versioned corrections feed subsequent improvement.", "value": "z:4.6"}, {"dimension": "z:5", "drivers": ["Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Monitoring at the claim-type level supports the required one-day detection.", "value": "z:5.4"}], "considered": [], "id": "B1", "name": "Deadline-aware direct inference", "open": [], "parts": [{"adr": "ADR1", "drivers": ["R1", "Q1", "Q3", "C1", "C2"], "name": "Direct approved-LLM deadline batches", "option": "O2", "point": {"z:1": "z:1.2", "z:2": "z:2.7"}, "title": "Route documents through EU inference capacity"}, {"adr": "ADR2", "drivers": ["R2", "Q4"], "name": "Versioned claim-type event topics", "option": "O1", "point": {"z:3": "z:3.1"}, "title": "Deliver independent result feeds to consuming teams"}, {"adr": "ADR3", "drivers": ["R3", "Q2"], "name": "Confidence-threshold review and rapid versioned corrections", "option": "O1", "point": {"z:4": "z:4.6", "z:5": "z:5.4"}, "title": "Close the human correction and quality feedback loop"}], "point": "Documents are sent to an approved EU LLM endpoint, processed in elastic, deadline-aware micro-batches, and emitted as versioned claim-type events to each team’s topic. Low-confidence claims enter review, whose versioned corrections support learning, while per-claim-type drift alerts and outcome dashboards monitor quality over time.", "relations": [], "step": 8, "summary": "Send every document to the approved EU LLM in elastic deadline-aware micro-batches, then publish versioned team events and use per-type review and monitoring."}, {"approach": "D", "choices": [{"dimension": "z:1", "drivers": ["R1", "C1", "C2", "Q3"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Claim-specific routing can reserve approved-LLM calls for the classes and documents that need them while retaining EU processing.", "value": "z:1.3"}, {"dimension": "z:2", "drivers": ["Q1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Priority lanes and backpressure help manage burst work against the arrival deadline.", "value": "z:2.8"}, {"dimension": "z:3", "drivers": ["R2", "Q4"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Teams receive independent, versioned results without sharing a polling database.", "value": "z:3.1"}, {"dimension": "z:4", "drivers": ["R3"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Targeted uncertain cases enter human review, and corrections remain traceable.", "value": "z:4.7"}, {"dimension": "z:5", "drivers": ["Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Category-level monitoring is aligned with the specified failure scenario.", "value": "z:5.4"}], "considered": [], "id": "D1", "name": "Class-specific priority pipeline", "open": [], "parts": [{"adr": "ADR1", "drivers": ["R1", "Q1", "Q3", "C1", "C2"], "name": "Claim-specific cascade with priority backpressure", "option": "O3", "point": {"z:1": "z:1.3", "z:2": "z:2.8"}, "title": "Route documents through EU inference capacity"}, {"adr": "ADR2", "drivers": ["R2", "Q4"], "name": "Versioned claim-type event topics", "option": "O1", "point": {"z:3": "z:3.1"}, "title": "Deliver independent result feeds to consuming teams"}, {"adr": "ADR3", "drivers": ["R3", "Q2"], "name": "Targeted review and versioned corrections", "option": "O2", "point": {"z:4": "z:4.7", "z:5": "z:5.4"}, "title": "Close the human correction and quality feedback loop"}], "point": "Documents are routed by claim class through a compact EU model and, where selected, an approved EU LLM endpoint, while autoscaled priority lanes use deadline backpressure to manage work. Results are published to versioned claim-type topics for team consumption; targeted human corrections support learning, while per-claim-type drift alerts and outcome dashboards monitor quality.", "relations": [], "step": 9, "summary": "Specialize compact-model and approved-LLM routing by claim type, prioritize work against deadlines, and target review and monitoring by type."}], "approaches": [{"dropped_because": "", "id": "A", "idea": "What if a confidence-gated cascade and an asynchronous queue keep the approved LLM for uncertain documents while scaling the overall flow?", "status": "live"}, {"dropped_because": "", "id": "B", "idea": "What if direct approved-LLM inference in elastic batches emphasizes uniform results and durable data delivery?", "status": "live"}, {"dropped_because": "Synchronous per-document calls, shared polling and monthly correction review cannot support the burst deadline, day-level claim-type visibility, or independent team processing at this volume.", "id": "C", "idea": "What if a synchronous service and shared database keep the implementation centralized and simple?", "status": "dropped"}, {"dropped_because": "", "id": "D", "idea": "What if routing and review are specialized by claim type, with priority lanes and versioned corrections?", "status": "live"}], "budget": {"max_points": 12, "used": 9}, "context": "An insurer receives between two and eight million documents a day (scanned forms, e-mails, PDFs) and classifies each one into one of 60 claim types with an LLM-based classifier. Volume varies strongly over the year: storm season brings four times the usual load. Three teams use the results: claims handling, fraud investigation and analytics. The documents contain personal data.", "dimensions": {"z:1": {"core": false, "href": null, "id": "z:1", "label": "Inference routing", "question": "", "values": ["z:1.1", "z:1.2", "z:1.3"]}, "z:2": {"core": false, "href": null, "id": "z:2", "label": "Work orchestration", "question": "", "values": ["z:2.1", "z:2.2", "z:2.3", "z:2.4", "z:2.5", "z:2.6", "z:2.7", "z:2.8"]}, "z:3": {"core": false, "href": null, "id": "z:3", "label": "Result delivery", "question": "", "values": ["z:3.1", "z:3.2", "z:3.3"]}, "z:4": {"core": false, "href": null, "id": "z:4", "label": "Review and learning", "question": "", "values": ["z:4.1", "z:4.2", "z:4.3", "z:4.4", "z:4.5", "z:4.6", "z:4.7"]}, "z:5": {"core": false, "href": null, "id": "z:5", "label": "Quality monitoring", "question": "", "values": ["z:5.1", "z:5.2", "z:5.3", "z:5.4"]}}, "fits": [], "graph_changed": false, "id": "documents-search-N-r1", "lanes": {"lanes": [{"alternative": "A1", "approach": "A", "cells": {"1": [{"move": "seed", "step": 1, "verdict": "strong", "why": "A queue and confidence-gated cascade should scale the LLM workload, route uncertain cases for correction, and separate the three consumers. Per-type monitoring should expose category-specific drops. The two-hour and per-document cost targets remain partly dependent on unprovided throughput and pricing evidence."}], "2": [{"move": "exploit", "step": 4, "verdict": "strong", "why": "Keeping the queue, cascade and team topics while shortening correction feedback and adding alerts should improve R3 and make Q2 actionable within one day. The numerical throughput and annual cost targets still need measurement."}], "3": [{"move": "exploit", "step": 7, "verdict": "strong", "why": "Adding priority lanes and versioned correction feedback to the strong cascade point should help the burst path and make changes from review auditable without reducing category-level visibility or team isolation."}]}, "dropped_because": "", "idea": "What if a confidence-gated cascade and an asynchronous queue keep the approved LLM for uncertain documents while scaling the overall flow?", "status": "live"}, {"alternative": "B1", "approach": "B", "cells": {"1": [{"move": "seed", "step": 2, "verdict": "mixed", "why": "Elastic batches and a durable store should absorb seasonal volume and distribute results, while sampled corrections improve the model. Aggregate reporting may not identify a claim-type drop within a day, and capacity and price targets need measurement."}], "2": [{"move": "exploit", "step": 5, "verdict": "strong", "why": "Deadline-aware micro-batches, event topics and per-type monitoring preserve the direct-LLM batch approach while addressing the missed observability need and improving consumer isolation and uncertain-case handling."}], "3": [{"move": "exploit", "step": 8, "verdict": "strong", "why": "Removing scheduled batch cadence in favor of elastic deadline-aware micro-batches and retaining fine-grained alerts should reduce wait time while keeping direct approved-provider inference and independently consumable outputs."}]}, "dropped_because": "", "idea": "What if direct approved-LLM inference in elastic batches emphasizes uniform results and durable data delivery?", "status": "live"}, {"alternative": null, "approach": "C", "cells": {"1": [{"move": "seed", "step": 3, "verdict": "weak", "why": "A centralized synchronous service should be straightforward to operate, but serial request handling, shared polling, monthly review and global-only monitoring are likely to fail the burst, loose-coupling and quality-response requirements."}], "2": [], "3": []}, "dropped_because": "Synchronous per-document calls, shared polling and monthly correction review cannot support the burst deadline, day-level claim-type visibility, or independent team processing at this volume.", "idea": "What if a synchronous service and shared database keep the implementation centralized and simple?", "status": "dropped"}, {"alternative": "D1", "approach": "D", "cells": {"1": [], "2": [{"move": "explore", "step": 6, "verdict": "strong", "why": "Claim-class-specific routing and targeted correction sets may focus model capacity and review effort where they matter, while priority lanes address storm volume. Per-type dashboards and topics should retain monitoring and consumer independence."}], "3": [{"move": "exploit", "step": 9, "verdict": "strong", "why": "Adding deadline backpressure, versioned correction feedback and drift alerts should strengthen the class-specific approach's burst handling, auditability and one-day response while preserving targeted review."}]}, "dropped_because": "", "idea": "What if routing and review are specialized by claim type, with priority lanes and versioned corrections?", "status": "live"}], "rounds": [1, 2, 3]}, "links": {"graph": null, "index": null}, "mode": "search", "qoc": [], "regions": [], "relations": [], "requirements": [{"attribute": "", "id": "R1", "kind": "functional", "text": "Classify every incoming document into a claim type, with a confidence."}, {"attribute": "", "id": "R2", "kind": "functional", "text": "Deliver the results to the three consuming teams."}, {"attribute": "", "id": "R3", "kind": "functional", "text": "Send the documents the classifier is unsure about to human review, and use the reviewers' corrections to improve the classifier."}, {"attribute": "throughput and scalability", "id": "Q1", "kind": "quality", "text": "During storm season, at eight million documents a day, every document is classified within two hours of arrival."}, {"attribute": "observability", "id": "Q2", "kind": "quality", "text": "When classification quality drops for one claim type (for example, after a form changes its layout), operators see it within one day."}, {"attribute": "cost", "id": "Q3", "kind": "quality", "text": "The classification costs less than 0.2 cents per document on average over the year."}, {"attribute": "loose coupling", "id": "Q4", "kind": "quality", "text": "A consuming team can change how it processes the results without the other teams or the classifier having to change."}, {"attribute": "", "id": "C1", "kind": "constraint", "text": "The documents contain personal data and may not leave the EU."}, {"attribute": "", "id": "C2", "kind": "constraint", "text": "The classifier uses an LLM from the insurer's approved provider, in its EU region."}], "rows": [{"cells": [{"kind": "choice", "reason": "Retains the approved provider for uncertain cases while using the EU compact model to control LLM volume.", "value": "z:1.1"}, {"kind": "choice", "reason": "A uniform approved-provider path keeps the classifier behavior direct and the processing within the EU.", "value": "z:1.2"}, {"kind": "choice", "reason": "Claim-specific routing can reserve approved-LLM calls for the classes and documents that need them while retaining EU processing.", "value": "z:1.3"}], "differs": true, "dimension": "z:1", "note": ""}, {"cells": [{"kind": "choice", "reason": "Asynchronous autoscaling and priority lanes give the storm-season workload room to expand and favor deadline-bound items.", "value": "z:2.6"}, {"kind": "choice", "reason": "Elastic batches make capacity schedulable around arrival deadlines and seasonal volume.", "value": "z:2.7"}, {"kind": "choice", "reason": "Priority lanes and backpressure help manage burst work against the arrival deadline.", "value": "z:2.8"}], "differs": true, "dimension": "z:2", "note": ""}, {"cells": [{"kind": "choice", "reason": "Low-confidence items reach people and corrections are traceable as learning inputs.", "value": "z:4.6"}, {"kind": "choice", "reason": "Confidence thresholds select review cases and versioned corrections feed subsequent improvement.", "value": "z:4.6"}, {"kind": "choice", "reason": "Targeted uncertain cases enter human review, and corrections remain traceable.", "value": "z:4.7"}], "differs": true, "dimension": "z:4", "note": ""}, {"cells": [{"kind": "choice", "reason": "Each team consumes a versioned feed independently of classifier changes and other consumers.", "value": "z:3.1"}, {"kind": "choice", "reason": "Independent versioned topics decouple each team's processing from the classifier and peers.", "value": "z:3.1"}, {"kind": "choice", "reason": "Teams receive independent, versioned results without sharing a polling database.", "value": "z:3.1"}], "differs": false, "dimension": "z:3", "note": ""}, {"cells": [{"kind": "choice", "reason": "Category-level alerts let operators identify a localized drop within the required window.", "value": "z:5.4"}, {"kind": "choice", "reason": "Monitoring at the claim-type level supports the required one-day detection.", "value": "z:5.4"}, {"kind": "choice", "reason": "Category-level monitoring is aligned with the specified failure scenario.", "value": "z:5.4"}], "differs": false, "dimension": "z:5", "note": ""}], "space": null, "title": "Large-scale document classification", "trajectory": [{"alternative": null, "approach": "A", "assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "meets", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "attested_by": [], "changed": [], "description": "A queue-based pipeline uses autoscaled workers with backpressure to run an EU compact model first and route low-confidence cases to an approved EU LLM endpoint. It publishes versioned claim-type events for teams, while human corrections feed learning and dashboards track drift and outcomes by claim type.", "diff": [{"after": "z:1.1", "before": null, "dimension": "z:1"}, {"after": "z:2.1", "before": null, "dimension": "z:2"}, {"after": "z:3.1", "before": null, "dimension": "z:3"}, {"after": "z:4.1", "before": null, "dimension": "z:4"}, {"after": "z:5.1", "before": null, "dimension": "z:5"}], "drivers": ["R1", "R2", "R3", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "seed", "novel": ["z:1", "z:2", "z:3", "z:4", "z:5"], "observation": "The queue and topic-based output cover the volume and team-boundary concerns structurally, and per-type dashboards address the required visibility. The actual two-hour throughput and 0.2-cent average cannot be verified without workload benchmarks, model behavior, and endpoint pricing.", "own_tradeoff": "This gains scalable processing, controlled escalation, team-specific delivery, and measurable improvement. It gives up simplicity and some speed and cost efficiency because it requires cascade management, human review, versioned topics, and per-claim-type monitoring.", "parent": null, "point": {"z:1": "z:1.1", "z:2": "z:2.1", "z:3": "z:3.1", "z:4": "z:4.1", "z:5": "z:5.1"}, "point_id": "P1", "reuses": null, "round": 1, "step": 1, "tradeoffs": [{"causes": ["z:1.1"], "costs": ["Q1"], "gains": ["Q3"], "note": "Using a compact model for confident cases may lower LLM spend, while the extra routing stage can add latency to the two-hour path."}], "verdict": "strong", "why": "A queue and confidence-gated cascade should scale the LLM workload, route uncertain cases for correction, and separate the three consumers. Per-type monitoring should expose category-specific drops. The two-hour and per-document cost targets remain partly dependent on unprovided throughput and pricing evidence."}, {"alternative": null, "approach": "B", "assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "misses", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "partly"}, "attested_by": [], "changed": [], "description": "Documents are queued into elastic scheduled micro-batches and sent to the approved EU LLM endpoint for inference. Results are stored durably, exported for individual teams, reviewed through sampling, and used for periodic model updates, with daily aggregate quality and volume reports.", "diff": [{"after": "z:1.2", "before": null, "dimension": "z:1"}, {"after": "z:2.2", "before": null, "dimension": "z:2"}, {"after": "z:3.2", "before": null, "dimension": "z:3"}, {"after": "z:4.2", "before": null, "dimension": "z:4"}, {"after": "z:5.2", "before": null, "dimension": "z:5"}], "drivers": ["R1", "R2", "R3", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "seed", "novel": ["z:1", "z:2", "z:3", "z:4", "z:5"], "observation": "Durable exports give each team a stable handoff, but daily aggregate reports lack the granularity required by the observability scenario. Scheduled batching supports scale in principle, though the two-hour deadline needs sizing evidence; full-volume approved-LLM pricing is also unknown.", "own_tradeoff": "This provides centralized, durable outputs and controlled learning with consistent endpoint usage, but gives up immediate processing, fine-grained quality visibility, and rapid adaptation between review cycles.", "parent": null, "point": {"z:1": "z:1.2", "z:2": "z:2.2", "z:3": "z:3.2", "z:4": "z:4.2", "z:5": "z:5.2"}, "point_id": "P2", "reuses": null, "round": 1, "step": 2, "tradeoffs": [{"causes": ["z:5.2", "z:4.2"], "costs": ["Q2"], "gains": ["R3"], "note": "Sampling and periodic updates keep correction work bounded, but aggregate reporting can mask a quality drop isolated to one claim type."}], "verdict": "mixed", "why": "Elastic batches and a durable store should absorb seasonal volume and distribute results, while sampled corrections improve the model. Aggregate reporting may not identify a claim-type drop within a day, and capacity and price targets need measurement."}, {"alternative": null, "approach": "C", "assessment": {"C1": "meets", "C2": "meets", "Q1": "misses", "Q2": "misses", "Q3": "misses", "Q4": "misses", "R1": "meets", "R2": "partly", "R3": "partly"}, "attested_by": [], "changed": [], "description": "Each document is synchronously sent to the approved EU LLM endpoint, with its result written to a shared relational database for teams to poll. Exceptions enter a manual queue reviewed monthly for corrections, while a global dashboard reports overall success rates.", "diff": [{"after": "z:1.2", "before": null, "dimension": "z:1"}, {"after": "z:2.3", "before": null, "dimension": "z:2"}, {"after": "z:3.3", "before": null, "dimension": "z:3"}, {"after": "z:4.3", "before": null, "dimension": "z:4"}, {"after": "z:5.3", "before": null, "dimension": "z:5"}], "drivers": ["R1", "R2", "R3", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "seed", "novel": ["z:2", "z:3", "z:4", "z:5"], "observation": "The approach violates the two-hour burst target by construction at this volume and its global dashboard cannot show a category-specific drop. Shared polling couples consumers, monthly correction review delays learning, and full-volume LLM spend has no cost control; this is the deliberately less promising centralized approach.", "own_tradeoff": "This provides centralized routing, shared results, and simple aggregate oversight, but sacrifices throughput and responsiveness at large scale, delays learning from errors, and can hide team-, document-, or category-specific quality problems.", "parent": null, "point": {"z:1": "z:1.2", "z:2": "z:2.3", "z:3": "z:3.3", "z:4": "z:4.3", "z:5": "z:5.3"}, "point_id": "P3", "reuses": null, "round": 1, "step": 3, "tradeoffs": [{"causes": ["z:2.3", "z:3.3", "z:4.3", "z:5.3"], "costs": ["Q1", "Q2", "Q3", "Q4", "R2", "R3"], "gains": ["R1"], "note": "Central synchronous handling simplifies the service shape, but serial processing, shared polling and monthly feedback cannot satisfy the specified volume, team isolation, category monitoring or rapid correction loop."}], "verdict": "weak", "why": "A centralized synchronous service should be straightforward to operate, but serial request handling, shared polling, monthly review and global-only monitoring are likely to fail the burst, loose-coupling and quality-response requirements."}, {"alternative": null, "approach": "A", "assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "meets", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "attested_by": [], "changed": ["z:4", "z:5"], "description": "The system processes documents through autoscaled queue workers with backpressure, routing confident cases to an EU compact model and uncertain cases to an approved EU LLM endpoint. It publishes versioned claim-type events to team-specific topics, while threshold-based review supplies corrections and per-claim-type monitoring tracks drift and outcomes.", "diff": [{"after": "z:4.4", "before": "z:4.1", "dimension": "z:4"}, {"after": "z:5.4", "before": "z:5.1", "dimension": "z:5"}], "drivers": ["R1", "R2", "R3", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "exploit", "novel": ["z:4", "z:5"], "observation": "Alerts by claim type and quicker correction handling make the day-level response more direct. No production benchmark establishes the deadline, and no endpoint tariff or document token profile establishes the cost threshold.", "own_tradeoff": "This gains scalable processing, EU-constrained fallback, targeted delivery, and actionable quality improvement. It gives up simplicity and potentially incurs extra latency, LLM cost, topic-version coordination, and errors from imperfect confidence thresholds.", "parent": 1, "point": {"z:1": "z:1.1", "z:2": "z:2.1", "z:3": "z:3.1", "z:4": "z:4.4", "z:5": "z:5.4"}, "point_id": "P4", "reuses": null, "round": 2, "step": 4, "tradeoffs": [{"causes": ["z:1.1"], "costs": ["Q1"], "gains": ["Q3"], "note": "The cascade may reduce paid LLM calls, but the additional inference decision can add processing latency."}], "verdict": "strong", "why": "Keeping the queue, cascade and team topics while shortening correction feedback and adding alerts should improve R3 and make Q2 actionable within one day. The numerical throughput and annual cost targets still need measurement."}, {"alternative": null, "approach": "B", "assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "meets", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "attested_by": [], "changed": ["z:2", "z:3", "z:4", "z:5"], "description": "The system sends every document to the approved EU LLM endpoint, using elastic, deadline-aware scheduled micro-batches to manage throughput. It publishes versioned claim-type events to each team, while confidence thresholds route uncertain claims to human reviewers whose corrections feed learning; dashboards track drift and outcomes by claim type.", "diff": [{"after": "z:2.4", "before": "z:2.2", "dimension": "z:2"}, {"after": "z:3.1", "before": "z:3.2", "dimension": "z:3"}, {"after": "z:4.1", "before": "z:4.2", "dimension": "z:4"}, {"after": "z:5.1", "before": "z:5.2", "dimension": "z:5"}], "drivers": ["R1", "R2", "R3", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "exploit", "novel": ["z:2"], "observation": "This corrects the seed's weak monitoring and review choices while retaining scalable batch scheduling and durable event delivery. Whether the approved endpoint meets either numerical target remains unproven without capacity and price data.", "own_tradeoff": "This gains controlled residency, scalable prioritization, traceable team-specific delivery, and measurable improvement, but gives up potentially lower latency or cost from alternative routing and incurs batching, review, and event-versioning overhead.", "parent": 2, "point": {"z:1": "z:1.2", "z:2": "z:2.4", "z:3": "z:3.1", "z:4": "z:4.1", "z:5": "z:5.1"}, "point_id": "P5", "reuses": null, "round": 2, "step": 5, "tradeoffs": [{"causes": ["z:1.2"], "costs": ["Q3"], "gains": ["R1"], "note": "Uniform use of the approved LLM keeps inference behavior direct, but sending every document to it may consume more of the per-document budget than a cascade."}], "verdict": "strong", "why": "Deadline-aware micro-batches, event topics and per-type monitoring preserve the direct-LLM batch approach while addressing the missed observability need and improving consumer isolation and uncertain-case handling."}, {"alternative": null, "approach": "D", "assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "meets", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "attested_by": [], "changed": [], "description": "The system routes each claim type through either a compact EU model or an approved EU-hosted LLM, with autoscaled queue workers and priority lanes managing processing. It publishes versioned results to team-specific claim-type topics, while targeted human corrections feed a versioned learning set and per-type drift and outcome dashboards.", "diff": [{"after": "z:1.3", "before": null, "dimension": "z:1"}, {"after": "z:2.5", "before": null, "dimension": "z:2"}, {"after": "z:3.1", "before": null, "dimension": "z:3"}, {"after": "z:4.5", "before": null, "dimension": "z:4"}, {"after": "z:5.1", "before": null, "dimension": "z:5"}], "drivers": ["R1", "R2", "R3", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "explore", "novel": ["z:1", "z:2", "z:4"], "observation": "The specialization gives operators a natural unit for monitoring and targeted review, while the EU compact model and EU provider endpoint preserve the stated boundary. Cost and deadline outcomes remain partly supported because no class-level benchmark or price data is supplied.", "own_tradeoff": "This improves jurisdictional control, prioritization, traceability, and targeted quality improvement, but increases routing, topic, monitoring, and model-versioning complexity while requiring ongoing human review and correction maintenance.", "parent": null, "point": {"z:1": "z:1.3", "z:2": "z:2.5", "z:3": "z:3.1", "z:4": "z:4.5", "z:5": "z:5.1"}, "point_id": "P6", "reuses": null, "round": 2, "step": 6, "tradeoffs": [{"causes": ["z:1.3"], "costs": ["Q1"], "gains": ["Q3"], "note": "Class specialization may reduce unnecessary LLM work, but its extra routing and model-selection logic adds operational and latency overhead."}], "verdict": "strong", "why": "Claim-class-specific routing and targeted correction sets may focus model capacity and review effort where they matter, while priority lanes address storm volume. Per-type dashboards and topics should retain monitoring and consumer independence."}, {"alternative": "A1", "approach": "A", "assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "meets", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "attested_by": [], "changed": ["z:2", "z:4"], "description": "The system first routes documents to an EU compact model and escalates low-confidence cases to an approved EU-hosted LLM. Autoscaled, backpressured workers prioritize processing, publish versioned claim-type events to team-specific topics, and feed confidence-based reviews and corrections into monitoring and future learning.", "diff": [{"after": "z:2.6", "before": "z:2.1", "dimension": "z:2"}, {"after": "z:4.6", "before": "z:4.4", "dimension": "z:4"}], "drivers": ["R1", "R2", "R3", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "exploit", "novel": ["z:2", "z:4"], "observation": "Priority lanes make the asynchronous design more responsive to urgent work and versioned corrections help track learning inputs. The architecture addresses all requirements at least partly; the two numeric service targets still require deployment measurements.", "own_tradeoff": "This gains scalable, traceable, claim-specific delivery and targeted quality control, but incurs cascade latency, queueing and operational complexity, while threshold-based review and model drift alerts can miss errors outside monitored outcomes.", "parent": 4, "point": {"z:1": "z:1.1", "z:2": "z:2.6", "z:3": "z:3.1", "z:4": "z:4.6", "z:5": "z:5.4"}, "point_id": "P7", "reuses": null, "round": 3, "step": 7, "tradeoffs": [{"causes": ["z:1.1"], "costs": ["Q1"], "gains": ["Q3"], "note": "Routing confident documents to the compact model may reduce LLM spend, though cascade latency remains in the path."}], "verdict": "strong", "why": "Adding priority lanes and versioned correction feedback to the strong cascade point should help the burst path and make changes from review auditable without reducing category-level visibility or team isolation."}, {"alternative": "B1", "approach": "B", "assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "meets", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "attested_by": [], "changed": ["z:2", "z:4", "z:5"], "description": "Documents are sent to an approved EU LLM endpoint, processed in elastic, deadline-aware micro-batches, and emitted as versioned claim-type events to each team’s topic. Low-confidence claims enter review, whose versioned corrections support learning, while per-claim-type drift alerts and outcome dashboards monitor quality over time.", "diff": [{"after": "z:2.7", "before": "z:2.4", "dimension": "z:2"}, {"after": "z:4.6", "before": "z:4.1", "dimension": "z:4"}, {"after": "z:5.4", "before": "z:5.1", "dimension": "z:5"}], "drivers": ["R1", "R2", "R3", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "exploit", "novel": ["z:2"], "observation": "Deadline-aware micro-batches directly target arrival-to-result time, and per-type alerts plus versioned feedback address observability and learning. Endpoint throughput and price still prevent a claim that the numerical thresholds are met.", "own_tradeoff": "This combines EU governance, scalable scheduling, team-specific delivery, and traceable improvement, but routing every document through one approved endpoint can constrain capacity, latency, model choice, or cost. Separate versioned topics and claim-level monitoring improve accountability but add operational and integration overhead.", "parent": 5, "point": {"z:1": "z:1.2", "z:2": "z:2.7", "z:3": "z:3.1", "z:4": "z:4.6", "z:5": "z:5.4"}, "point_id": "P8", "reuses": null, "round": 3, "step": 8, "tradeoffs": [{"causes": ["z:1.2"], "costs": ["Q3"], "gains": ["R1"], "note": "Direct inference avoids cascade routing uncertainty but exposes every document to the approved endpoint's per-call cost."}], "verdict": "strong", "why": "Removing scheduled batch cadence in favor of elastic deadline-aware micro-batches and retaining fine-grained alerts should reduce wait time while keeping direct approved-provider inference and independently consumable outputs."}, {"alternative": "D1", "approach": "D", "assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "meets", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "attested_by": [], "changed": ["z:2", "z:4", "z:5"], "description": "Documents are routed by claim class through a compact EU model and, where selected, an approved EU LLM endpoint, while autoscaled priority lanes use deadline backpressure to manage work. Results are published to versioned claim-type topics for team consumption; targeted human corrections support learning, while per-claim-type drift alerts and outcome dashboards monitor quality.", "diff": [{"after": "z:2.8", "before": "z:2.5", "dimension": "z:2"}, {"after": "z:4.7", "before": "z:4.5", "dimension": "z:4"}, {"after": "z:5.4", "before": "z:5.1", "dimension": "z:5"}], "drivers": ["R1", "R2", "R3", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "exploit", "novel": ["z:2", "z:4"], "observation": "Specialization, priority handling, and per-type alerts align the control loop to the 60 claim types. The point is a strong architectural candidate, but actual classification latency, endpoint prices and compact-model accuracy must be measured before claiming Q1 or Q3 fully.", "own_tradeoff": "This gains jurisdiction-aware routing, scalable deadline handling, team-specific integration, and focused improvement, but increases routing, versioning, and operational complexity and may weaken cross-team consistency and end-to-end simplicity.", "parent": 6, "point": {"z:1": "z:1.3", "z:2": "z:2.8", "z:3": "z:3.1", "z:4": "z:4.7", "z:5": "z:5.4"}, "point_id": "P9", "reuses": null, "round": 3, "step": 9, "tradeoffs": [{"causes": ["z:1.3"], "costs": ["Q1"], "gains": ["Q3"], "note": "Class-specific routing can concentrate LLM calls on harder categories, while model selection and the cascade add latency and operational work."}], "verdict": "strong", "why": "Adding deadline backpressure, versioned correction feedback and drift alerts should strengthen the class-specific approach's burst handling, auditability and one-day response while preserving targeted review."}], "trajectory_dimensions": ["z:1", "z:2", "z:3", "z:4", "z:5"], "unaddressed": [], "uncovered": [], "values": {"z:1.1": {"description": "", "dimension": "z:1", "href": null, "id": "z:1.1", "label": "Confidence-gated cascade (EU compact model then approved LLM EU endpoint)", "passages": [], "roles": {"A1": "chosen"}, "sources": [], "status": "", "steps": [1, 4, 7]}, "z:1.2": {"description": "", "dimension": "z:1", "href": null, "id": "z:1.2", "label": "Approved LLM EU endpoint for every document", "passages": [], "roles": {"B1": "chosen"}, "sources": [], "status": "", "steps": [2, 3, 5, 8]}, "z:1.3": {"description": "", "dimension": "z:1", "href": null, "id": "z:1.3", "label": "Class-specific cascade using compact EU model and approved LLM EU endpoint", "passages": [], "roles": {"D1": "chosen"}, "sources": [], "status": "", "steps": [6, 9]}, "z:2.1": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.1", "label": "Autoscaled queue workers with backpressure", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [1, 4]}, "z:2.2": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.2", "label": "Elastic scheduled micro-batches", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [2]}, "z:2.3": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.3", "label": "Synchronous per-document service calls", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [3]}, "z:2.4": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.4", "label": "Elastic scheduled micro-batches with deadline-aware priority", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [5]}, "z:2.5": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.5", "label": "Autoscaled queue workers with priority lanes", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [6]}, "z:2.6": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.6", "label": "Autoscaled queue workers with backpressure and priority lanes", "passages": [], "roles": {"A1": "chosen"}, "sources": [], "status": "", "steps": [7]}, "z:2.7": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.7", "label": "Elastic deadline-aware micro-batches", "passages": [], "roles": {"B1": "chosen"}, "sources": [], "status": "", "steps": [8]}, "z:2.8": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.8", "label": "Autoscaled priority lanes with deadline backpressure", "passages": [], "roles": {"D1": "chosen"}, "sources": [], "status": "", "steps": [9]}, "z:3.1": {"description": "", "dimension": "z:3", "href": null, "id": "z:3.1", "label": "Versioned claim-type event topics for each team", "passages": [], "roles": {"A1": "chosen", "B1": "chosen", "D1": "chosen"}, "sources": [], "status": "", "steps": [1, 4, 5, 6, 7, 8, 9]}, "z:3.2": {"description": "", "dimension": "z:3", "href": null, "id": "z:3.2", "label": "Durable result lake with team-specific exports", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [2]}, "z:3.3": {"description": "", "dimension": "z:3", "href": null, "id": "z:3.3", "label": "Shared relational results database polled by teams", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [3]}, "z:4.1": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.1", "label": "Confidence-threshold human review with correction feedback", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [1, 5]}, "z:4.2": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.2", "label": "Sampled human review with periodic model updates", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [2]}, "z:4.3": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.3", "label": "Manual exception queue with monthly correction review", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [3]}, "z:4.4": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.4", "label": "Confidence-threshold review with rapid correction feedback", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [4]}, "z:4.5": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.5", "label": "Targeted human review with versioned correction set", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [6]}, "z:4.6": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.6", "label": "Confidence-threshold review with versioned correction feedback", "passages": [], "roles": {"A1": "chosen", "B1": "chosen"}, "sources": [], "status": "", "steps": [7, 8]}, "z:4.7": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.7", "label": "Targeted human review with versioned correction feedback", "passages": [], "roles": {"D1": "chosen"}, "sources": [], "status": "", "steps": [9]}, "z:5.1": {"description": "", "dimension": "z:5", "href": null, "id": "z:5.1", "label": "Per-claim-type drift and outcome dashboards", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [1, 5, 6]}, "z:5.2": {"description": "", "dimension": "z:5", "href": null, "id": "z:5.2", "label": "Daily aggregate quality and volume reports", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [2]}, "z:5.3": {"description": "", "dimension": "z:5", "href": null, "id": "z:5.3", "label": "Global success-rate dashboard", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [3]}, "z:5.4": {"description": "", "dimension": "z:5", "href": null, "id": "z:5.4", "label": "Per-claim-type drift alerts and outcome dashboards", "passages": [], "roles": {"A1": "chosen", "B1": "chosen", "D1": "chosen"}, "sources": [], "status": "", "steps": [4, 7, 8, 9]}}, "wiki": false, "with_space": true}</script>
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById("theme-toggle");
+    function current() {
+      return root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    }
+    function label() { btn.textContent = current() === "dark" ? "☀" : "☾"; }
+    btn.addEventListener("click", function () {
+      var next = current() === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      try { localStorage.setItem("ddspace-wiki-theme", next); } catch (e) {}
+      label();
+      document.dispatchEvent(new CustomEvent("themechange"));
+    });
+    label();
+  })();
+</script>
+<script src="../assets/d3.min.js"></script>
+<script src="../assets/graph-layout.js"></script>
+<script>
+(function () {
+  const data = JSON.parse(document.getElementById("explainer-data").textContent);
+  const COLOR = {};
+  function readColors() {
+    const cs = getComputedStyle(document.documentElement), get = (name) => cs.getPropertyValue(name).trim();
+    ["dimension", "source", "accepted", "mixed", "rejected", "outcome", "muted", "fg", "accent", "novel"]
+      .forEach((k) => { COLOR[k] = get("--" + k); });
+  }
+  readColors();
+  const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const alts = data.alternatives;
+  const altName = (a) => a.id + " · " + a.name;
+
+  // The subgraph, as a tree from the centre: the domain, the involved dimensions, their values, then the design
+  // points the agent evaluated (one per step), then the requirements on the outer ring, linked to the points
+  // whose assessment judges them.
+  const steps = data.trajectory || [];
+  const pointValues = new Set();  // explored: every value a design point of the page takes (a step's or a choice's)
+  steps.forEach((s) => Object.values(s.point).forEach((v) => pointValues.add(v)));
+  alts.forEach((a) => a.choices.forEach((c) => c.value && pointValues.add(c.value)));
+  const consideredValues = new Set();
+  alts.forEach((a) => a.considered.forEach((c) => c.value && consideredValues.add(c.value)));
+  const options = new Map();  // "ADR:option" -> option, from every ADR
+  (data.adrs || []).forEach((r) => r.options.forEach((o) => {
+    options.set(o.key, o); Object.values(o.point).forEach((v) => consideredValues.add(v)); }));
+  const exploredDims = new Set([...pointValues].map((v) => (data.values[v] || {}).dimension).filter(Boolean));
+  const nodes = [{ id: "domain", kind: "domain", label: data.space ? (data.space.domain || "") : data.title }];
+  const edges = [];
+  Object.values(data.dimensions).forEach((dm) => {
+    nodes.push({ ...dm, kind: "dimension" });
+    edges.push({ source: "domain", target: dm.id, type: "domain" });
+    dm.values.forEach((vid) => edges.push({ source: dm.id, target: vid, type: "has_value" }));
+  });
+  Object.values(data.values).forEach((v) => nodes.push({ ...v, kind: "value" }));
+  const pid = (n) => "p:" + n;
+  steps.forEach((s) => {
+    nodes.push({ id: pid(s.step), kind: "point", step: s.step, verdict: s.verdict, values: Object.values(s.point),
+      label: (s.alternative ? s.alternative + " · " : "") + "#" + s.step, description: s.description });
+    Object.values(s.point).forEach((v) => edges.push({ source: v, target: pid(s.step), type: "member" }));
+    Object.entries(s.assessment || {}).forEach(([r, judged]) =>
+      edges.push({ source: pid(s.step), target: "r:" + r, type: "assess", judged }));
+  });
+  data.relations.forEach((r) => edges.push({ source: r.source, target: r.target, type: "relation", relation: r.type,
+    directed: r.directed, reading: r.reading }));
+  data.requirements.forEach((r) => nodes.push({ ...r, id: "r:" + r.id, req: r.id, kind: "requirement", label: r.id }));
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const links = edges.filter((e) => byId.has(e.source) && byId.has(e.target));
+  const TREE = new Set(["domain", "has_value", "member"]);
+
+  const SYMBOL = { domain: d3.symbolCircle, dimension: d3.symbolCircle, value: d3.symbolDiamond, point: d3.symbolTriangle,
+    requirement: d3.symbolSquare };
+  const radius = (n) => n.kind === "domain" ? 14 : n.kind === "dimension" ? 10 : n.kind === "value" ? 6 : n.kind === "point" ? 8 : 7;
+  const shapePath = (n) => d3.symbol().type(SYMBOL[n.kind] || d3.symbolCircle)
+    .size(Math.PI * radius(n) * radius(n) * (n.kind === "value" ? 1.25 : 1))();
+  const JUDGED = { strong: "accepted", grounded: "accepted", mixed: "mixed", partial: "mixed", weak: "rejected",
+    ungrounded: "rejected", meets: "accepted", partly: "mixed", misses: "rejected" };
+  const nodeColor = (n) => n.kind === "value" ? (COLOR[n.status] || COLOR.accent) : n.kind === "domain" ? COLOR.fg
+    : n.kind === "requirement" ? COLOR.novel : n.kind === "point" ? (COLOR[JUDGED[n.verdict]] || COLOR.accent) : COLOR.dimension;
+
+  // The shared radial layout (graph-layout.js). Dimension labels point inwards, so each dimension sits just inside
+  // its values; the other rings start beyond the longest label of the ring inside them. Points (in step order,
+  // clockwise from the top) and requirements sit evenly around their rings.
+  const LABEL_MAX = 22;  // short labels keep the rings tight, so the graph (and its text) is drawn larger
+  const shortLabel = (s) => { s = String(s ?? ""); return s.length > LABEL_MAX ? s.slice(0, LABEL_MAX - 1).trimEnd() + "…" : s; };
+  const measure = (() => {
+    const ctx = document.createElement("canvas").getContext("2d");
+    ctx.font = "15px " + getComputedStyle(document.body).fontFamily;
+    return (s) => ctx ? ctx.measureText(s).width : s.length * 6.5;
+  })();
+  const labelReach = (ns) => d3.max(ns, (n) => radius(n) + 4 + measure(shortLabel(n.label)) + 3) || 0;
+  const radialTargets = (nodes, links, cx, cy) => DelveLayout.radialTargets(nodes, links, cx, cy, {
+    rings: ["domain", "dimension", "value", "point", "requirement"],
+    spacing: { dimension: 90, value: 30, point: 34, requirement: 40 }, ringGap: 70,
+    labelReach, restJitter: 0.04, inward: ["dimension"], inset: { dimension: 36 }, even: ["point", "requirement"] });
+
+  const svg = d3.select("#svg"), g = svg.append("g");
+  svg.append("defs").append("marker").attr("id", "arrow").attr("viewBox", "0 -5 10 10").attr("refX", 20).attr("refY", 0)
+    .attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto")
+    .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", COLOR.dimension);
+  const zoom = d3.zoom().scaleExtent([0.2, 6]).on("zoom", (ev) => g.attr("transform", ev.transform));
+  svg.call(zoom);
+  const linkLayer = g.append("g"), nodeLayer = g.append("g");
+  const REL_DASH = { requires: null, affects: "7,3", constrains: "2,3", co_occurs_with: "1,5", refines: "9,3,2,3" };
+  function edgeStyle(e) {
+    if (e.type === "relation") return { stroke: COLOR.dimension, width: 2, dash: REL_DASH[e.relation] || null, op: 0.85, arrow: e.directed !== false };
+    if (e.type === "assess") return { stroke: COLOR[JUDGED[e.judged]] || COLOR.muted, width: 1.2, dash: e.judged === "misses" ? "4,3" : null, op: 0.22 };
+    if (e.type === "member") return { stroke: COLOR.muted, width: 1, dash: null, op: 0.12 };
+    if (e.type === "domain") return { stroke: COLOR.muted, width: 0.8, dash: null, op: 0.3 };
+    return { stroke: COLOR.muted, width: 1, dash: null, op: 0.5 };
+  }
+  const width = () => document.getElementById("canvas").clientWidth;
+  const height = () => document.getElementById("canvas").clientHeight;
+  const cx = 0, cy = 0;  // the layout's own frame; fit() maps it onto the canvas
+  const pos = (id) => byId.get(id);
+  const linkSel = linkLayer.selectAll("line").data(links).enter().append("line")
+    .attr("class", (d) => "link" + (TREE.has(d.type) ? " tree" : ""));
+  function styleLinks() {
+    linkSel.each(function (d) { const st = edgeStyle(d); d3.select(this).attr("stroke", st.stroke).attr("stroke-width", st.width)
+      .attr("stroke-dasharray", st.dash).attr("stroke-opacity", st.op).attr("marker-end", st.arrow ? "url(#arrow)" : null); });
+  }
+  styleLinks();
+  linkSel.filter((d) => d.reading).append("title").text((d) => d.reading);
+  linkSel.filter((d) => d.type === "assess").append("title").text((d) => byId.get(d.source).label + " " + d.judged + " " + d.target.slice(2));
+  const nodeSel = nodeLayer.selectAll("g.node").data(nodes).enter().append("g").attr("class", "node")
+    .style("cursor", "pointer").on("click", (ev, d) => { ev.stopPropagation(); select(d.id); });
+  nodeSel.append("circle").attr("r", (d) => Math.max(radius(d), 10)).attr("fill", "transparent");
+  nodeSel.append("path").attr("class", "shape").attr("d", shapePath);
+  nodeSel.append("text").text((d) => d.kind === "domain" ? d.label : shortLabel(d.label));
+  // A selected path shows its nodes' full labels (the rest of the graph is faded); otherwise labels are short.
+  function labels(keep) {
+    nodeSel.select("text").text((d) => d.kind === "domain" || (keep && keep.has(d.id)) ? d.label : shortLabel(d.label));
+  }
+  nodeSel.append("title").text((d) => d.kind === "requirement" ? d.req + ": " + d.text
+    : d.kind === "point" ? "Step " + d.step + " · " + d.verdict + (d.description ? ": " + d.description : "")
+    : d.label + (d.status ? " (" + d.status + ")" : ""));
+  const orientLabels = () => DelveLayout.orientLabels(nodeSel.select("text"), cx, cy, { radius, centreDy: "-1.4em",
+    inward: (d) => d.kind === "dimension" });
+  function fit() {
+    const shown = nodes.filter(visible);
+    const xs = shown.map((d) => d.x), ys = shown.map((d) => d.y), pad = 70;
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const k = Math.min(2.5, 0.95 / Math.max((x1 - x0 + 2 * pad) / (width() || 1), (y1 - y0 + 2 * pad) / (height() || 1)));
+    svg.call(zoom.transform, d3.zoomIdentity.translate(width() / 2, height() / 2).scale(k).translate(-(x0 + x1) / 2, -(y0 + y1) / 2));
+  }
+  // Shown: every node but the values no design point takes and no alternative considered, unless the reader asks
+  // for every value the space offers. The layout is computed over the shown nodes only.
+  let showAll = false;
+  const visible = (d) => d.kind !== "value" || showAll || pointValues.has(d.id) || consideredValues.has(d.id);
+  function layout() {
+    const shown = nodes.filter(visible), ids = new Set(shown.map((n) => n.id));
+    const target = radialTargets(shown, links.filter((l) => ids.has(l.source) && ids.has(l.target)), cx, cy);
+    shown.forEach((n) => { const t = target.get(n.id); n.x = t.x; n.y = t.y; });
+    nodeSel.style("display", (d) => ids.has(d.id) ? null : "none").attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
+    linkSel.style("display", (d) => ids.has(d.source) && ids.has(d.target) ? null : "none")
+      .attr("x1", (d) => pos(d.source).x).attr("y1", (d) => pos(d.source).y)
+      .attr("x2", (d) => pos(d.target).x).attr("y2", (d) => pos(d.target).y);
+    orientLabels();
+    fit();
+  }
+  layout();
+  document.querySelectorAll("[data-zoom]").forEach((b) => b.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (b.dataset.zoom === "fit") fit(); else svg.transition().duration(200).call(zoom.scaleBy, b.dataset.zoom === "in" ? 1.4 : 1 / 1.4);
+  }));
+  // A requirement no design point is judged against: drawn hollow, with a dashed outline.
+  const judgedReqs = new Set(links.filter((e) => e.type === "assess").map((e) => e.target));
+  nodeSel.classed("unjudged", (d) => d.kind === "requirement" && !judgedReqs.has(d.id));
+  nodeSel.filter((d) => d.kind === "requirement" && !judgedReqs.has(d.id)).select("title")
+    .text((d) => d.req + ": " + d.text + " (no design point is judged against it)");
+  const toggle = document.getElementById("show-all");
+  if (toggle) toggle.addEventListener("change", () => { showAll = toggle.checked; layout(); });
+
+  // The active view: the trajectory (every step's point, or the selected step's), one alternative, or the compare
+  // view (every alternative). Explored dimensions and values stay coloured in every view; the point shown is outlined.
+  let view = "adrs", selected = null, selectedStep = null, selectedAlt = null, selectedOption = null;
+  const explored = (d) => d.kind === "value" ? pointValues.has(d.id) : d.kind === "dimension" ? exploredDims.has(d.id) : true;
+  linkSel.classed("explored", (d) => (d.type === "has_value" && pointValues.has(d.target))
+    || (d.type === "domain" && exploredDims.has(d.target)));
+  const stepOf = (n) => steps.find((s) => s.step === n);
+  function shownPoint() {
+    const lit = new Set();
+    const add = (s) => { if (!s) return; lit.add(pid(s.step)); Object.values(s.point).forEach((v) => lit.add(v)); };
+    if (view === "trajectory") { if (selectedStep !== null) add(stepOf(selectedStep)); return lit; }
+    if (view === "adrs" && selectedOption) {
+      const o = options.get(selectedOption); Object.values(o.point).forEach((v) => lit.add(v)); if (o.step) lit.add(pid(o.step));
+      return lit;
+    }
+    alts.filter((a) => view === "compare" || (view === "adrs" && a.id === selectedAlt)).forEach((a) => {
+      add(stepOf(a.step)); a.choices.forEach((c) => c.value && lit.add(c.value)); });
+    return lit;
+  }
+  function applyView() {
+    const lit = shownPoint();
+    nodeSel.classed("greyed", (d) => !explored(d)).classed("in-point", (d) => lit.has(d.id))
+      .select("path.shape").attr("fill", (d) => explored(d) ? nodeColor(d) : COLOR.muted)
+      .attr("stroke", (d) => d.id === selected || lit.has(d.id) ? COLOR.fg : d.kind === "dimension" ? "#fff" : "none")
+      .attr("stroke-width", (d) => d.id === selected ? 3 : lit.has(d.id) ? 2.2 : 1.5)
+      .attr("transform", (d) => lit.has(d.id) ? "scale(1.45)" : null);
+    // The point shown: its links to its values and to the requirements stand out.
+    linkSel.classed("shown", (d) => (d.type === "member" && lit.has(d.target)) || (d.type === "assess" && lit.has(d.source)));
+    document.querySelectorAll("[data-step]").forEach((el) =>
+      el.classList.toggle("sel", view === "trajectory" && selectedStep !== null && Number(el.dataset.step) === selectedStep));
+    document.querySelectorAll(".solution").forEach((el) => el.classList.toggle("sel", el.dataset.alt === selectedAlt));
+    document.querySelectorAll(".option").forEach((el) => el.classList.toggle("sel", el.dataset.option === selectedOption));
+  }
+  // A selected node's lineage in the tree (domain -> dimension -> value -> design point -> requirement): its
+  // ancestors up to the centre, and the paths down from it through design points to the requirements they are
+  // judged against. A requirement lights the points judged against it and their ancestors.
+  function lineage(id) {
+    const keep = new Set([id, "domain"]);
+    const up = (vid) => { keep.add(vid); const v = data.values[vid]; if (v) keep.add(v.dimension); };
+    const pointUp = (p) => { keep.add(p); (byId.get(p).values || []).forEach(up); };
+    const pointsWith = (vid) => links.filter((e) => e.type === "member" && e.source === vid).forEach((e) => keep.add(e.target));
+    const n = byId.get(id);
+    if (!n) return keep;
+    if (n.kind === "domain") { pointValues.forEach(up); steps.forEach((s) => keep.add(pid(s.step))); }
+    else if (n.kind === "dimension") (data.dimensions[id].values || []).filter((v) => pointValues.has(v))
+      .forEach((v) => { up(v); pointsWith(v); });
+    else if (n.kind === "value") { up(id); pointsWith(id); }
+    else if (n.kind === "point") pointUp(id);
+    else if (n.kind === "requirement") links.filter((e) => e.type === "assess" && e.target === id).forEach((e) => pointUp(e.source));
+    if (n.kind !== "requirement")  // down to the requirements the kept points are judged against
+      links.filter((e) => e.type === "assess" && keep.has(e.source)).forEach((e) => keep.add(e.target));
+    return keep;
+  }
+  function highlight(id) {
+    const keep = lineage(id);
+    labels(keep);
+    nodeSel.classed("dim-out", (d) => !keep.has(d.id));
+    linkSel.classed("dim-out", (d) => !(keep.has(d.source) && keep.has(d.target)))
+      .classed("on-path", (d) => d.type !== "relation" && keep.has(d.source) && keep.has(d.target));
+  }
+  const HINT = '<p class="hint">Select anything in the graph or the text (a dimension, a value, a design point, a requirement, an alternative or an option) to see what it is and the part it plays in this rationale.</p>';
+  function clearSelection() {
+    selected = null; selectedStep = null; selectedAlt = null; selectedOption = null;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    document.querySelectorAll(".chip.sel").forEach((c) => c.classList.remove("sel"));
+    document.getElementById("info").innerHTML = HINT;
+    applyView();
+  }
+  // The details panel: every kind of element reads the same way: what it is (kind, name, one sentence), then
+  // sections named as on the page (in the decisions, in the alternatives, in the trajectory, requirements, sources).
+  const EXPLAIN = data.mode === "explain";
+  const link = (n) => n.href ? '<p class="info-link"><a class="open-page" href="' + esc(n.href) + '">Open its page in the wiki →</a></p>' : "";
+  const vlabel = (vid) => { const v = data.values[vid]; return v ? '<span data-id="' + esc(v.id) + '" class="vref">' + esc(v.label) + "</span>" : "—"; };
+  const dlabel = (did) => { const x = data.dimensions[did]; return x ? '<span data-id="' + esc(x.id) + '" class="dref">' + esc(x.label) + "</span>" : "—"; };
+  const rlabel = (rid) => '<span data-id="r:' + esc(rid) + '" class="vref">' + esc(rid) + "</span>";
+  const pair = (did, vid) => dlabel(did) + " → " + vlabel(vid);
+  const head = (kind, title, sub) => '<div class="kind">' + kind + "</div><h2>" + title + "</h2>" + (sub ? '<p class="info-sub">' + sub + "</p>" : "");
+  const sec = (title, body) => body ? '<h3 class="info-h">' + esc(title) + "</h3>" + body : "";
+  const list = (items) => items.length ? "<ul>" + items.map((i) => "<li>" + i + "</li>").join("") + "</ul>" : "";
+  const para = (text) => text ? "<p>" + text + "</p>" : "";
+  // A step's trade-off against the requirements, and the one the point's description names.
+  const tradeoffLine = (t) => (t.causes && t.causes.length ? t.causes.map(vlabel).join(", ") + ": " : "") + '<span class="t-gain">gains</span> ' + t.gains.map(rlabel).join(", ")
+    + ' <span class="t-cost">gives up</span> ' + t.costs.map(rlabel).join(", ") + (t.note ? '<br><span class="muted">' + esc(t.note) + "</span>" : "");
+  const tradeoffSecs = (s) => sec("Trade-offs against the requirements", list((s.tradeoffs || []).map(tradeoffLine)))
+    + sec("The point's own trade-off", para(esc(s.own_tradeoff || "")));
+  const judgedChip = (rid, j) => '<span class="j j-' + esc(j) + '" data-id="r:' + esc(rid) + '">' + esc(rid) + " " + esc(j) + "</span>";
+  const judgedWord = (j) => '<span class="j j-' + esc(j) + '">' + esc(j) + "</span>";  // inside a requirement's own panel
+  const chips = (assessment) => { const e = Object.entries(assessment || {}); return e.length ? '<div class="judged">' + e.map(([r, j]) => judgedChip(r, j)).join("") + "</div>" : ""; };
+  const stepChip = (s) => '<span class="node-chip vb-' + esc(s.verdict) + '" data-step-ref="' + s.step + '" title="' + esc(s.verdict) + '">#' + s.step + "</span>";
+  const MEANS = {
+    strong: "it meets every constraint and serves every requirement at least partly",
+    mixed: "good on some requirements, but it misses one or carries a conflict",
+    weak: "it breaks a constraint or misses a key requirement",
+    grounded: "the requirements call for these values and what is known supports them",
+    partial: "only part of that holds: the requirements or what is known support it, not both",
+    ungrounded: "neither the requirements nor what is known support it" };
+  const STATUS = { accepted: "The sources accept this value.", mixed: "The sources are divided on this value.",
+    rejected: "The sources reject this value.", outcome: "The sources report this as an outcome." };
+  const STANCE = { accepts: "accepts it", rejects: "rejects it", supports: "supports it", both: "both accepts and rejects it" };
+  function phrase(s) {
+    const p = s.parent ? "#" + s.parent : "";
+    return { seed: "Seed of approach " + s.approach, exploit: "Refined " + p + (s.approach ? " (approach " + s.approach + ")" : ""),
+      explore: "New approach " + s.approach + (s.parent ? ", started from " + p : ""), ablate: "Ablation of " + p + ": which value made it work?",
+      solution: "The solution as one design point", region: "A region of " + p + ": part of the solution",
+      contrast: "A contrast on " + p + ": one option changed" }[s.move] || s.move;
+  }
+  function moveItems(s) {
+    if (["seed", "solution", "region"].includes(s.move) || !s.parent || !(s.diff || []).length)
+      return Object.entries(s.point).map(([d, v]) => pair(d, v));
+    return s.diff.map((c) => c.before == null ? "add " + pair(c.dimension, c.after)
+      : c.after == null ? "drop " + dlabel(c.dimension) + ' <span class="muted">(was ' + vlabel(c.before) + ")</span>"
+      : "change " + dlabel(c.dimension) + ": " + vlabel(c.before) + " → " + vlabel(c.after));
+  }
+  const adrOptions = [];  // [{r, o}] over every ADR option
+  (data.adrs || []).forEach((r) => r.options.forEach((o) => adrOptions.push({ r, o })));
+  const statusBadge = (o) => o.status === "chosen"
+    ? '<span class="badge accepted">chosen' + (EXPLAIN ? "" : " in " + esc(o.in.join(", "))) + "</span>"
+    : '<span class="badge rejected">discarded</span>';
+  const adrRef = (id, title) => '<a href="#adr-' + esc(id) + '" class="adr-link">' + esc(id) + "</a> · " + esc(title);
+  const optLine = ({ r, o }) => adrRef(r.id, r.title) + ": <b>" + esc(o.name) + "</b> " + statusBadge(o);
+  const altsTitle = EXPLAIN ? "In the solution" : "In the alternatives";
+  const ev = (list) => list.map((e) => esc(e.doc) + (e.stance ? " (" + esc(e.stance) + ")" : "")).join(", ");
+  const taking = (vid) => steps.filter((s) => Object.values(s.point).includes(vid));
+
+  function details(n) {
+    if (n.kind === "dimension") {
+      const dm = data.dimensions[n.id];
+      const explored = (dm.values || []).filter((v) => pointValues.has(v));
+      return head("Dimension · a design concern", esc(n.label), esc(n.question || ""))
+        + sec("In the decisions", list(adrOptions.filter(({ o }) => o.point[n.id]).map((x) => optLine(x) + "<br>" + pair(n.id, x.o.point[n.id]))))
+        + sec(altsTitle, list(alts.map((a) => {
+            const c = a.choices.find((x) => x.dimension === n.id), o = a.open.find((x) => x.dimension === n.id);
+            return "<b>" + esc(a.id) + "</b> " + (c ? vlabel(c.value) + (c.reason ? '<br><span class="muted">' + esc(c.reason) + "</span>" : "")
+              : o ? "leaves it open" + (o.reason ? ': <span class="muted">' + esc(o.reason) + "</span>" : "") : '<span class="muted">does not settle it</span>');
+          })))
+        + sec("In the trajectory", explored.length
+            ? para(explored.length + " of the " + dm.values.length + " values " + (data.wiki ? "the space offers" : "the agent named") + " were taken by some design point:")
+              + list(explored.map((v) => vlabel(v) + " " + taking(v).map(stepChip).join("")))
+            : para('<span class="muted">No design point settled this dimension.</span>'))
+        + sec("Relations", list(data.relations.filter((r) => r.source === n.id || r.target === n.id)
+            .map((r) => dlabel(r.source) + " <em>" + esc(r.type) + "</em> " + dlabel(r.target) + ' <span class="muted">(in the space)</span>')
+            .concat(alts.flatMap((a) => a.relations.filter((r) => r.source === n.id || r.target === n.id).map((r) =>
+              (r.source ? dlabel(r.source) : esc(r.source_label)) + " <em>" + esc(r.type) + "</em> " + (r.target ? dlabel(r.target) : esc(r.target_label))
+              + ' <span class="muted">(' + esc(a.id) + (r.holds ? ": holds" : ": does not hold") + (r.note ? ", " + esc(r.note) : "") + ")</span>")))))
+        + link(n);
+    }
+    if (n.kind === "value") {
+      const points = taking(n.id);
+      const roles = [];
+      alts.forEach((a) => {
+        const c = a.choices.find((x) => x.value === n.id), k = a.considered.find((x) => x.value === n.id);
+        if (c) roles.push("<b>Chosen in " + esc(a.id) + "</b>" + (c.drivers.length ? " for " + c.drivers.map(rlabel).join(", ") : "")
+          + (c.reason ? "<br>" + esc(c.reason) : "") + (c.quote ? '<div class="quote">“' + esc(c.quote) + "”</div>" : "")
+          + (c.evidence.length ? '<br><span class="ev">Cited evidence: ' + ev(c.evidence) + "</span>" : ""));
+        else if (k) roles.push("<b>Weighed and set aside in " + esc(a.id) + "</b>" + (k.reason ? "<br>" + esc(k.reason) : ""));
+      });
+      return head("Value · an option for " + dlabel(n.dimension), esc(n.label), esc(n.description || ""))
+        + (n.status && STATUS[n.status] ? para('<span class="badge ' + esc(n.status) + '">' + esc(n.status) + "</span> " + STATUS[n.status]) : "")
+        + sec("In the decisions", list(adrOptions.filter(({ o }) => Object.values(o.point).includes(n.id)).map(optLine)))
+        + sec(altsTitle, list(roles))
+        + sec("In the trajectory", points.length
+            ? para("Taken by " + points.length + " design point" + (points.length > 1 ? "s" : "") + ": " + points.map(stepChip).join("")
+              + "<br>First tried in #" + points[0].step + ": " + esc(phrase(points[0])) + ".")
+            : para('<span class="muted">No design point took it: ' + (data.wiki ? "the space offers it, but the agent did not try it." : "the agent named it as an option, but did not try it.") + "</span>"))
+        + sec("What the sources say", list(n.sources.map((s) => (s.href ? '<a href="' + esc(s.href) + '">' + esc(s.label) + "</a>" : esc(s.label))
+            + (s.stance ? " " + esc(STANCE[s.stance] || s.stance) : "")))
+            + (n.passages.length ? '<p class="ev">Passages: ' + ev(n.passages) + "</p>" : ""))
+        + link(n);
+    }
+    if (n.kind === "requirement") {
+      const rq = data.requirements.find((r) => r.id === n.req) || {};
+      const adrsFor = (data.adrs || []).filter((r) => r.drivers.includes(n.req));
+      const judged = steps.filter((s) => s.assessment && s.assessment[n.req]);
+      const drives = [];
+      alts.forEach((a) => a.choices.filter((c) => c.drivers.includes(n.req)).forEach((c) =>
+        drives.push("<b>" + esc(a.id) + "</b> " + pair(c.dimension, c.value))));
+      return head("Requirement · " + esc(rq.kind || "requirement") + (rq.attribute ? ": " + esc(rq.attribute) : ""), esc(n.req), esc(n.text))
+        + sec("In the decisions", adrsFor.length
+            ? list(adrsFor.map((r) => adrRef(r.id, r.title) + ": "
+                + r.options.filter((o) => o.status === "chosen").map((o) => "<b>" + esc(o.name) + "</b>" + (EXPLAIN ? "" : " (" + esc(o.in.join(", ")) + ")")).join("; ")))
+            : para('<span class="muted">No ADR addresses it.</span>'))
+        + sec(altsTitle, list(alts.map((a) => { const s = stepOf(a.step), j = s && s.assessment ? s.assessment[n.req] : null;
+            return "<b>" + esc(a.id) + "</b> " + (j ? judgedWord(j) : '<span class="muted">not judged</span>'); })))
+        + sec("In the trajectory", judged.length
+            ? para(judged.length + " design point" + (judged.length > 1 ? "s were" : " was") + " judged against it:")
+              + '<div class="judged">' + judged.map((s) => '<span class="pair-chip">' + stepChip(s) + judgedWord(s.assessment[n.req]) + "</span>").join(" ") + "</div>"
+            : para('<span class="muted">No design point was judged against it.</span>'))
+        + sec("Choices that name it as a driver", list(drives));
+    }
+    return head("Design space", esc(n.label || data.title),
+        data.space ? "The centre of the graph. Around it: the dimensions this rationale involves, their values, the design points the agent evaluated and the requirements."
+          : "The problem. Around it: the dimensions the agent named, their values, the design points it evaluated and the requirements.")
+      + sec("At a glance", list([exploredDims.size + " of " + Object.keys(data.dimensions).length + " dimensions settled by some design point",
+          pointValues.size + " values taken by some design point", steps.length + " design points evaluated"
+          + (data.budget && data.budget.max_points ? " (budget " + data.budget.max_points + ")" : ""),
+          alts.length + (EXPLAIN ? " solution explained" : " alternative" + (alts.length > 1 ? "s" : "") + " proposed"),
+          (data.adrs || []).length + " ADRs"]))
+      + link(n);
+  }
+  function select(id) {
+    const n = byId.get(id); if (!n) return;
+    if (n.kind === "point") { selectStep(n.step); return; }
+    selected = id; applyView(); highlight(id);
+    document.querySelectorAll(".chip.sel").forEach((c) => c.classList.remove("sel"));
+    if (n.kind === "requirement") document.querySelectorAll('[data-requirement="' + n.req + '"]').forEach((c) => c.classList.add("sel"));
+    showInfo(details(n));
+  }
+  svg.on("click", () => clearSelection());
+
+  // The trajectory: selecting a step (its column, its entry or its point in the graph) lights its point and its lineage.
+  function stepInfo(s) {
+    const sub = (s.approach ? "Approach " + esc(s.approach) + (s.round ? ", round " + esc(s.round) : "") + ". " : "") + esc(s.description || "");
+    const inAdrs = adrOptions.filter(({ o }) => o.step === s.step);
+    return head("Design point" + (s.point_id ? " · " + esc(s.point_id) : ""), "#" + s.step + " · " + esc(phrase(s)),
+        sub + (s.reuses ? " The same point as #" + s.reuses + ": reused, not evaluated again." : ""))
+      + para('<span class="vd-chip vb-' + esc(s.verdict) + '">' + esc(s.verdict) + "</span> " + esc(MEANS[s.verdict] || "")
+        + (s.alternative ? '<br><span class="alt-chip">' + (EXPLAIN ? "This is the solution." : "It became alternative " + esc(s.alternative) + ".") + "</span>" : ""))
+      + sec("Thought", para(esc(s.why)))
+      + sec("Move", list(moveItems(s)))
+      + sec("Observed", para(esc(s.observation)))
+      + sec("Requirements", chips(s.assessment))
+      + tradeoffSecs(s)
+      + (["seed", "solution", "region"].includes(s.move) ? "" : sec("The whole point", list(Object.entries(s.point).map(([d, v]) => pair(d, v)))))
+      + sec("In the decisions", list(inAdrs.map(optLine)))
+      + (data.wiki ? sec("What the sources say", s.attested_by.length
+          ? para("Attested by " + s.attested_by.map((a) => a.href ? '<a href="' + esc(a.href) + '">' + esc(a.label) + "</a>" : esc(a.label)).join("; ") + ".")
+          : para('<span class="muted">No source attests this combination.</span>')) : "");
+  }
+  function selectStep(n) {
+    const s = stepOf(n); if (!s) return;
+    selected = null; selectedStep = n;
+    if (view !== "trajectory") document.querySelector('.tab[data-tab="trajectory"]')?.click();
+    selectedStep = n; applyView(); highlight(pid(n));
+    showInfo(stepInfo(s));
+  }
+  document.querySelectorAll(".step-h, .region, .node-chip, .heat-h, td.h, .story-step, .opt").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    selectStep(Number(el.dataset.step));
+  }));
+  // The ADRs tab: an alternative or an option lights its point in the graph.
+  function altInfo(a) {
+    const s = stepOf(a.step);
+    return head(EXPLAIN ? "The solution" : "Alternative" + (a.approach ? " · from approach " + esc(a.approach) : ""), esc(altName(a)), esc(a.summary || ""))
+      + sec("Composed of", list((a.parts || []).map((p) => adrRef(p.adr, p.name)
+          + "<br>" + Object.entries(p.point).map(([d, v]) => pair(d, v)).join("<br>"))))
+      + sec("Requirements", s ? chips(s.assessment) : "")
+      + (s ? tradeoffSecs(s) : "")
+      + sec("Left open", list(a.open.map((o) => dlabel(o.dimension) + (o.reason ? ': <span class="muted">' + esc(o.reason) + "</span>" : ""))))
+      + sec("Each choice", list(a.choices.map((c) => pair(c.dimension, c.value) + (c.drivers.length ? " · for " + c.drivers.map(rlabel).join(", ") : "")
+          + (c.reason ? '<br><span class="muted">' + esc(c.reason) + "</span>" : "")
+          + (c.fit === "approximate" ? '<br><span class="badge mixed approx">approximate fit</span> ' + esc(c.fit_note || "") : "") + (c.quote ? '<div class="quote">“' + esc(c.quote) + "”</div>" : "")
+          + (c.evidence.length ? '<br><span class="ev">Cited evidence: ' + ev(c.evidence) + "</span>" : ""))));
+  }
+  function optionInfo(o) {
+    const { r } = adrOptions.find((x) => x.o === o) || {};
+    return head("Option · " + (r ? esc(r.id) + " " + esc(r.title) : "ADR"), esc(o.name), statusBadge(o) + " " + esc(o.reason || ""))
+      + sec("Values", list(Object.entries(o.point).map(([d, v]) => pair(d, v))))
+      + (o.fit === "approximate" ? sec("Approximate fit", para(esc(o.fit_note || "The values only roughly match this option."))) : "")
+      + sec("Pros", list(o.pros.map(esc))) + sec("Cons", list(o.cons.map(esc)))
+      + (o.quotes && o.quotes.length ? sec("In the solution's words", o.quotes.map((q) => '<div class="quote">“' + esc(q) + "”</div>").join("")) : "")
+      + (r ? sec("The decision it answers", para(esc(r.context)) + '<div class="judged">' + r.drivers.map((d) => '<span class="chip-sm">' + rlabel(d) + "</span>").join(" ") + "</div>") : "");
+  }
+  function showInfo(html) {
+    const info = document.getElementById("info"); info.innerHTML = html; info.scrollTop = 0;
+    info.querySelectorAll("[data-id]").forEach((el) => el.addEventListener("click", () => select(el.dataset.id)));
+    info.querySelectorAll("[data-step-ref]").forEach((el) => el.addEventListener("click", () => selectStep(Number(el.dataset.stepRef))));
+    info.querySelectorAll("a.adr-link").forEach((el) => el.addEventListener("click", () => {
+      if (view !== "adrs") document.querySelector('.tab[data-tab="adrs"]')?.click(); }));
+  }
+  document.querySelectorAll(".solution").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    const a = alts.find((x) => x.id === el.dataset.alt); if (!a) return;
+    selected = null; selectedOption = null; selectedAlt = a.id;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    applyView(); showInfo(altInfo(a));
+  }));
+  document.querySelectorAll(".option").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    const o = options.get(el.dataset.option); if (!o) return;
+    selected = null; selectedAlt = null; selectedOption = o.key;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    applyView(); showInfo(optionInfo(o));
+  }));
+  // A gap's approximate fit selects its ADR option (or its alternative) in the ADRs tab.
+  document.querySelectorAll("[data-gap-option], [data-gap-alt]").forEach((el) => {
+    const go = () => {
+      if (view !== "adrs") document.querySelector('.tab[data-tab="adrs"]')?.click();
+      const target = el.dataset.gapOption ? document.querySelector('.option[data-option="' + CSS.escape(el.dataset.gapOption) + '"]')
+        : document.querySelector('.solution[data-alt="' + CSS.escape(el.dataset.gapAlt) + '"]');
+      if (target) { target.click(); target.scrollIntoView({ block: "center", behavior: "smooth" }); }
+    };
+    el.addEventListener("click", (e) => { if (!e.target.closest("a") && !e.target.closest("[data-node]")) go(); });
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+  });
+  // The lanes: an arrow from each point's parent to it (refine along a lane, a new approach across lanes,
+  // an ablation dotted).
+  function overlay(wrapSel, svgSel) {
+    const wrap = document.querySelector(wrapSel), svgEl = wrap && wrap.querySelector(svgSel);
+    if (!wrap || !svgEl || !wrap.offsetParent) return null;
+    svgEl.setAttribute("width", wrap.scrollWidth); svgEl.setAttribute("height", wrap.scrollHeight);
+    const box = wrap.getBoundingClientRect();
+    const at = (el, side) => { const r = el.getBoundingClientRect();
+      return [(side === "left" ? r.left : side === "right" ? r.right : r.left + r.width / 2) - box.left + wrap.scrollLeft,
+        r.top + r.height / 2 - box.top]; };
+    return { svgEl, at };
+  }
+  const MOVE_COLOR = (m) => m === "explore" || m === "contrast" ? COLOR.novel : m === "seed" || m === "solution" ? COLOR.dimension : COLOR.accent;
+  function drawLanes() {
+    const o = overlay(".lanes-wrap", "svg.lane-arrows"); if (!o) return;
+    let html = "";
+    steps.forEach((s) => {
+      if (!s.parent) return;
+      const a = document.querySelector('.node-chip[data-step="' + s.parent + '"]'), b = document.querySelector('.node-chip[data-step="' + s.step + '"]');
+      if (!a || !b) return;
+      const [x0, y0] = o.at(a, "right"), [x1, y1] = o.at(b, "left");
+      const mx = (x0 + x1) / 2, dash = s.move === "ablate" ? "2,3" : s.move === "explore" ? "6,4" : null;
+      html += '<path d="M' + x0 + "," + y0 + " C" + mx + "," + y0 + " " + mx + "," + y1 + " " + x1 + "," + y1 + '" fill="none" stroke="'
+        + MOVE_COLOR(s.move) + '" stroke-width="1.8"' + (dash ? ' stroke-dasharray="' + dash + '"' : "") + ' marker-end="url(#lane-arrow)"></path>';
+    });
+    o.svgEl.innerHTML = '<defs><marker id="lane-arrow" viewBox="0 -5 10 10" refX="9" refY="0" markerWidth="6" markerHeight="6" orient="auto">'
+      + '<path d="M0,-5L10,0L0,5" fill="' + COLOR.muted + '"></path></marker></defs>' + html;
+  }
+  // The questions, options and criteria: a link from each option to each requirement its point was judged against.
+  const JUDGE_STYLE = { meets: [() => COLOR.accepted, null], partly: [() => COLOR.mixed, null], misses: [() => COLOR.rejected, "5,4"] };
+  function drawQoc() {
+    const o = overlay(".qoc-wrap", "svg.qoc-links"); if (!o) return;
+    let html = "";
+    document.querySelectorAll(".opt[data-qoc]").forEach((el) => {
+      const [qi, oi] = el.dataset.qoc.split(":").map(Number), opt = (data.qoc[qi] || { options: [] }).options[oi];
+      if (!opt) return;
+      const [x0, y0] = o.at(el, "right");
+      Object.entries(opt.assessment || {}).forEach(([rid, judged]) => {
+        const c = document.querySelector('.crit[data-crit="' + rid + '"]'); if (!c) return;
+        const [x1, y1] = o.at(c, "left"), st = JUDGE_STYLE[judged] || [() => COLOR.muted, null], mx = (x0 + x1) / 2;
+        html += '<path data-from="' + el.dataset.qoc + '" d="M' + x0 + "," + y0 + " C" + mx + "," + y0 + " " + mx + "," + y1 + " " + x1 + "," + y1
+          + '" fill="none" stroke="' + st[0]() + '" stroke-width="1.5" stroke-opacity="' + (opt.specific ? 0.8 : 0.14) + '"'
+          + (st[1] ? ' stroke-dasharray="' + st[1] + '"' : "") + "></path>";
+      });
+    });
+    o.svgEl.innerHTML = html;
+  }
+  document.querySelectorAll(".opt[data-qoc]").forEach((el) => {
+    const mark = (on) => document.querySelectorAll('svg.qoc-links path[data-from="' + el.dataset.qoc + '"]')
+      .forEach((p) => p.classList.toggle("traced", on));
+    el.addEventListener("mouseenter", () => mark(true)); el.addEventListener("mouseleave", () => mark(false));
+  });
+  function drawTrajectory() { drawLanes(); drawQoc(); drawLineage(); }
+  document.querySelector("details.grid-details")?.addEventListener("toggle", drawLineage);
+  // The lineage: an arc from each step's parent column to its own, above the grid.
+  function drawLineage() {
+    const svgL = document.querySelector("svg.lineage"); if (!svgL) return;
+    const box = svgL.getBoundingClientRect(), table = document.querySelector("table.traj");
+    svgL.style.width = table.scrollWidth + "px";
+    const x = (n) => { const th = document.querySelector('.step-h[data-step="' + n + '"]'); if (!th) return null;
+      const r = th.getBoundingClientRect(); return r.left - box.left + r.width / 2; };
+    const colorOf = (m) => m === "explore" || m === "contrast" ? COLOR.novel : m === "exploit" || m === "region" ? COLOR.accent : COLOR.dimension;
+    let html = "";
+    steps.forEach((s) => {
+      const x1 = x(s.step); if (x1 === null) return;
+      html += '<circle cx="' + x1 + '" cy="40" r="3" fill="' + colorOf(s.move) + '"></circle>';
+      const x0 = s.parent ? x(s.parent) : null; if (x0 === null) return;
+      const h = Math.min(36, 10 + Math.abs(x1 - x0) / 8);
+      html += '<path d="M' + x0 + ",40 C" + x0 + "," + (40 - h) + " " + x1 + "," + (40 - h) + " " + x1 + ',40" fill="none" stroke="'
+        + colorOf(s.move) + '" stroke-width="1.6"></path>';
+    });
+    svgL.innerHTML = html;
+  }
+  document.querySelectorAll("main [data-node]").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a")) return;  // a wiki link opens its page
+    e.preventDefault(); select(el.dataset.node);
+  }));
+
+  // Tabs: switching shows the tab's panel, re-lights the graph and drops the selection fade.
+  document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => {
+    view = t.dataset.tab;
+    document.querySelectorAll(".tab").forEach((x) => x.setAttribute("aria-selected", x === t ? "true" : "false"));
+    document.querySelectorAll(".panel").forEach((p) => { p.hidden = p.dataset.panel !== view; });
+    clearSelection();
+    if (view === "trajectory") drawTrajectory();
+  }));
+  applyView();
+  drawTrajectory();
+  // The dividers: drag (or use the arrow keys on) the vertical one to share the width between the text and the
+  // graph, the horizontal one to share the height between the graph and its details. Double-click resets. The
+  // split is kept in this browser only (a convenience; the page works without storage).
+  (function splitters() {
+    const KEY = "delve-explainer-split", root = document.documentElement, wrap = document.querySelector(".ex-wrap");
+    const side = document.querySelector(".ex-side");
+    const LIMITS = { left: [20, 80], canvas: [20, 85] }, DEFAULT = { left: 50, canvas: 60 };
+    let split = { ...DEFAULT };
+    try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) split = { ...split, ...s }; } catch (e) { /* no storage */ }
+    const clamp = (k, v) => Math.min(LIMITS[k][1], Math.max(LIMITS[k][0], v));
+    let pending = null;
+    function apply(save) {
+      root.style.setProperty("--split-left", clamp("left", split.left) + "%");
+      root.style.setProperty("--split-canvas", clamp("canvas", split.canvas) + "%");
+      if (!pending) pending = requestAnimationFrame(() => { pending = null; fit(); drawTrajectory(); });
+      if (save) { try { localStorage.setItem(KEY, JSON.stringify(split)); } catch (e) { /* no storage */ } }
+    }
+    function drag(handle, key, axis) {
+      if (!handle) return;
+      handle.addEventListener("pointerdown", (e) => {
+        e.preventDefault(); handle.setPointerCapture(e.pointerId); handle.classList.add("dragging");
+        document.body.classList.add("resizing", axis === "x" ? "col" : "row");
+        const move = (ev) => {
+          if (axis === "x") { const r = wrap.getBoundingClientRect(); split.left = clamp("left", (ev.clientX - r.left) / r.width * 100); }
+          else { const r = side.getBoundingClientRect(); split.canvas = clamp("canvas", (ev.clientY - r.top) / r.height * 100); }
+          apply(false);
+        };
+        const up = () => { handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up);
+          handle.classList.remove("dragging"); document.body.classList.remove("resizing", "col", "row"); apply(true); };
+        handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up);
+      });
+      handle.addEventListener("keydown", (e) => {
+        const step = e.shiftKey ? 10 : 2;
+        const delta = { ArrowLeft: -step, ArrowUp: -step, ArrowRight: step, ArrowDown: step }[e.key];
+        if (delta === undefined) return;
+        e.preventDefault(); split[key] = clamp(key, split[key] + delta); apply(true);
+      });
+      handle.addEventListener("dblclick", () => { split[key] = DEFAULT[key]; apply(true); });
+    }
+    drag(document.querySelector(".splitter-v"), "left", "x");
+    drag(document.querySelector(".splitter-h"), "canvas", "y");
+    apply(false);
+  })();
+
+  let lastSize = width() + "x" + height(), timer = null;
+  window.addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(() => {
+    const size = width() + "x" + height(); if (size !== lastSize) { lastSize = size; fit(); drawTrajectory(); } }, 200); });
+  document.addEventListener("themechange", () => { readColors(); styleLinks(); applyView(); drawTrajectory(); });
+})();
+</script>
+</body>
+</html>

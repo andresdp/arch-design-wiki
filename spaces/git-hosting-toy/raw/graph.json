@@ -1,0 +1,893 @@
+{
+ "schema_version": 1,
+ "run": "20261109_000000",
+ "name": "toy-git-hosting",
+ "domain": "toy-git-hosting",
+ "view": "selected",
+ "use_case": "Identify the design decisions practitioners face, the alternatives they consider for each, and the outcomes they report.",
+ "core_rule": "≥ 2 sources",
+ "nodes": [
+  {
+   "id": "d:1",
+   "kind": "dimension",
+   "label": "Source of truth for repository state",
+   "href": "concepts/source-of-truth-for-repository-state",
+   "description": "Where the authoritative copy of each repository's objects and references lives.",
+   "core": true,
+   "values": 4,
+   "evidence": {
+    "codes": 5,
+    "documents": 13,
+    "sources": 2
+   },
+   "exclusivity": 0.5
+  },
+  {
+   "id": "v:1.1",
+   "kind": "value",
+   "label": "Repository files on server disks",
+   "status": "accepted",
+   "href": "entities/repository-files-on-server-disks",
+   "dimension": "Source of truth for repository state",
+   "dimension_id": "d:1",
+   "core": true,
+   "description": "Plain Git repositories on the servers' local disks are the authoritative state.",
+   "passages": [
+    {
+     "doc": "s01_p02",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p04",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p05",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p07",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s02_p01",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s02_p02",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "v:1.2",
+   "kind": "value",
+   "label": "Write-ahead log in object storage",
+   "status": "accepted",
+   "href": "entities/write-ahead-log-in-object-storage",
+   "dimension": "Source of truth for repository state",
+   "dimension_id": "d:1",
+   "core": true,
+   "description": "An append-only log in object storage is the authority; repositories on disk are derived from it.",
+   "passages": [
+    {
+     "doc": "s01_p09",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p10",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p11",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p12",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p14",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p15",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "v:1.3",
+   "kind": "value",
+   "label": "Objects in a distributed hash table",
+   "status": "mixed",
+   "href": "entities/objects-in-a-distributed-hash-table",
+   "dimension": "Source of truth for repository state",
+   "dimension_id": "d:1",
+   "core": true,
+   "description": "Git objects are stored individually in a distributed key-value store.",
+   "passages": [
+    {
+     "doc": "s01_p03",
+     "stance": "both"
+    },
+    {
+     "doc": "s01_p09",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "v:1.4",
+   "kind": "value",
+   "label": "Blobs plus a relational reference database",
+   "status": "rejected",
+   "href": "entities/blobs-plus-a-relational-reference-database",
+   "dimension": "Source of truth for repository state",
+   "dimension_id": "d:1",
+   "core": true,
+   "description": "Pack data in blob storage and references in a relational database, two stores to keep consistent.",
+   "passages": [
+    {
+     "doc": "s01_p15",
+     "stance": "rejects"
+    }
+   ]
+  },
+  {
+   "id": "d:2",
+   "kind": "dimension",
+   "label": "Replication for durability",
+   "href": "concepts/replication-for-durability",
+   "description": "How copies of a repository are kept so that a lost machine loses no data.",
+   "core": true,
+   "values": 4,
+   "evidence": {
+    "codes": 7,
+    "documents": 14,
+    "sources": 3
+   },
+   "exclusivity": 0.667
+  },
+  {
+   "id": "v:2.1",
+   "kind": "value",
+   "label": "Block-level filesystem replication",
+   "status": "rejected",
+   "href": "entities/block-level-filesystem-replication",
+   "dimension": "Replication for durability",
+   "dimension_id": "d:2",
+   "core": true,
+   "description": "The filesystem under Git is replicated block by block between paired machines.",
+   "passages": [
+    {
+     "doc": "s01_p05",
+     "stance": "rejects"
+    },
+    {
+     "doc": "s02_p01",
+     "stance": "rejects"
+    },
+    {
+     "doc": "s02_p02",
+     "stance": "rejects"
+    }
+   ]
+  },
+  {
+   "id": "v:2.2",
+   "kind": "value",
+   "label": "Three Git replicas with majority writes",
+   "status": "accepted",
+   "href": "entities/three-git-replicas-with-majority-writes",
+   "dimension": "Replication for durability",
+   "dimension_id": "d:2",
+   "core": true,
+   "description": "Each repository has three plain Git replicas; a write succeeds once a majority has it.",
+   "passages": [
+    {
+     "doc": "s01_p08",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s02_p01",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s03_p01",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s03_p02",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s03_p03",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s03_p05",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s03_p06",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s03_p09",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "v:2.3",
+   "kind": "value",
+   "label": "Durability delegated to object storage",
+   "status": "accepted",
+   "href": "entities/durability-delegated-to-object-storage",
+   "dimension": "Replication for durability",
+   "dimension_id": "d:2",
+   "core": true,
+   "description": "The object store holding the log keeps the data durable; servers hold no unique data.",
+   "passages": [
+    {
+     "doc": "s01_p10",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p11",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p12",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p14",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "v:2.4",
+   "kind": "value",
+   "label": "Single copy on a file server",
+   "status": "accepted",
+   "href": "entities/single-copy-on-a-file-server",
+   "dimension": "Replication for durability",
+   "dimension_id": "d:2",
+   "core": true,
+   "description": "One file server holds each repository, reached by RPC, with no replica.",
+   "passages": [
+    {
+     "doc": "s01_p05",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "d:3",
+   "kind": "dimension",
+   "label": "Reference update coordination",
+   "href": "concepts/reference-update-coordination",
+   "description": "How concurrent updates to a repository's references are ordered and made atomic.",
+   "core": true,
+   "values": 3,
+   "evidence": {
+    "codes": 3,
+    "documents": 7,
+    "sources": 2
+   },
+   "exclusivity": 0.5
+  },
+  {
+   "id": "v:3.1",
+   "kind": "value",
+   "label": "Three-phase commit across replicas",
+   "status": "accepted",
+   "href": "entities/three-phase-commit-across-replicas",
+   "dimension": "Reference update coordination",
+   "dimension_id": "d:3",
+   "core": true,
+   "description": "Reference updates run as a transaction that all replicas vote on.",
+   "passages": [
+    {
+     "doc": "s01_p07",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p08",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s02_p03",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s02_p04",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "v:3.2",
+   "kind": "value",
+   "label": "Compare-and-swap on the log",
+   "status": "accepted",
+   "href": "entities/compare-and-swap-on-the-log",
+   "dimension": "Reference update coordination",
+   "dimension_id": "d:3",
+   "core": true,
+   "description": "Writers append to the log with a compare-and-swap, without a consensus protocol.",
+   "passages": [
+    {
+     "doc": "s01_p10",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p11",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "v:3.3",
+   "kind": "value",
+   "label": "One server serializes the updates",
+   "status": "accepted",
+   "href": "entities/one-server-serializes-the-updates",
+   "dimension": "Reference update coordination",
+   "dimension_id": "d:3",
+   "core": true,
+   "description": "The single file server holding the repository applies updates one at a time.",
+   "passages": [
+    {
+     "doc": "s01_p05",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "d:4",
+   "kind": "dimension",
+   "label": "Client data transfer",
+   "href": "concepts/client-data-transfer",
+   "description": "What a developer's machine downloads to work on a repository.",
+   "core": true,
+   "values": 3,
+   "evidence": {
+    "codes": 6,
+    "documents": 11,
+    "sources": 3
+   },
+   "exclusivity": 0.333
+  },
+  {
+   "id": "v:4.1",
+   "kind": "value",
+   "label": "Full clone over the Git protocol",
+   "status": "accepted",
+   "href": "entities/full-clone-over-the-git-protocol",
+   "dimension": "Client data transfer",
+   "dimension_id": "d:4",
+   "core": true,
+   "description": "The client fetches the whole history with standard Git.",
+   "passages": [
+    {
+     "doc": "s01_p03",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p06",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p10",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p03",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "v:4.2",
+   "kind": "value",
+   "label": "Partial clone with sparse checkout",
+   "status": "accepted",
+   "href": "entities/partial-clone-with-sparse-checkout",
+   "dimension": "Client data transfer",
+   "dimension_id": "d:4",
+   "core": true,
+   "description": "The client fetches only the history and files it needs, with standard Git features.",
+   "passages": [
+    {
+     "doc": "s04_p01",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s04_p02",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p01",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p04",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p06",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p08",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p15",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "v:4.3",
+   "kind": "value",
+   "label": "Virtualized filesystem with on-demand objects",
+   "status": "mixed",
+   "href": "entities/virtualized-filesystem-with-on-demand-objects",
+   "dimension": "Client data transfer",
+   "dimension_id": "d:4",
+   "core": true,
+   "description": "A virtual filesystem shows every file and downloads objects only when a file is opened.",
+   "passages": [
+    {
+     "doc": "s01_p03",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p01",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p03",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p06",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p08",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p15",
+     "stance": "rejects"
+    }
+   ]
+  },
+  {
+   "id": "d:5",
+   "kind": "dimension",
+   "label": "Serving reads",
+   "href": "concepts/serving-reads",
+   "description": "Where read traffic (fetches, clones, CI checkouts) is served from.",
+   "core": true,
+   "values": 3,
+   "evidence": {
+    "codes": 5,
+    "documents": 9,
+    "sources": 4
+   },
+   "exclusivity": 0.5
+  },
+  {
+   "id": "v:5.1",
+   "kind": "value",
+   "label": "Nearest up-to-date replica",
+   "status": "accepted",
+   "href": "entities/nearest-up-to-date-replica",
+   "dimension": "Serving reads",
+   "dimension_id": "d:5",
+   "core": true,
+   "description": "Reads go to the closest replica that has the latest state.",
+   "passages": [
+    {
+     "doc": "s01_p07",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s02_p01",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s02_p06",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s03_p04",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "v:5.2",
+   "kind": "value",
+   "label": "Cache servers near the clients",
+   "status": "accepted",
+   "href": "entities/cache-servers-near-the-clients",
+   "dimension": "Serving reads",
+   "dimension_id": "d:5",
+   "core": true,
+   "description": "Cache servers in each office or region serve objects and forward misses to the origin.",
+   "passages": [
+    {
+     "doc": "s05_p03",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p08",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "v:5.3",
+   "kind": "value",
+   "label": "Stateless servers with a local disk cache",
+   "status": "accepted",
+   "href": "entities/stateless-servers-with-a-local-disk-cache",
+   "dimension": "Serving reads",
+   "dimension_id": "d:5",
+   "core": true,
+   "description": "Any server can serve any repository, rebuilding a warm copy on its local disk from the log.",
+   "passages": [
+    {
+     "doc": "s01_p02",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p07",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p11",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s01_p13",
+     "stance": "accepts"
+    },
+    {
+     "doc": "s05_p08",
+     "stance": "accepts"
+    }
+   ]
+  },
+  {
+   "id": "s:s1",
+   "kind": "source",
+   "label": "Git at any scale",
+   "href": "sources/s1",
+   "url": "https://cursor.com/blog/git-at-any-scale"
+  },
+  {
+   "id": "s:s2",
+   "kind": "source",
+   "label": "Stretching Spokes",
+   "href": "sources/s2",
+   "url": "https://github.blog/engineering/infrastructure/stretching-spokes/"
+  },
+  {
+   "id": "s:s3",
+   "kind": "source",
+   "label": "Building resilience in Spokes",
+   "href": "sources/s3",
+   "url": "https://github.blog/engineering/infrastructure/building-resilience-in-spokes/"
+  },
+  {
+   "id": "s:s4",
+   "kind": "source",
+   "label": "Scalar philosophy",
+   "href": "sources/s4",
+   "url": "https://github.com/microsoft/git/blob/vfs-2.37.3/contrib/scalar/docs/philosophy.md"
+  },
+  {
+   "id": "s:s5",
+   "kind": "source",
+   "label": "Introducing Scalar",
+   "href": "sources/s5",
+   "url": "https://devblogs.microsoft.com/devops/introducing-scalar/"
+  }
+ ],
+ "edges": [
+  {
+   "source": "d:1",
+   "target": "v:1.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:1",
+   "target": "v:1.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:1",
+   "target": "v:1.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:1",
+   "target": "v:1.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:2",
+   "target": "v:2.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:2",
+   "target": "v:2.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:2",
+   "target": "v:2.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:2",
+   "target": "v:2.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:2",
+   "target": "d:1",
+   "type": "relation",
+   "relation": "requires",
+   "directed": true,
+   "reading": "Replication for durability requires Source of truth for repository state to be decided first"
+  },
+  {
+   "source": "d:2",
+   "target": "d:5",
+   "type": "relation",
+   "relation": "constrains",
+   "directed": true,
+   "reading": "Choices on Replication for durability limit the options available on Serving reads"
+  },
+  {
+   "source": "d:3",
+   "target": "v:3.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:3",
+   "target": "v:3.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:3",
+   "target": "v:3.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:3",
+   "target": "d:1",
+   "type": "relation",
+   "relation": "requires",
+   "directed": true,
+   "reading": "Reference update coordination requires Source of truth for repository state to be decided first"
+  },
+  {
+   "source": "d:4",
+   "target": "v:4.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:4",
+   "target": "v:4.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:4",
+   "target": "v:4.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:4",
+   "target": "d:5",
+   "type": "relation",
+   "relation": "constrains",
+   "directed": true,
+   "reading": "Choices on Client data transfer limit the options available on Serving reads"
+  },
+  {
+   "source": "d:5",
+   "target": "v:5.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:5",
+   "target": "v:5.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:5",
+   "target": "v:5.3",
+   "type": "has_value"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:1.1",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:1.2",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:1.3",
+   "type": "evidence",
+   "stance": "both"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:1.4",
+   "type": "evidence",
+   "stance": "rejects"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:2.1",
+   "type": "evidence",
+   "stance": "rejects"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:2.2",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:2.3",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:2.4",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:3.1",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:3.2",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:3.3",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:4.1",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:4.3",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:5.1",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s1",
+   "target": "v:5.3",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s2",
+   "target": "v:1.1",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s2",
+   "target": "v:2.1",
+   "type": "evidence",
+   "stance": "rejects"
+  },
+  {
+   "source": "s:s2",
+   "target": "v:2.2",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s2",
+   "target": "v:3.1",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s2",
+   "target": "v:5.1",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s3",
+   "target": "v:2.2",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s3",
+   "target": "v:5.1",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s4",
+   "target": "v:4.2",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s5",
+   "target": "v:4.1",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s5",
+   "target": "v:4.2",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s5",
+   "target": "v:4.3",
+   "type": "evidence",
+   "stance": "both"
+  },
+  {
+   "source": "s:s5",
+   "target": "v:5.2",
+   "type": "evidence",
+   "stance": "accepts"
+  },
+  {
+   "source": "s:s5",
+   "target": "v:5.3",
+   "type": "evidence",
+   "stance": "accepts"
+  }
+ ]
+}

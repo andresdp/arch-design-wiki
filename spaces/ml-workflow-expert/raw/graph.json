@@ -1,0 +1,2861 @@
+{
+ "schema_version": 1,
+ "run": "20261108_202031",
+ "name": "c1-e",
+ "domain": "c1-e",
+ "view": "selected",
+ "use_case": "Identify the architectural design decisions that practitioners face when designing and implementing machine learning systems along the machine learning workflow — from data ingestion and processing, through model building and training, to putting models into production and operating them — as documented in practitioner (gray) literature. For each decision, identify the alternative decision options practitioners use or consider, the forces (quality attributes, constraints and practical concerns) that drive the choice between them, and how decisions relate to one another. Each dimension must name one architectural design decision; its values are the alternative options for that decision.",
+ "core_rule": "≥ 0 sources",
+ "nodes": [
+  {
+   "id": "d:1",
+   "kind": "dimension",
+   "label": "How to integrate a machine learning model in an application?",
+   "href": "concepts/how-to-integrate-a-machine-learning-model-in-an-application",
+   "description": "How to integrate a machine learning model in an application?",
+   "core": true,
+   "values": 7,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:1.1",
+   "kind": "value",
+   "label": "Model as a service",
+   "status": "accepted",
+   "href": "entities/model-as-a-service",
+   "dimension": "How to integrate a machine learning model in an application?",
+   "dimension_id": "d:1",
+   "core": true,
+   "description": "create one service per model",
+   "passages": []
+  },
+  {
+   "id": "v:1.2",
+   "kind": "value",
+   "label": "Model in monolith",
+   "status": "accepted",
+   "href": "entities/model-in-monolith",
+   "dimension": "How to integrate a machine learning model in an application?",
+   "dimension_id": "d:1",
+   "core": true,
+   "description": "embed the model in the code of the application",
+   "passages": []
+  },
+  {
+   "id": "v:1.3",
+   "kind": "value",
+   "label": "Model as module in modular monolith",
+   "status": "accepted",
+   "href": "entities/model-as-module-in-modular-monolith",
+   "dimension": "How to integrate a machine learning model in an application?",
+   "dimension_id": "d:1",
+   "core": true,
+   "description": "create a module for the model in the application",
+   "passages": []
+  },
+  {
+   "id": "v:1.4",
+   "kind": "value",
+   "label": "Model in batch prediction system",
+   "status": "accepted",
+   "href": "entities/model-in-batch-prediction-system",
+   "dimension": "How to integrate a machine learning model in an application?",
+   "dimension_id": "d:1",
+   "core": true,
+   "description": "call an external batch prediction system",
+   "passages": []
+  },
+  {
+   "id": "v:1.5",
+   "kind": "value",
+   "label": "Event-driven model as a service",
+   "status": "accepted",
+   "href": "entities/event-driven-model-as-a-service",
+   "dimension": "How to integrate a machine learning model in an application?",
+   "dimension_id": "d:1",
+   "core": true,
+   "description": "event-driven pub/sub or queueing interface for model",
+   "passages": []
+  },
+  {
+   "id": "v:1.6",
+   "kind": "value",
+   "label": "Serverless model as a service",
+   "status": "accepted",
+   "href": "entities/serverless-model-as-a-service",
+   "dimension": "How to integrate a machine learning model in an application?",
+   "dimension_id": "d:1",
+   "core": true,
+   "description": "serverless/function-as-a-service computing model for offering the model",
+   "passages": []
+  },
+  {
+   "id": "v:1.7",
+   "kind": "value",
+   "label": "No integration of the model",
+   "status": "accepted",
+   "href": "entities/no-integration-of-the-model",
+   "dimension": "How to integrate a machine learning model in an application?",
+   "dimension_id": "d:1",
+   "core": true,
+   "description": "model is not integrated, maybe results are used, e.g. as a forecast",
+   "passages": []
+  },
+  {
+   "id": "d:2",
+   "kind": "dimension",
+   "label": "How to store data used in machine learning applications?",
+   "href": "concepts/how-to-store-data-used-in-machine-learning-applications",
+   "description": "How to store data used in machine learning applications?",
+   "core": true,
+   "values": 4,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:2.1",
+   "kind": "value",
+   "label": "Shared data store",
+   "status": "accepted",
+   "href": "entities/shared-data-store",
+   "dimension": "How to store data used in machine learning applications?",
+   "dimension_id": "d:2",
+   "core": true,
+   "description": "store data in shared data store",
+   "passages": []
+  },
+  {
+   "id": "v:2.2",
+   "kind": "value",
+   "label": "Data service",
+   "status": "accepted",
+   "href": "entities/data-service",
+   "dimension": "How to store data used in machine learning applications?",
+   "dimension_id": "d:2",
+   "core": true,
+   "description": "store data in services",
+   "passages": []
+  },
+  {
+   "id": "v:2.3",
+   "kind": "value",
+   "label": "Event store",
+   "status": "accepted",
+   "href": "entities/event-store",
+   "dimension": "How to store data used in machine learning applications?",
+   "dimension_id": "d:2",
+   "core": true,
+   "description": "store data as events being exchanged in the systems",
+   "passages": []
+  },
+  {
+   "id": "v:2.4",
+   "kind": "value",
+   "label": "No data store",
+   "status": "accepted",
+   "href": "entities/no-data-store",
+   "dimension": "How to store data used in machine learning applications?",
+   "dimension_id": "d:2",
+   "core": true,
+   "description": "get data without storing it, e.g. manual ingested raw data or only event streaming",
+   "passages": []
+  },
+  {
+   "id": "d:3",
+   "kind": "dimension",
+   "label": "How to design the interface for data access?",
+   "href": "concepts/how-to-design-the-interface-for-data-access",
+   "description": "How to design the interface for data access?",
+   "core": true,
+   "values": 5,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:3.1",
+   "kind": "value",
+   "label": "Local data access API",
+   "status": "accepted",
+   "href": "entities/local-data-access-api",
+   "dimension": "How to design the interface for data access?",
+   "dimension_id": "d:3",
+   "core": true,
+   "description": "data provider encapsulated by local data access API abstraction",
+   "passages": []
+  },
+  {
+   "id": "v:3.2",
+   "kind": "value",
+   "label": "Service-based data access API",
+   "status": "accepted",
+   "href": "entities/service-based-data-access-api",
+   "dimension": "How to design the interface for data access?",
+   "dimension_id": "d:3",
+   "core": true,
+   "description": "data provider encapsulated by data access services",
+   "passages": []
+  },
+  {
+   "id": "v:3.3",
+   "kind": "value",
+   "label": "Pub/sub data access API",
+   "status": "accepted",
+   "href": "entities/pub-sub-data-access-api",
+   "dimension": "How to design the interface for data access?",
+   "dimension_id": "d:3",
+   "core": true,
+   "description": "subscription for data access; publisher notifies upon data availability",
+   "passages": []
+  },
+  {
+   "id": "v:3.4",
+   "kind": "value",
+   "label": "Message/event queueing-based data access API",
+   "status": "accepted",
+   "href": "entities/message-event-queueing-based-data-access-api",
+   "dimension": "How to design the interface for data access?",
+   "dimension_id": "d:3",
+   "core": true,
+   "description": "new data queued in messages/events; message/event raised upon data availability",
+   "passages": []
+  },
+  {
+   "id": "v:3.5",
+   "kind": "value",
+   "label": "Data provider is accessed directly",
+   "status": "accepted",
+   "href": "entities/data-provider-is-accessed-directly",
+   "dimension": "How to design the interface for data access?",
+   "dimension_id": "d:3",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:4",
+   "kind": "dimension",
+   "label": "How to persist and provide access to features?",
+   "href": "concepts/how-to-persist-and-provide-access-to-features",
+   "description": "How to persist and provide access to features?",
+   "core": true,
+   "values": 2,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:4.1",
+   "kind": "value",
+   "label": "Feature store",
+   "status": "accepted",
+   "href": "entities/feature-store",
+   "dimension": "How to persist and provide access to features?",
+   "dimension_id": "d:4",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:4.2",
+   "kind": "value",
+   "label": "Store features in data stores without specific support",
+   "status": "accepted",
+   "href": "entities/store-features-in-data-stores-without-specific-support",
+   "dimension": "How to persist and provide access to features?",
+   "dimension_id": "d:4",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:5",
+   "kind": "dimension",
+   "label": "How to serve model predictions or scores?",
+   "href": "concepts/how-to-serve-model-predictions-or-scores",
+   "description": "How to serve model predictions or scores?",
+   "core": true,
+   "values": 5,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:5.1",
+   "kind": "value",
+   "label": "Microservice based model serving",
+   "status": "accepted",
+   "href": "entities/microservice-based-model-serving",
+   "dimension": "How to serve model predictions or scores?",
+   "dimension_id": "d:5",
+   "core": true,
+   "description": "deliver predictions or scores in real time by distributed service",
+   "passages": []
+  },
+  {
+   "id": "v:5.2",
+   "kind": "value",
+   "label": "Local service/API based model serving",
+   "status": "accepted",
+   "href": "entities/local-service-api-based-model-serving",
+   "dimension": "How to serve model predictions or scores?",
+   "dimension_id": "d:5",
+   "core": true,
+   "description": "deliver predictions or scores in real time by local service",
+   "passages": []
+  },
+  {
+   "id": "v:5.3",
+   "kind": "value",
+   "label": "Data batch based model serving",
+   "status": "accepted",
+   "href": "entities/data-batch-based-model-serving",
+   "dimension": "How to serve model predictions or scores?",
+   "dimension_id": "d:5",
+   "core": true,
+   "description": "process data in batches on-schedule and write predictions or scores to data storage",
+   "passages": []
+  },
+  {
+   "id": "v:5.4",
+   "kind": "value",
+   "label": "Precompute serving",
+   "status": "accepted",
+   "href": "entities/precompute-serving",
+   "dimension": "How to serve model predictions or scores?",
+   "dimension_id": "d:5",
+   "core": true,
+   "description": "precompute models e.g. as forecasts and deliver as reports",
+   "passages": []
+  },
+  {
+   "id": "v:5.5",
+   "kind": "value",
+   "label": "Hybrid online/offline model serving",
+   "status": "accepted",
+   "href": "entities/hybrid-online-offline-model-serving",
+   "dimension": "How to serve model predictions or scores?",
+   "dimension_id": "d:5",
+   "core": true,
+   "description": "combine online computations by services with offline computations in batches",
+   "passages": []
+  },
+  {
+   "id": "d:6",
+   "kind": "dimension",
+   "label": "How to inform clients about prediction result availability?",
+   "href": "concepts/how-to-inform-clients-about-prediction-result-availability",
+   "description": "How to inform clients about prediction result availability?",
+   "core": true,
+   "values": 3,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:6.1",
+   "kind": "value",
+   "label": "Push notification",
+   "status": "accepted",
+   "href": "entities/push-notification",
+   "dimension": "How to inform clients about prediction result availability?",
+   "dimension_id": "d:6",
+   "core": true,
+   "description": "notify clients about results",
+   "passages": []
+  },
+  {
+   "id": "v:6.2",
+   "kind": "value",
+   "label": "Polling",
+   "status": "accepted",
+   "href": "entities/polling",
+   "dimension": "How to inform clients about prediction result availability?",
+   "dimension_id": "d:6",
+   "core": true,
+   "description": "clients poll for the results",
+   "passages": []
+  },
+  {
+   "id": "v:6.3",
+   "kind": "value",
+   "label": "Block on result",
+   "status": "accepted",
+   "href": "entities/block-on-result",
+   "dimension": "How to inform clients about prediction result availability?",
+   "dimension_id": "d:6",
+   "core": true,
+   "description": "clients blocks until the results are available",
+   "passages": []
+  },
+  {
+   "id": "d:7",
+   "kind": "dimension",
+   "label": "How to ingest data into ML projects or applications?",
+   "href": "concepts/how-to-ingest-data-into-ml-projects-or-applications",
+   "description": "How to ingest data into ML projects or applications?",
+   "core": true,
+   "values": 4,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:7.1",
+   "kind": "value",
+   "label": "Streamed data ingestion",
+   "status": "accepted",
+   "href": "entities/streamed-data-ingestion",
+   "dimension": "How to ingest data into ML projects or applications?",
+   "dimension_id": "d:7",
+   "core": true,
+   "description": "receive a continuous stream of data",
+   "passages": []
+  },
+  {
+   "id": "v:7.2",
+   "kind": "value",
+   "label": "Data ingestion by request",
+   "status": "accepted",
+   "href": "entities/data-ingestion-by-request",
+   "dimension": "How to ingest data into ML projects or applications?",
+   "dimension_id": "d:7",
+   "core": true,
+   "description": "actively get raw data from data sources",
+   "passages": []
+  },
+  {
+   "id": "v:7.3",
+   "kind": "value",
+   "label": "Data ingestion in batches",
+   "status": "accepted",
+   "href": "entities/data-ingestion-in-batches",
+   "dimension": "How to ingest data into ML projects or applications?",
+   "dimension_id": "d:7",
+   "core": true,
+   "description": "get data in one or more batches, possibly only in part automated",
+   "passages": []
+  },
+  {
+   "id": "v:7.4",
+   "kind": "value",
+   "label": "Manual data ingestion",
+   "status": "accepted",
+   "href": "entities/manual-data-ingestion",
+   "dimension": "How to ingest data into ML projects or applications?",
+   "dimension_id": "d:7",
+   "core": true,
+   "description": "provide data for ingestion manually",
+   "passages": []
+  },
+  {
+   "id": "d:8",
+   "kind": "dimension",
+   "label": "How to perform automatic integration and delivery in a machine learning context?",
+   "href": "concepts/how-to-perform-automatic-integration-and-delivery-in-a-machine-learning-context",
+   "description": "How to perform automatic integration and delivery in a machine learning context?",
+   "core": true,
+   "values": 4,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:8.1",
+   "kind": "value",
+   "label": "CI/CD pipeline",
+   "status": "accepted",
+   "href": "entities/ci-cd-pipeline",
+   "dimension": "How to perform automatic integration and delivery in a machine learning context?",
+   "dimension_id": "d:8",
+   "core": true,
+   "description": "continuously automate the deployment e.g. upon commits",
+   "passages": []
+  },
+  {
+   "id": "v:8.2",
+   "kind": "value",
+   "label": "Build and Deployment scripts",
+   "status": "accepted",
+   "href": "entities/build-and-deployment-scripts",
+   "dimension": "How to perform automatic integration and delivery in a machine learning context?",
+   "dimension_id": "d:8",
+   "core": true,
+   "description": "manually perform automated deployments",
+   "passages": []
+  },
+  {
+   "id": "v:8.3",
+   "kind": "value",
+   "label": "Machine learning orchestrator",
+   "status": "accepted",
+   "href": "entities/machine-learning-orchestrator",
+   "dimension": "How to perform automatic integration and delivery in a machine learning context?",
+   "dimension_id": "d:8",
+   "core": true,
+   "description": "orchestrate multiple pipelines and/or components",
+   "passages": []
+  },
+  {
+   "id": "v:8.4",
+   "kind": "value",
+   "label": "No integration or delivery automation",
+   "status": "accepted",
+   "href": "entities/no-integration-or-delivery-automation",
+   "dimension": "How to perform automatic integration and delivery in a machine learning context?",
+   "dimension_id": "d:8",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:9",
+   "kind": "dimension",
+   "label": "Which tasks can be performed by a delivery pipeline or component?",
+   "href": "concepts/which-tasks-can-be-performed-by-a-delivery-pipeline-or-component",
+   "description": "Which tasks can be performed by a delivery pipeline or component?",
+   "core": true,
+   "values": 9,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:9.1",
+   "kind": "value",
+   "label": "Packaging",
+   "status": "accepted",
+   "href": "entities/packaging",
+   "dimension": "Which tasks can be performed by a delivery pipeline or component?",
+   "dimension_id": "d:9",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:9.2",
+   "kind": "value",
+   "label": "Testing",
+   "status": "accepted",
+   "href": "entities/testing",
+   "dimension": "Which tasks can be performed by a delivery pipeline or component?",
+   "dimension_id": "d:9",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:9.3",
+   "kind": "value",
+   "label": "Building",
+   "status": "accepted",
+   "href": "entities/building",
+   "dimension": "Which tasks can be performed by a delivery pipeline or component?",
+   "dimension_id": "d:9",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:9.4",
+   "kind": "value",
+   "label": "Deployment",
+   "status": "accepted",
+   "href": "entities/deployment",
+   "dimension": "Which tasks can be performed by a delivery pipeline or component?",
+   "dimension_id": "d:9",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:9.5",
+   "kind": "value",
+   "label": "Containerization",
+   "status": "accepted",
+   "href": "entities/containerization",
+   "dimension": "Which tasks can be performed by a delivery pipeline or component?",
+   "dimension_id": "d:9",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:9.6",
+   "kind": "value",
+   "label": "Canary testing",
+   "status": "accepted",
+   "href": "entities/canary-testing-2",
+   "dimension": "Which tasks can be performed by a delivery pipeline or component?",
+   "dimension_id": "d:9",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:9.7",
+   "kind": "value",
+   "label": "A/B testing",
+   "status": "accepted",
+   "href": "entities/a-b-testing-2",
+   "dimension": "Which tasks can be performed by a delivery pipeline or component?",
+   "dimension_id": "d:9",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:9.8",
+   "kind": "value",
+   "label": "Evidence based hypothesis testing",
+   "status": "accepted",
+   "href": "entities/evidence-based-hypothesis-testing-2",
+   "dimension": "Which tasks can be performed by a delivery pipeline or component?",
+   "dimension_id": "d:9",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:9.9",
+   "kind": "value",
+   "label": "Version control repository",
+   "status": "accepted",
+   "href": "entities/version-control-repository",
+   "dimension": "Which tasks can be performed by a delivery pipeline or component?",
+   "dimension_id": "d:9",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:10",
+   "kind": "dimension",
+   "label": "Which model versions should be deployed to production and how?",
+   "href": "concepts/which-model-versions-should-be-deployed-to-production-and-how",
+   "description": "Which model versions should be deployed to production and how?",
+   "core": true,
+   "values": 3,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:10.1",
+   "kind": "value",
+   "label": "N versions in production",
+   "status": "accepted",
+   "href": "entities/n-versions-in-production",
+   "dimension": "Which model versions should be deployed to production and how?",
+   "dimension_id": "d:10",
+   "core": true,
+   "description": "deploy multiple model versions at the same time",
+   "passages": []
+  },
+  {
+   "id": "v:10.2",
+   "kind": "value",
+   "label": "Rollback to previous model version",
+   "status": "accepted",
+   "href": "entities/rollback-to-previous-model-version",
+   "dimension": "Which model versions should be deployed to production and how?",
+   "dimension_id": "d:10",
+   "core": true,
+   "description": "redeploy previous model version and then switch to previous model",
+   "passages": []
+  },
+  {
+   "id": "v:10.3",
+   "kind": "value",
+   "label": "Single model in production",
+   "status": "accepted",
+   "href": "entities/single-model-in-production",
+   "dimension": "Which model versions should be deployed to production and how?",
+   "dimension_id": "d:10",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:11",
+   "kind": "dimension",
+   "label": "How to version data decision?",
+   "href": "concepts/how-to-version-data-decision",
+   "description": "How to version data decision?",
+   "core": true,
+   "values": 3,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:11.1",
+   "kind": "value",
+   "label": "Data version repository",
+   "status": "accepted",
+   "href": "entities/data-version-repository",
+   "dimension": "How to version data decision?",
+   "dimension_id": "d:11",
+   "core": true,
+   "description": "version repository with specific technology-support for data versioning",
+   "passages": []
+  },
+  {
+   "id": "v:11.2",
+   "kind": "value",
+   "label": "Data versioning in code repository",
+   "status": "accepted",
+   "href": "entities/data-versioning-in-code-repository",
+   "dimension": "How to version data decision?",
+   "dimension_id": "d:11",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:11.3",
+   "kind": "value",
+   "label": "No data versioning",
+   "status": "accepted",
+   "href": "entities/no-data-versioning",
+   "dimension": "How to version data decision?",
+   "dimension_id": "d:11",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:12",
+   "kind": "dimension",
+   "label": "How to trigger a machine learning pipeline or orchestrator?",
+   "href": "concepts/how-to-trigger-a-machine-learning-pipeline-or-orchestrator",
+   "description": "How to trigger a machine learning pipeline or orchestrator?",
+   "core": true,
+   "values": 6,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:12.1",
+   "kind": "value",
+   "label": "On-demand trigger",
+   "status": "accepted",
+   "href": "entities/on-demand-trigger",
+   "dimension": "How to trigger a machine learning pipeline or orchestrator?",
+   "dimension_id": "d:12",
+   "core": true,
+   "description": "ad-hoc manual execution of the pipeline, or triggered by other pipeline or service",
+   "passages": []
+  },
+  {
+   "id": "v:12.2",
+   "kind": "value",
+   "label": "On-commit trigger",
+   "status": "accepted",
+   "href": "entities/on-commit-trigger",
+   "dimension": "How to trigger a machine learning pipeline or orchestrator?",
+   "dimension_id": "d:12",
+   "core": true,
+   "description": "when a commit to a source or data version control repository happens",
+   "passages": []
+  },
+  {
+   "id": "v:12.3",
+   "kind": "value",
+   "label": "On-schedule trigger",
+   "status": "accepted",
+   "href": "entities/on-schedule-trigger",
+   "dimension": "How to trigger a machine learning pipeline or orchestrator?",
+   "dimension_id": "d:12",
+   "core": true,
+   "description": "frequent pipeline runs e.g. on a daily, weekly, or monthly basis",
+   "passages": []
+  },
+  {
+   "id": "v:12.4",
+   "kind": "value",
+   "label": "On availability of new training data trigger",
+   "status": "accepted",
+   "href": "entities/on-availability-of-new-training-data-trigger",
+   "dimension": "How to trigger a machine learning pipeline or orchestrator?",
+   "dimension_id": "d:12",
+   "core": true,
+   "description": "when new data is collected and made available in data stores",
+   "passages": []
+  },
+  {
+   "id": "v:12.5",
+   "kind": "value",
+   "label": "On model performance degradation trigger",
+   "status": "accepted",
+   "href": "entities/on-model-performance-degradation-trigger",
+   "dimension": "How to trigger a machine learning pipeline or orchestrator?",
+   "dimension_id": "d:12",
+   "core": true,
+   "description": "when a noticeable performance degradation is observed",
+   "passages": []
+  },
+  {
+   "id": "v:12.6",
+   "kind": "value",
+   "label": "On changes in the data distribution trigger",
+   "status": "accepted",
+   "href": "entities/on-changes-in-the-data-distribution-trigger",
+   "dimension": "How to trigger a machine learning pipeline or orchestrator?",
+   "dimension_id": "d:12",
+   "core": true,
+   "description": "when a significant changes in the data distributions of features is observed",
+   "passages": []
+  },
+  {
+   "id": "d:13",
+   "kind": "dimension",
+   "label": "How to automatically provision environments?",
+   "href": "concepts/how-to-automatically-provision-environments",
+   "description": "How to automatically provision environments?",
+   "core": true,
+   "values": 2,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:13.1",
+   "kind": "value",
+   "label": "Automated provisioning",
+   "status": "accepted",
+   "href": "entities/automated-provisioning",
+   "dimension": "How to automatically provision environments?",
+   "dimension_id": "d:13",
+   "core": true,
+   "description": "automatically provision environments",
+   "passages": []
+  },
+  {
+   "id": "v:13.2",
+   "kind": "value",
+   "label": "No automated provisioning",
+   "status": "accepted",
+   "href": "entities/no-automated-provisioning",
+   "dimension": "How to automatically provision environments?",
+   "dimension_id": "d:13",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:14",
+   "kind": "dimension",
+   "label": "How to automatically process the data used for model building?",
+   "href": "concepts/how-to-automatically-process-the-data-used-for-model-building",
+   "description": "How to automatically process the data used for model building?",
+   "core": true,
+   "values": 4,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:14.1",
+   "kind": "value",
+   "label": "Data pipeline",
+   "status": "accepted",
+   "href": "entities/data-pipeline",
+   "dimension": "How to automatically process the data used for model building?",
+   "dimension_id": "d:14",
+   "core": true,
+   "description": "process data in dedicated, flexible pipeline",
+   "passages": []
+  },
+  {
+   "id": "v:14.2",
+   "kind": "value",
+   "label": "ETL pipeline",
+   "status": "accepted",
+   "href": "entities/etl-pipeline",
+   "dimension": "How to automatically process the data used for model building?",
+   "dimension_id": "d:14",
+   "core": true,
+   "description": "process data through extract, transform, and load steps",
+   "passages": []
+  },
+  {
+   "id": "v:14.3",
+   "kind": "value",
+   "label": "Data processing component",
+   "status": "accepted",
+   "href": "entities/data-processing-component",
+   "dimension": "How to automatically process the data used for model building?",
+   "dimension_id": "d:14",
+   "core": true,
+   "description": "process data in dedicated component",
+   "passages": []
+  },
+  {
+   "id": "v:14.4",
+   "kind": "value",
+   "label": "No data processing automation",
+   "status": "accepted",
+   "href": "entities/no-data-processing-automation",
+   "dimension": "How to automatically process the data used for model building?",
+   "dimension_id": "d:14",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:15",
+   "kind": "dimension",
+   "label": "Should data be processed in batches or in realtime?",
+   "href": "concepts/should-data-be-processed-in-batches-or-in-realtime",
+   "description": "Should data be processed in batches or in realtime?",
+   "core": true,
+   "values": 2,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:15.1",
+   "kind": "value",
+   "label": "Batch-based data processing",
+   "status": "accepted",
+   "href": "entities/batch-based-data-processing",
+   "dimension": "Should data be processed in batches or in realtime?",
+   "dimension_id": "d:15",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:15.2",
+   "kind": "value",
+   "label": "Real-time, stream-based data processing",
+   "status": "accepted",
+   "href": "entities/real-time-stream-based-data-processing",
+   "dimension": "Should data be processed in batches or in realtime?",
+   "dimension_id": "d:15",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:16",
+   "kind": "dimension",
+   "label": "Which data processing tasks can be performed by a data processing pipeline or component?",
+   "href": "concepts/which-data-processing-tasks-can-be-performed-by-a-data-processing-pipeline-or-co",
+   "description": "Which data processing tasks can be performed by a data processing pipeline or component?",
+   "core": true,
+   "values": 7,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:16.1",
+   "kind": "value",
+   "label": "Data extraction",
+   "status": "accepted",
+   "href": "entities/data-extraction",
+   "dimension": "Which data processing tasks can be performed by a data processing pipeline or component?",
+   "dimension_id": "d:16",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:16.2",
+   "kind": "value",
+   "label": "Data preparation",
+   "status": "accepted",
+   "href": "entities/data-preparation",
+   "dimension": "Which data processing tasks can be performed by a data processing pipeline or component?",
+   "dimension_id": "d:16",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:16.3",
+   "kind": "value",
+   "label": "Data validation",
+   "status": "accepted",
+   "href": "entities/data-validation",
+   "dimension": "Which data processing tasks can be performed by a data processing pipeline or component?",
+   "dimension_id": "d:16",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:16.4",
+   "kind": "value",
+   "label": "Data transformation",
+   "status": "accepted",
+   "href": "entities/data-transformation",
+   "dimension": "Which data processing tasks can be performed by a data processing pipeline or component?",
+   "dimension_id": "d:16",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:16.5",
+   "kind": "value",
+   "label": "Data selection",
+   "status": "accepted",
+   "href": "entities/data-selection",
+   "dimension": "Which data processing tasks can be performed by a data processing pipeline or component?",
+   "dimension_id": "d:16",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:16.6",
+   "kind": "value",
+   "label": "Feature engineering",
+   "status": "accepted",
+   "href": "entities/feature-engineering",
+   "dimension": "Which data processing tasks can be performed by a data processing pipeline or component?",
+   "dimension_id": "d:16",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:16.7",
+   "kind": "value",
+   "label": "Data processing hyperparameter tuning",
+   "status": "accepted",
+   "href": "entities/data-processing-hyperparameter-tuning",
+   "dimension": "Which data processing tasks can be performed by a data processing pipeline or component?",
+   "dimension_id": "d:16",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:17",
+   "kind": "dimension",
+   "label": "How to parallelize data processing?",
+   "href": "concepts/how-to-parallelize-data-processing",
+   "description": "How to parallelize data processing?",
+   "core": true,
+   "values": 4,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:17.1",
+   "kind": "value",
+   "label": "Data pipeline per data set",
+   "status": "accepted",
+   "href": "entities/data-pipeline-per-data-set",
+   "dimension": "How to parallelize data processing?",
+   "dimension_id": "d:17",
+   "core": true,
+   "description": "dedicated pipeline for each dataset",
+   "passages": []
+  },
+  {
+   "id": "v:17.2",
+   "kind": "value",
+   "label": "Data partitioning in data pipeline",
+   "status": "accepted",
+   "href": "entities/data-partitioning-in-data-pipeline",
+   "dimension": "How to parallelize data processing?",
+   "dimension_id": "d:17",
+   "core": true,
+   "description": "within a pipeline, the data is partitioned to benefit from parallel processing",
+   "passages": []
+  },
+  {
+   "id": "v:17.3",
+   "kind": "value",
+   "label": "Hybrid data processing parallelization",
+   "status": "accepted",
+   "href": "entities/hybrid-data-processing-parallelization",
+   "dimension": "How to parallelize data processing?",
+   "dimension_id": "d:17",
+   "core": true,
+   "description": "combining one or more of the other parallelization options",
+   "passages": []
+  },
+  {
+   "id": "v:17.4",
+   "kind": "value",
+   "label": "No parallel data processing",
+   "status": "accepted",
+   "href": "entities/no-parallel-data-processing",
+   "dimension": "How to parallelize data processing?",
+   "dimension_id": "d:17",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:18",
+   "kind": "dimension",
+   "label": "How to perform model building in an ML project?",
+   "href": "concepts/how-to-perform-model-building-in-an-ml-project",
+   "description": "How to perform model building in an ML project?",
+   "core": true,
+   "values": 3,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:18.1",
+   "kind": "value",
+   "label": "Model building pipeline",
+   "status": "accepted",
+   "href": "entities/model-building-pipeline",
+   "dimension": "How to perform model building in an ML project?",
+   "dimension_id": "d:18",
+   "core": true,
+   "description": "model training, evaluation, and validation in automated pipeline",
+   "passages": []
+  },
+  {
+   "id": "v:18.2",
+   "kind": "value",
+   "label": "Model builder component",
+   "status": "accepted",
+   "href": "entities/model-builder-component",
+   "dimension": "How to perform model building in an ML project?",
+   "dimension_id": "d:18",
+   "core": true,
+   "description": "model training, evaluation, and validation in dedicated component",
+   "passages": []
+  },
+  {
+   "id": "v:18.3",
+   "kind": "value",
+   "label": "Model building in development tool",
+   "status": "accepted",
+   "href": "entities/model-building-in-development-tool",
+   "dimension": "How to perform model building in an ML project?",
+   "dimension_id": "d:18",
+   "core": true,
+   "description": "model building performed in development sandbox",
+   "passages": []
+  },
+  {
+   "id": "d:19",
+   "kind": "dimension",
+   "label": "When and how to train the model?",
+   "href": "concepts/when-and-how-to-train-the-model",
+   "description": "When and how to train the model?",
+   "core": true,
+   "values": 3,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:19.1",
+   "kind": "value",
+   "label": "Batch-based learning",
+   "status": "accepted",
+   "href": "entities/batch-based-learning",
+   "dimension": "When and how to train the model?",
+   "dimension_id": "d:19",
+   "core": true,
+   "description": "train the model in batches, possibly offline",
+   "passages": []
+  },
+  {
+   "id": "v:19.2",
+   "kind": "value",
+   "label": "Incremental learning",
+   "status": "accepted",
+   "href": "entities/incremental-learning",
+   "dimension": "When and how to train the model?",
+   "dimension_id": "d:19",
+   "core": true,
+   "description": "train the model incrementally, possibly online",
+   "passages": []
+  },
+  {
+   "id": "v:19.3",
+   "kind": "value",
+   "label": "Hybrid batch-based and incremental learning",
+   "status": "accepted",
+   "href": "entities/hybrid-batch-based-and-incremental-learning",
+   "dimension": "When and how to train the model?",
+   "dimension_id": "d:19",
+   "core": true,
+   "description": "train some factors of the model in batches, possibly offline, and incrementally train other factors, possibly online",
+   "passages": []
+  },
+  {
+   "id": "d:20",
+   "kind": "dimension",
+   "label": "Which tasks can be performed by a model building pipeline or component?",
+   "href": "concepts/which-tasks-can-be-performed-by-a-model-building-pipeline-or-component",
+   "description": "Which tasks can be performed by a model building pipeline or component?",
+   "core": true,
+   "values": 10,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:20.1",
+   "kind": "value",
+   "label": "Model training",
+   "status": "accepted",
+   "href": "entities/model-training",
+   "dimension": "Which tasks can be performed by a model building pipeline or component?",
+   "dimension_id": "d:20",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:20.2",
+   "kind": "value",
+   "label": "Data splitting",
+   "status": "accepted",
+   "href": "entities/data-splitting",
+   "dimension": "Which tasks can be performed by a model building pipeline or component?",
+   "dimension_id": "d:20",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:20.3",
+   "kind": "value",
+   "label": "Data checkpoints",
+   "status": "accepted",
+   "href": "entities/data-checkpoints",
+   "dimension": "Which tasks can be performed by a model building pipeline or component?",
+   "dimension_id": "d:20",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:20.4",
+   "kind": "value",
+   "label": "Model validation",
+   "status": "accepted",
+   "href": "entities/model-validation",
+   "dimension": "Which tasks can be performed by a model building pipeline or component?",
+   "dimension_id": "d:20",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:20.5",
+   "kind": "value",
+   "label": "Model selection",
+   "status": "accepted",
+   "href": "entities/model-selection",
+   "dimension": "Which tasks can be performed by a model building pipeline or component?",
+   "dimension_id": "d:20",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:20.6",
+   "kind": "value",
+   "label": "Model packaging",
+   "status": "accepted",
+   "href": "entities/model-packaging",
+   "dimension": "Which tasks can be performed by a model building pipeline or component?",
+   "dimension_id": "d:20",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:20.7",
+   "kind": "value",
+   "label": "Development tool facade",
+   "status": "accepted",
+   "href": "entities/development-tool-facade",
+   "dimension": "Which tasks can be performed by a model building pipeline or component?",
+   "dimension_id": "d:20",
+   "core": true,
+   "description": "use API to integrate development tool",
+   "passages": []
+  },
+  {
+   "id": "v:20.8",
+   "kind": "value",
+   "label": "Development tool export",
+   "status": "accepted",
+   "href": "entities/development-tool-export",
+   "dimension": "Which tasks can be performed by a model building pipeline or component?",
+   "dimension_id": "d:20",
+   "core": true,
+   "description": "use exported file to work in development tool",
+   "passages": []
+  },
+  {
+   "id": "v:20.9",
+   "kind": "value",
+   "label": "Train multiple model versions with different parameters and/or algorithms",
+   "status": "accepted",
+   "href": "entities/train-multiple-model-versions-with-different-parameters-and-or-algorithms",
+   "dimension": "Which tasks can be performed by a model building pipeline or component?",
+   "dimension_id": "d:20",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:20.10",
+   "kind": "value",
+   "label": "Model hyperparameter tuning",
+   "status": "accepted",
+   "href": "entities/model-hyperparameter-tuning",
+   "dimension": "Which tasks can be performed by a model building pipeline or component?",
+   "dimension_id": "d:20",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:21",
+   "kind": "dimension",
+   "label": "How to parallelize model building?",
+   "href": "concepts/how-to-parallelize-model-building",
+   "description": "How to parallelize model building?",
+   "core": true,
+   "values": 5,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:21.1",
+   "kind": "value",
+   "label": "Model building pipeline per model",
+   "status": "accepted",
+   "href": "entities/model-building-pipeline-per-model",
+   "dimension": "How to parallelize model building?",
+   "dimension_id": "d:21",
+   "core": true,
+   "description": "all models run concurrently",
+   "passages": []
+  },
+  {
+   "id": "v:21.2",
+   "kind": "value",
+   "label": "Training data partitioning",
+   "status": "accepted",
+   "href": "entities/training-data-partitioning",
+   "dimension": "How to parallelize model building?",
+   "dimension_id": "d:21",
+   "core": true,
+   "description": "the data is partitioned and each partition has a replica of the model",
+   "passages": []
+  },
+  {
+   "id": "v:21.3",
+   "kind": "value",
+   "label": "Model partitioning",
+   "status": "accepted",
+   "href": "entities/model-partitioning",
+   "dimension": "How to parallelize model building?",
+   "dimension_id": "d:21",
+   "core": true,
+   "description": "the model is partitioned and each partition updates a portion of parameters",
+   "passages": []
+  },
+  {
+   "id": "v:21.4",
+   "kind": "value",
+   "label": "Hybrid model building parallelization",
+   "status": "accepted",
+   "href": "entities/hybrid-model-building-parallelization",
+   "dimension": "How to parallelize model building?",
+   "dimension_id": "d:21",
+   "core": true,
+   "description": "combining one or more of the other parallelization options",
+   "passages": []
+  },
+  {
+   "id": "v:21.5",
+   "kind": "value",
+   "label": "No parallel model building",
+   "status": "accepted",
+   "href": "entities/no-parallel-model-building",
+   "dimension": "How to parallelize model building?",
+   "dimension_id": "d:21",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:22",
+   "kind": "dimension",
+   "label": "How to monitor and track the model in production?",
+   "href": "concepts/how-to-monitor-and-track-the-model-in-production",
+   "description": "How to monitor and track the model in production?",
+   "core": true,
+   "values": 4,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:22.1",
+   "kind": "value",
+   "label": "Model performance monitoring",
+   "status": "accepted",
+   "href": "entities/model-performance-monitoring",
+   "dimension": "How to monitor and track the model in production?",
+   "dimension_id": "d:22",
+   "core": true,
+   "description": "observe specific model performance parameters",
+   "passages": []
+  },
+  {
+   "id": "v:22.2",
+   "kind": "value",
+   "label": "Monitoring or logging data and predictions",
+   "status": "accepted",
+   "href": "entities/monitoring-or-logging-data-and-predictions",
+   "dimension": "How to monitor and track the model in production?",
+   "dimension_id": "d:22",
+   "core": true,
+   "description": "log and monitor system data and predictions",
+   "passages": []
+  },
+  {
+   "id": "v:22.3",
+   "kind": "value",
+   "label": "No in-production monitoring",
+   "status": "accepted",
+   "href": "entities/no-in-production-monitoring",
+   "dimension": "How to monitor and track the model in production?",
+   "dimension_id": "d:22",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:22.4",
+   "kind": "value",
+   "label": "Model in-production tracking",
+   "status": "accepted",
+   "href": "entities/model-in-production-tracking",
+   "dimension": "How to monitor and track the model in production?",
+   "dimension_id": "d:22",
+   "core": true,
+   "description": "track model usage, inputs, outputs, interpretability, and fairness",
+   "passages": []
+  },
+  {
+   "id": "d:23",
+   "kind": "dimension",
+   "label": "Should AutoML be used and if so where?",
+   "href": "concepts/should-automl-be-used-and-if-so-where",
+   "description": "Should AutoML be used and if so where?",
+   "core": true,
+   "values": 2,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:23.1",
+   "kind": "value",
+   "label": "AutoML",
+   "status": "accepted",
+   "href": "entities/automl",
+   "dimension": "Should AutoML be used and if so where?",
+   "dimension_id": "d:23",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:23.2",
+   "kind": "value",
+   "label": "No AutoML",
+   "status": "accepted",
+   "href": "entities/no-automl",
+   "dimension": "Should AutoML be used and if so where?",
+   "dimension_id": "d:23",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:24",
+   "kind": "dimension",
+   "label": "How to adjust models based on monitoring results?",
+   "href": "concepts/how-to-adjust-models-based-on-monitoring-results",
+   "description": "How to adjust models based on monitoring results?",
+   "core": true,
+   "values": 2,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:24.1",
+   "kind": "value",
+   "label": "Manual model adjustment",
+   "status": "accepted",
+   "href": "entities/manual-model-adjustment",
+   "dimension": "How to adjust models based on monitoring results?",
+   "dimension_id": "d:24",
+   "core": true,
+   "description": "humans adjust and redeploy the models",
+   "passages": []
+  },
+  {
+   "id": "v:24.2",
+   "kind": "value",
+   "label": "Automated model adjustment",
+   "status": "accepted",
+   "href": "entities/automated-model-adjustment",
+   "dimension": "How to adjust models based on monitoring results?",
+   "dimension_id": "d:24",
+   "core": true,
+   "description": "automated measures are triggered to adjust the models",
+   "passages": []
+  },
+  {
+   "id": "d:25",
+   "kind": "dimension",
+   "label": "What to build, test, and deploy automatically by CI/CD pipelines?",
+   "href": "concepts/what-to-build-test-and-deploy-automatically-by-ci-cd-pipelines",
+   "description": "What to build, test, and deploy automatically by CI/CD pipelines?",
+   "core": true,
+   "values": 3,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:25.1",
+   "kind": "value",
+   "label": "Build, test, and deploy models to be served and other system components",
+   "status": "accepted",
+   "href": "entities/build-test-and-deploy-models-to-be-served-and-other-system-components",
+   "dimension": "What to build, test, and deploy automatically by CI/CD pipelines?",
+   "dimension_id": "d:25",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:25.2",
+   "kind": "value",
+   "label": "Build, test, and deploy machine learning pipelines and components needed during pipeline runs",
+   "status": "accepted",
+   "href": "entities/build-test-and-deploy-machine-learning-pipelines-and-components-needed-during-pi",
+   "dimension": "What to build, test, and deploy automatically by CI/CD pipelines?",
+   "dimension_id": "d:25",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:25.3",
+   "kind": "value",
+   "label": "No automated deployment",
+   "status": "accepted",
+   "href": "entities/no-automated-deployment",
+   "dimension": "What to build, test, and deploy automatically by CI/CD pipelines?",
+   "dimension_id": "d:25",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:26",
+   "kind": "dimension",
+   "label": "What to test in a machine learning/data science pipeline?",
+   "href": "concepts/what-to-test-in-a-machine-learning-data-science-pipeline",
+   "description": "What to test in a machine learning/data science pipeline?",
+   "core": true,
+   "values": 14,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:26.1",
+   "kind": "value",
+   "label": "Canary testing",
+   "status": "accepted",
+   "href": "entities/canary-testing",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.2",
+   "kind": "value",
+   "label": "A/B testing",
+   "status": "accepted",
+   "href": "entities/a-b-testing",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.3",
+   "kind": "value",
+   "label": "Evidence based hypothesis testing",
+   "status": "accepted",
+   "href": "entities/evidence-based-hypothesis-testing",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.4",
+   "kind": "value",
+   "label": "Unit testing system components",
+   "status": "accepted",
+   "href": "entities/unit-testing-system-components",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.5",
+   "kind": "value",
+   "label": "System integration testing",
+   "status": "accepted",
+   "href": "entities/system-integration-testing",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.6",
+   "kind": "value",
+   "label": "Unit testing feature engineering logic",
+   "status": "accepted",
+   "href": "entities/unit-testing-feature-engineering-logic",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.7",
+   "kind": "value",
+   "label": "Unit testing different methods implemented in a model",
+   "status": "accepted",
+   "href": "entities/unit-testing-different-methods-implemented-in-a-model",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.8",
+   "kind": "value",
+   "label": "Testing model training converges",
+   "status": "accepted",
+   "href": "entities/testing-model-training-converges",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.9",
+   "kind": "value",
+   "label": "Testing trained model quality",
+   "status": "accepted",
+   "href": "entities/testing-trained-model-quality",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.10",
+   "kind": "value",
+   "label": "Unit testing pipeline components",
+   "status": "accepted",
+   "href": "entities/unit-testing-pipeline-components",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.11",
+   "kind": "value",
+   "label": "Integration testing pipeline components",
+   "status": "accepted",
+   "href": "entities/integration-testing-pipeline-components",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.12",
+   "kind": "value",
+   "label": "Prediction service API testing",
+   "status": "accepted",
+   "href": "entities/prediction-service-api-testing",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.13",
+   "kind": "value",
+   "label": "Prediction service performance testing",
+   "status": "accepted",
+   "href": "entities/prediction-service-performance-testing",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:26.14",
+   "kind": "value",
+   "label": "No testing",
+   "status": "accepted",
+   "href": "entities/no-testing",
+   "dimension": "What to test in a machine learning/data science pipeline?",
+   "dimension_id": "d:26",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:27",
+   "kind": "dimension",
+   "label": "Should MLOps be used and if so when?",
+   "href": "concepts/should-mlops-be-used-and-if-so-when",
+   "description": "Should MLOps be used and if so when?",
+   "core": true,
+   "values": 2,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:27.1",
+   "kind": "value",
+   "label": "MLOps",
+   "status": "accepted",
+   "href": "entities/mlops",
+   "dimension": "Should MLOps be used and if so when?",
+   "dimension_id": "d:27",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "v:27.2",
+   "kind": "value",
+   "label": "No MLOps",
+   "status": "accepted",
+   "href": "entities/no-mlops",
+   "dimension": "Should MLOps be used and if so when?",
+   "dimension_id": "d:27",
+   "core": true,
+   "description": "",
+   "passages": []
+  },
+  {
+   "id": "d:28",
+   "kind": "dimension",
+   "label": "What development environment should be used?",
+   "href": "concepts/what-development-environment-should-be-used",
+   "description": "What development environment should be used?",
+   "core": true,
+   "values": 2,
+   "evidence": {
+    "codes": 0,
+    "documents": 0,
+    "sources": 0
+   },
+   "exclusivity": null
+  },
+  {
+   "id": "v:28.1",
+   "kind": "value",
+   "label": "Use computational notebooks",
+   "status": "accepted",
+   "href": "entities/use-computational-notebooks",
+   "dimension": "What development environment should be used?",
+   "dimension_id": "d:28",
+   "core": true,
+   "description": "use computational notebooks",
+   "passages": []
+  },
+  {
+   "id": "v:28.2",
+   "kind": "value",
+   "label": "Use an IDE",
+   "status": "accepted",
+   "href": "entities/use-an-ide",
+   "dimension": "What development environment should be used?",
+   "dimension_id": "d:28",
+   "core": true,
+   "description": "use an IDE",
+   "passages": []
+  }
+ ],
+ "edges": [
+  {
+   "source": "d:1",
+   "target": "v:1.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:1",
+   "target": "v:1.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:1",
+   "target": "v:1.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:1",
+   "target": "v:1.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:1",
+   "target": "v:1.5",
+   "type": "has_value"
+  },
+  {
+   "source": "d:1",
+   "target": "v:1.6",
+   "type": "has_value"
+  },
+  {
+   "source": "d:1",
+   "target": "v:1.7",
+   "type": "has_value"
+  },
+  {
+   "source": "d:1",
+   "target": "d:5",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to integrate a machine learning model in an application? affect the outcomes of How to serve model predictions or scores?"
+  },
+  {
+   "source": "d:2",
+   "target": "v:2.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:2",
+   "target": "v:2.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:2",
+   "target": "v:2.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:2",
+   "target": "v:2.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:2",
+   "target": "d:3",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to store data used in machine learning applications? affect the outcomes of How to design the interface for data access?"
+  },
+  {
+   "source": "d:2",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to store data used in machine learning applications? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:3",
+   "target": "v:3.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:3",
+   "target": "v:3.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:3",
+   "target": "v:3.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:3",
+   "target": "v:3.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:3",
+   "target": "v:3.5",
+   "type": "has_value"
+  },
+  {
+   "source": "d:4",
+   "target": "v:4.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:4",
+   "target": "v:4.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:4",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to persist and provide access to features? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:5",
+   "target": "v:5.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:5",
+   "target": "v:5.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:5",
+   "target": "v:5.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:5",
+   "target": "v:5.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:5",
+   "target": "v:5.5",
+   "type": "has_value"
+  },
+  {
+   "source": "d:5",
+   "target": "d:4",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to serve model predictions or scores? affect the outcomes of How to persist and provide access to features?"
+  },
+  {
+   "source": "d:5",
+   "target": "d:6",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to serve model predictions or scores? affect the outcomes of How to inform clients about prediction result availability?"
+  },
+  {
+   "source": "d:5",
+   "target": "d:7",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to serve model predictions or scores? affect the outcomes of How to ingest data into ML projects or applications?"
+  },
+  {
+   "source": "d:6",
+   "target": "v:6.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:6",
+   "target": "v:6.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:6",
+   "target": "v:6.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:7",
+   "target": "v:7.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:7",
+   "target": "v:7.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:7",
+   "target": "v:7.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:7",
+   "target": "v:7.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:7",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to ingest data into ML projects or applications? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:8",
+   "target": "v:8.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:8",
+   "target": "v:8.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:8",
+   "target": "v:8.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:8",
+   "target": "v:8.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:8",
+   "target": "d:10",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to perform automatic integration and delivery in a machine learning context? affect the outcomes of Which model versions should be deployed to production and how?"
+  },
+  {
+   "source": "d:8",
+   "target": "d:11",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to perform automatic integration and delivery in a machine learning context? affect the outcomes of How to version data decision?"
+  },
+  {
+   "source": "d:8",
+   "target": "d:12",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to perform automatic integration and delivery in a machine learning context? affect the outcomes of How to trigger a machine learning pipeline or orchestrator?"
+  },
+  {
+   "source": "d:8",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to perform automatic integration and delivery in a machine learning context? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:9",
+   "target": "v:9.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:9",
+   "target": "v:9.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:9",
+   "target": "v:9.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:9",
+   "target": "v:9.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:9",
+   "target": "v:9.5",
+   "type": "has_value"
+  },
+  {
+   "source": "d:9",
+   "target": "v:9.6",
+   "type": "has_value"
+  },
+  {
+   "source": "d:9",
+   "target": "v:9.7",
+   "type": "has_value"
+  },
+  {
+   "source": "d:9",
+   "target": "v:9.8",
+   "type": "has_value"
+  },
+  {
+   "source": "d:9",
+   "target": "v:9.9",
+   "type": "has_value"
+  },
+  {
+   "source": "d:9",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on Which tasks can be performed by a delivery pipeline or component? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:10",
+   "target": "v:10.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:10",
+   "target": "v:10.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:10",
+   "target": "v:10.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:10",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on Which model versions should be deployed to production and how? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:11",
+   "target": "v:11.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:11",
+   "target": "v:11.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:11",
+   "target": "v:11.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:11",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to version data decision? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:12",
+   "target": "v:12.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:12",
+   "target": "v:12.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:12",
+   "target": "v:12.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:12",
+   "target": "v:12.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:12",
+   "target": "v:12.5",
+   "type": "has_value"
+  },
+  {
+   "source": "d:12",
+   "target": "v:12.6",
+   "type": "has_value"
+  },
+  {
+   "source": "d:12",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to trigger a machine learning pipeline or orchestrator? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:13",
+   "target": "v:13.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:13",
+   "target": "v:13.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:13",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to automatically provision environments? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:14",
+   "target": "v:14.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:14",
+   "target": "v:14.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:14",
+   "target": "v:14.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:14",
+   "target": "v:14.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:14",
+   "target": "d:4",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to automatically process the data used for model building? affect the outcomes of How to persist and provide access to features?"
+  },
+  {
+   "source": "d:14",
+   "target": "d:7",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to automatically process the data used for model building? affect the outcomes of How to ingest data into ML projects or applications?"
+  },
+  {
+   "source": "d:14",
+   "target": "d:17",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to automatically process the data used for model building? affect the outcomes of How to parallelize data processing?"
+  },
+  {
+   "source": "d:14",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to automatically process the data used for model building? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:15",
+   "target": "v:15.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:15",
+   "target": "v:15.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:15",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on Should data be processed in batches or in realtime? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:16",
+   "target": "v:16.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:16",
+   "target": "v:16.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:16",
+   "target": "v:16.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:16",
+   "target": "v:16.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:16",
+   "target": "v:16.5",
+   "type": "has_value"
+  },
+  {
+   "source": "d:16",
+   "target": "v:16.6",
+   "type": "has_value"
+  },
+  {
+   "source": "d:16",
+   "target": "v:16.7",
+   "type": "has_value"
+  },
+  {
+   "source": "d:16",
+   "target": "d:23",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on Which data processing tasks can be performed by a data processing pipeline or component? affect the outcomes of Should AutoML be used and if so where?"
+  },
+  {
+   "source": "d:16",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on Which data processing tasks can be performed by a data processing pipeline or component? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:17",
+   "target": "v:17.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:17",
+   "target": "v:17.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:17",
+   "target": "v:17.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:17",
+   "target": "v:17.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:17",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to parallelize data processing? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:18",
+   "target": "v:18.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:18",
+   "target": "v:18.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:18",
+   "target": "v:18.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:18",
+   "target": "d:14",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to perform model building in an ML project? affect the outcomes of How to automatically process the data used for model building?"
+  },
+  {
+   "source": "d:18",
+   "target": "d:4",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to perform model building in an ML project? affect the outcomes of How to persist and provide access to features?"
+  },
+  {
+   "source": "d:18",
+   "target": "d:12",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to perform model building in an ML project? affect the outcomes of How to trigger a machine learning pipeline or orchestrator?"
+  },
+  {
+   "source": "d:18",
+   "target": "d:21",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to perform model building in an ML project? affect the outcomes of How to parallelize model building?"
+  },
+  {
+   "source": "d:18",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to perform model building in an ML project? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:19",
+   "target": "v:19.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:19",
+   "target": "v:19.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:19",
+   "target": "v:19.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:19",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on When and how to train the model? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:20",
+   "target": "v:20.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:20",
+   "target": "v:20.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:20",
+   "target": "v:20.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:20",
+   "target": "v:20.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:20",
+   "target": "v:20.5",
+   "type": "has_value"
+  },
+  {
+   "source": "d:20",
+   "target": "v:20.6",
+   "type": "has_value"
+  },
+  {
+   "source": "d:20",
+   "target": "v:20.7",
+   "type": "has_value"
+  },
+  {
+   "source": "d:20",
+   "target": "v:20.8",
+   "type": "has_value"
+  },
+  {
+   "source": "d:20",
+   "target": "v:20.9",
+   "type": "has_value"
+  },
+  {
+   "source": "d:20",
+   "target": "v:20.10",
+   "type": "has_value"
+  },
+  {
+   "source": "d:20",
+   "target": "d:23",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on Which tasks can be performed by a model building pipeline or component? affect the outcomes of Should AutoML be used and if so where?"
+  },
+  {
+   "source": "d:20",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on Which tasks can be performed by a model building pipeline or component? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:21",
+   "target": "v:21.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:21",
+   "target": "v:21.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:21",
+   "target": "v:21.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:21",
+   "target": "v:21.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:21",
+   "target": "v:21.5",
+   "type": "has_value"
+  },
+  {
+   "source": "d:21",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to parallelize model building? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:22",
+   "target": "v:22.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:22",
+   "target": "v:22.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:22",
+   "target": "v:22.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:22",
+   "target": "v:22.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:22",
+   "target": "d:24",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to monitor and track the model in production? affect the outcomes of How to adjust models based on monitoring results?"
+  },
+  {
+   "source": "d:22",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to monitor and track the model in production? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:23",
+   "target": "v:23.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:23",
+   "target": "v:23.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:24",
+   "target": "v:24.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:24",
+   "target": "v:24.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:24",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on How to adjust models based on monitoring results? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:25",
+   "target": "v:25.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:25",
+   "target": "v:25.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:25",
+   "target": "v:25.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:25",
+   "target": "d:8",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on What to build, test, and deploy automatically by CI/CD pipelines? affect the outcomes of How to perform automatic integration and delivery in a machine learning context?"
+  },
+  {
+   "source": "d:25",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on What to build, test, and deploy automatically by CI/CD pipelines? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.3",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.4",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.5",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.6",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.7",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.8",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.9",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.10",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.11",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.12",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.13",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "v:26.14",
+   "type": "has_value"
+  },
+  {
+   "source": "d:26",
+   "target": "d:27",
+   "type": "relation",
+   "relation": "affects",
+   "directed": true,
+   "reading": "Choices on What to test in a machine learning/data science pipeline? affect the outcomes of Should MLOps be used and if so when?"
+  },
+  {
+   "source": "d:27",
+   "target": "v:27.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:27",
+   "target": "v:27.2",
+   "type": "has_value"
+  },
+  {
+   "source": "d:28",
+   "target": "v:28.1",
+   "type": "has_value"
+  },
+  {
+   "source": "d:28",
+   "target": "v:28.2",
+   "type": "has_value"
+  }
+ ]
+}

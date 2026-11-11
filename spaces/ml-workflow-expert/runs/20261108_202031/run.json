@@ -1,0 +1,14 @@
+{
+  "id": "20261108_202031",
+  "kind": "import-model",
+  "started_at": "2026-11-08T20:20:31",
+  "status": "ok",
+  "finished_at": "2026-11-08T20:20:31",
+  "seed_run": null,
+  "feedback": null,
+  "source_ids": [],
+  "new_source_ids": [],
+  "passages": 0,
+  "taxonomy": "gt_model_taxonomy_20261108_202031.json",
+  "argv": []
+}

@@ -1,0 +1,1157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git hosting for a fast-growing engineering organization · Explainer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="../assets/ddspace-icon.svg" type="image/svg+xml">
+<script>
+  // Theme: the reader's choice (kept in this browser) or the system setting.
+  (function () { try { var t = localStorage.getItem("ddspace-wiki-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {} })();
+</script>
+<style>
+  body { background: var(--bg); }
+  .ex-wrap { display: grid; grid-template-columns: minmax(0, var(--split-left, 1fr)) 8px minmax(0, 1fr); gap: 0; min-height: calc(100vh - 50px); }
+  .ex-text { padding: 22px 28px 60px; overflow-wrap: anywhere; }
+  .ex-side { background: var(--panel); display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh; }
+  #canvas { position: relative; flex: 0 0 var(--split-canvas, 60%); min-height: 160px; overflow: hidden; }
+  .splitter-v { position: sticky; top: 0; height: 100vh; cursor: col-resize; background: var(--border);
+    border-left: 3px solid var(--bg); border-right: 3px solid var(--panel); touch-action: none; }
+  .splitter-h { flex: none; height: 8px; cursor: row-resize; background: var(--border);
+    border-top: 3px solid var(--panel); border-bottom: 3px solid var(--panel); touch-action: none; }
+  .splitter-v:hover, .splitter-h:hover, .splitter-v:focus-visible, .splitter-h:focus-visible, .splitter-v.dragging,
+  .splitter-h.dragging { background: var(--accent); outline: none; }
+  body.resizing { user-select: none; }
+  body.resizing.col { cursor: col-resize; } body.resizing.row { cursor: row-resize; }
+  #svg { width: 100%; height: 100%; display: block; cursor: grab; }
+  #info { flex: 1 1 0; min-height: 80px; overflow-y: auto; padding: 12px 16px; border-top: 1px solid var(--border); font-size: 13.5px; }
+  #info h2 { margin: 4px 0; font-size: 17px; border: none; }
+  #info ul { padding-left: 16px; margin: 4px 0 10px; }
+  #info .info-h { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 14px 0 4px; font-weight: 600; }
+  #info .info-sub { color: var(--muted); margin: 2px 0 8px; line-height: 1.45; }
+  #info p { margin: 4px 0; line-height: 1.45; }
+  #info .info-link { margin-top: 14px; }
+  #info .node-chip { padding: 1px 7px; font-size: 11px; margin: 1px 3px 1px 0; }
+  #info .pair-chip { display: inline-block; margin: 0 8px 4px 0; white-space: nowrap; }
+  .muted, .hint { color: var(--muted); font-size: 12.5px; }
+  h1 { margin: 6px 0 4px; font-size: 24px; }
+  h2.sec { font-size: 16px; margin: 22px 0 8px; border: none; }
+  .banner { background: var(--mixed); color: #fff; padding: 9px 14px; border-radius: 8px; margin: 0 0 14px; font-size: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 6px 0; list-style: none; }
+  .chip { display: inline-flex; gap: 6px; align-items: baseline; border: 1px solid var(--border); background: var(--panel);
+    color: var(--fg); border-radius: 999px; padding: 4px 11px; font: inherit; font-size: 13px; cursor: pointer; text-align: left; }
+  .chip strong { color: var(--accent); }
+  /* in a flex chip, the id and the kind keep their width; only the text wraps */
+  .chip > strong, .chip > .muted { flex: none; white-space: nowrap; }
+  .chip { text-align: left; }
+  .chip.small { padding: 0 7px; font-size: 11.5px; margin-right: 3px; }
+  .chip:hover, .chip.sel { border-color: var(--accent); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--border); margin: 18px 0 0; }
+  .tab { font: inherit; font-size: 14px; padding: 7px 14px; border: 1px solid transparent; border-bottom: none;
+    border-radius: 8px 8px 0 0; background: none; color: var(--muted); cursor: pointer; }
+  .tab[aria-selected="true"] { background: var(--panel); border-color: var(--border); color: var(--fg); font-weight: 600;
+    margin-bottom: -1px; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-top: none; padding: 12px 16px 16px;
+    border-radius: 0 0 8px 8px; }
+  .panel[hidden] { display: none; }
+  .choice { border-top: 1px solid var(--border); padding: 9px 0; }
+  .choice:first-of-type { border-top: none; }
+  .choice .head { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+  .choice .arrow { color: var(--muted); }
+  .choice p { margin: 4px 0; line-height: 1.45; font-size: 14px; }
+  .quote { border-left: 3px solid var(--accent); padding: 2px 10px; margin: 6px 0; font-style: italic; }
+  .ev { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .vref, .dref { cursor: pointer; display: inline-flex; gap: 5px; align-items: center; }
+  .others { font-size: 12.5px; color: var(--muted); }
+  .scroll { overflow-x: auto; }
+  table.compare td.open { color: var(--muted); font-style: italic; }
+  tr.differs th { border-left: 3px solid var(--accent); }
+  .node text { font-size: 15px; fill: var(--fg); paint-order: stroke; stroke: var(--panel); stroke-width: 3px; pointer-events: none; }
+  .node.greyed path.shape { opacity: .35; }
+  .node.greyed text { opacity: .5; }
+  .node.in-point text { font-weight: 600; }
+  .link.explored { stroke: var(--accent); stroke-opacity: .7; stroke-width: 3px; }
+  .link.on-path { stroke-opacity: 1; stroke-width: 4px; }
+  .link.on-path.tree { stroke: var(--accent); }
+  .link.on-path:not(.tree) { stroke-width: 1.8px; stroke-opacity: .85; }
+  .zoom-ctl { position: absolute; top: 8px; right: 10px; display: flex; gap: 4px; z-index: 2; }
+  .zoom-ctl button { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel);
+    color: var(--fg); font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
+  .zoom-ctl button:hover { border-color: var(--accent); }
+  .link.shown { stroke-opacity: .95; stroke-width: 2.4px; }
+  .graph-toggle { position: absolute; top: 8px; left: 10px; font-size: 12px; color: var(--muted); background: var(--panel);
+    padding: 2px 6px; border-radius: 6px; display: flex; gap: 5px; align-items: center; cursor: pointer; }
+  .node.dim-out, .link.dim-out { opacity: .1; }
+  .graph-key { font-size: 11.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 12px; padding: 6px 12px;
+    border-top: 1px solid var(--border); }
+  .graph-key b { color: var(--fg); font-weight: 600; }
+  .traj-wrap { position: relative; }
+  svg.lineage { display: block; width: 100%; height: 46px; overflow: visible; }
+  table.traj { border-collapse: separate; border-spacing: 0; font-size: 12.5px; overflow-wrap: normal; word-break: normal; hyphens: none; }
+  table.traj th, table.traj td { padding: 4px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.traj thead th { position: sticky; top: 0; background: var(--panel); }
+  table.traj th.row-h { text-align: left; font-weight: 500; min-width: 140px; max-width: 220px; }
+  table.traj .step-h { cursor: pointer; text-align: center; min-width: 112px; border-top: 3px solid var(--muted); }
+  table.traj .step-h b { display: block; font-size: 14px; }
+  table.traj .step-h .mv, table.traj .step-h .vd, table.traj .step-h .alt { display: block; font-size: 11px; }
+  .mv-seed, .mv-solution { border-top-color: var(--dimension) !important; } .mv-seed .mv, .mv-solution .mv { color: var(--dimension); }
+  .mv-exploit, .mv-region { border-top-color: var(--accent) !important; } .mv-exploit .mv, .mv-region .mv { color: var(--accent); }
+  .mv-explore, .mv-contrast { border-top-color: var(--novel) !important; } .mv-explore .mv, .mv-contrast .mv { color: var(--novel); }
+  .vd-strong, .vd-grounded { color: var(--accepted); } .vd-mixed, .vd-partial { color: var(--mixed); }
+  .vd-weak, .vd-ungrounded { color: var(--rejected); }
+  table.traj .alt { font-weight: 700; color: var(--fg); }
+  table.traj td.c { text-align: left; min-width: 112px; max-width: 150px; }
+  table.traj td.changed { box-shadow: inset 0 0 0 2px var(--accent); border-radius: 4px; }
+  table.traj td.novel .cell-v { font-weight: 700; }
+  table.traj td.contrast { box-shadow: inset 0 0 0 2px var(--novel); border-radius: 4px; }
+  table.traj td.dropped { opacity: .55; }
+  table.traj .sel { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  table.traj .band-h { text-align: center; font-size: 12px; min-width: 40px; }
+  table.traj td.band span { display: block; height: 18px; border-radius: 3px; background: var(--accepted); opacity: .75; }
+  .cell-v { font-size: 12px; }
+  .legend { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0; }
+  .region { border: 1px solid var(--border); border-left: 4px solid var(--accepted); border-radius: 6px; padding: 8px 12px; margin: 8px 0; }
+  .link.off { display: none; }
+  .mode-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px;
+    margin-bottom: 6px; color: #fff; }
+  .mode-icon.mode-search { background: var(--accent); } .mode-icon.mode-explain { background: var(--mixed); }
+  .lanes-wrap, .qoc-wrap { position: relative; }
+  svg.lane-arrows, svg.qoc-links { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+  table.lanes { border-collapse: separate; border-spacing: 0; font-size: 13px; width: 100%; }
+  table.lanes th, table.lanes td { border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: middle; }
+  table.lanes thead th { font-size: 12px; color: var(--muted); font-weight: 600; }
+  table.lanes tbody th { min-width: 160px; max-width: 240px; font-weight: 400; }
+  table.lanes .idea { display: block; color: var(--muted); font-size: 12px; }
+  table.lanes tr.dropped th, table.lanes tr.dropped td:not(.outcome) { opacity: .7; }
+  table.lanes td.outcome { font-size: 12px; max-width: 220px; }
+  .node-chip { font: inherit; font-size: 12px; border-radius: 12px; padding: 3px 9px; margin: 2px 6px 2px 0; cursor: pointer;
+    border: 2px solid var(--border); background: var(--panel); color: var(--fg); position: relative; z-index: 1; white-space: nowrap; }
+  .node-chip small { color: var(--muted); }
+  .vb-strong, .vb-grounded { border-color: var(--accepted) !important; } .vb-mixed, .vb-partial { border-color: var(--mixed) !important; }
+  .vb-weak, .vb-ungrounded { border-color: var(--rejected) !important; }
+  .node-chip.sel, .story-step.sel, .opt.sel { box-shadow: 0 0 0 3px var(--accent); }
+  table.heat td.h.sel, table.heat th.sel { outline: 2px solid var(--fg); }
+  .alt-chip { font-size: 12px; font-weight: 600; color: var(--accepted); }
+  .dropped-mark { color: var(--rejected); font-weight: 600; }
+  table.heat { border-collapse: separate; border-spacing: 2px; font-size: 11px; width: auto; }
+  table.heat th, table.heat td { white-space: nowrap; }
+  table.heat th { color: var(--muted); font-weight: 600; padding: 0 3px; }
+  table.heat th.heat-r { text-align: left; border-bottom: 1px solid var(--border); }
+  table.heat td.h { width: 26px; height: 18px; border-radius: 3px; cursor: pointer; }
+  table.heat .rb { border-left: 6px solid var(--panel); }
+  .h-meets { background: var(--accepted); } .h-partly { background: var(--mixed); } .h-misses { background: var(--rejected); }
+  .h-none { background: var(--border); opacity: .5; }
+  .sw { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 3px; }
+  .chip-sm { cursor: pointer; }
+  .gaps { margin-top: 28px; border-top: 2px solid var(--border); padding-top: 6px; }
+  .gap-summary { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  .gap-count strong { color: var(--accent); font-size: 1.1em; }
+  .gap-h { font-size: 14px; margin: 16px 0 6px; }
+  .choice.gap .head .chip { margin: 0; }
+  .choice.fit { cursor: pointer; }
+  .choice.fit:hover, .choice.fit:focus { border-color: var(--accent); }
+  .badge.neutral { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .fit-note { font-size: 13px; color: var(--muted); }
+  .tradeoffs { margin: 4px 0; padding-left: 18px; font-size: 13px; }
+  .t-gain, .t-cost { font-size: 11px; border-radius: 9px; padding: 0 6px; border: 1px solid; }
+  .t-gain { color: var(--accepted); } .t-cost { color: var(--rejected); }
+  .own-tradeoff { font-size: 13px; border-left: 3px solid var(--mixed); padding-left: 8px; }
+  .round-head { margin: 18px 0 6px; font-size: 14px; border-bottom: 2px solid var(--border); padding-bottom: 4px; }
+  .round-end { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .story-step { border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 8px 0; cursor: pointer; }
+  .story-step.mv-explore, .story-step.mv-contrast { border-left-color: var(--novel); }
+  .story-step.mv-exploit, .story-step.mv-region { border-left-color: var(--accent); }
+  .story-step.mv-ablate { border-left-style: dotted; border-left-color: var(--accent); }
+  .story-step.mv-seed, .story-step.mv-solution { border-left-color: var(--dimension); }
+  .story-head { font-size: 14px; margin-bottom: 4px; }
+  .story-step p { margin: 4px 0; line-height: 1.45; font-size: 13.5px; }
+  .lbl { display: inline-block; min-width: 68px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+  .lbl-row { display: flex; gap: 0; font-size: 13px; } .lbl-row .lbl { padding-top: 2px; }
+  ul.moves { margin: 0; padding-left: 16px; } ul.moves li { margin: 1px 0; }
+  .vd-chip { font-size: 11px; border: 2px solid var(--border); border-radius: 10px; padding: 0 7px; margin-left: 4px; }
+  .judged { margin: 4px 0; } .j { font-size: 11px; border-radius: 9px; padding: 1px 7px; margin: 2px 4px 2px 0; display: inline-block; color: #fff; cursor: pointer; }
+  .j-meets { background: var(--accepted); } .j-partly { background: var(--mixed); } .j-misses { background: var(--rejected); }
+  .qoc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); column-gap: 90px; font-size: 13px; }
+  .qoc-hdr { display: grid; grid-template-columns: 1fr 1fr; color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+  .qoc-crit .qoc-hdr { grid-template-columns: 1fr; }
+  .qoc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid var(--border); padding: 6px 0; align-items: center; }
+  .opt { border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px; margin: 3px 0; cursor: pointer; background: var(--panel); position: relative; z-index: 1; }
+  .opt-solution { border-left: 4px solid var(--accent); } .opt-contrast { border-left: 4px solid var(--novel); }
+  .crit { border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; margin: 6px 0; cursor: pointer; background: var(--panel); position: relative; z-index: 1; }
+  svg.qoc-links path.traced { stroke-opacity: 1; stroke-width: 3px; }
+  details.grid-details { margin-top: 22px; } details.grid-details summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+  .solution, .option { border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 8px 0; cursor: pointer; }
+  .solution.sel, .option.sel { box-shadow: 0 0 0 2px var(--accent); }
+  .adr { border-top: 1px solid var(--border); margin-top: 18px; padding-top: 8px; }
+  .adr h3 { margin: 6px 0; font-size: 16px; }
+  .option.chosen { border-left: 4px solid var(--accepted); }
+  .option.discarded { border-left: 4px solid var(--rejected); opacity: .9; }
+  .option .values { font-size: 13px; margin: 4px 0; }
+  ul.pc { list-style: none; padding: 0; margin: 4px 0; font-size: 13px; }
+  ul.pc li::before { font-weight: 700; margin-right: 6px; }
+  ul.pc li.pro::before { content: "+"; color: var(--accepted); }
+  ul.pc li.con::before { content: "−"; color: var(--rejected); }
+  ul.parts { margin: 4px 0 6px; padding-left: 18px; font-size: 13px; }
+  ul.parts li { margin: 4px 0; }
+  .pairs { display: block; margin: 2px 0; }
+  .pairs .pair { display: block; padding-left: 10px; font-size: 13px; }
+  .node.unjudged path.shape { fill: var(--panel); stroke: var(--rejected); stroke-dasharray: 2,2; stroke-width: 1.5px; }
+  @media (max-width: 900px) {
+    .ex-wrap { grid-template-columns: 1fr; }
+    .splitter-v, .splitter-h { display: none; }
+    .ex-text { padding: 16px 16px 30px; }
+    .ex-side { position: static; height: auto; border-left: none; border-top: 1px solid var(--border); }
+    #canvas { height: 420px; flex: none; }
+    #info { flex: none; }
+  }
+</style>
+</head>
+<body class="page-explainer">
+<header class="top">
+<span class="brand"><img src="../assets/ddspace-icon.svg" alt="" class="brand-icon" width="32" height="32">Design rationale</span>  <nav></nav>
+  <button class="theme-btn" id="theme-toggle" type="button" title="Switch light / dark mode" aria-label="Switch light / dark mode" style="margin-left:auto">◐</button>
+</header>
+<div class="ex-wrap">
+<main class="ex-text">
+  <div class="mode-icon mode-search" role="img" aria-label="Search: alternative solutions for a problem" title="Search: alternative solutions for a problem">
+<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>  </div>
+  <div class="kind">Search · design rationale · no design space</div>
+  <h1>Git hosting for a fast-growing engineering organization</h1>
+<p>A software company hosts its own Git service for 3,000 engineers in four regions. Its CI system starts about 40,000 jobs a day, each fetching a repository. The largest repository has 15 years of history and is about 200 GB; most engineers touch only a small part of it. The service runs in the company&#39;s cloud account, and a team of five engineers builds and operates it.</p>
+  <h2 class="sec">Requirements</h2>
+  <ul class="chips" id="requirements">
+    <li><button class="chip" type="button" data-requirement="R1" data-node="r:R1"><strong>R1</strong> Accept pushes and serve fetches and clones for every repository over the standard Git protocol. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="R2" data-node="r:R2"><strong>R2</strong> Let engineers work on the largest repository without downloading all of it. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q1" data-node="r:Q1"><strong>Q1</strong> When any single machine or disk is lost, no pushed commit is lost. <span class="muted">quality: durability</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q2" data-node="r:Q2"><strong>Q2</strong> When one server fails during working hours, pushes and fetches continue within one minute, without an operator. <span class="muted">quality: availability</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q3" data-node="r:Q3"><strong>Q3</strong> A CI job in any region fetches the latest state of a repository within 30 seconds at the 95th percentile, even right after a push. <span class="muted">quality: performance</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q4" data-node="r:Q4"><strong>Q4</strong> A fetch that starts after a push has succeeded always sees that push. <span class="muted">quality: consistency</span></button></li>
+    <li><button class="chip" type="button" data-requirement="C1" data-node="r:C1"><strong>C1</strong> Five engineers build and run the service. <span class="muted">constraint</span></button></li>
+    <li><button class="chip" type="button" data-requirement="C2" data-node="r:C2"><strong>C2</strong> Engineers keep using standard Git clients; no custom client may be required. <span class="muted">constraint</span></button></li>
+  </ul>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" type="button" role="tab" data-tab="adrs" aria-selected="true">Decisions (ADRs)</button>
+    <button class="tab" type="button" role="tab" data-tab="compare" aria-selected="false">Comparison</button>
+<button class="tab" type="button" role="tab" data-tab="trajectory" aria-selected="false">Trajectory</button>  </div>
+
+  <section class="panel" data-panel="adrs">
+    <p class="hint">The alternatives the agent proposes, then its decisions as architecture decision records: each ADR addresses a few related requirements and weighs options (partial design points), chosen by one or more alternatives or discarded. Select an alternative or an option to see it in the graph.</p>
+    <h2 class="sec">Alternatives</h2>
+    <div class="solution" data-alt="A1" tabindex="0"><strong>A1 · Quorum commits with regional commit-aware caches</strong>
+<p>Store immutable objects in replicated cloud storage and use regional stateless gateways with commit-aware caches. A push succeeds after quorum commit and cache invalidation; clients use partial clone.</p>      <p class="muted">Composed of 3 partial design points, one per ADR:</p>
+      <ul class="parts">
+        <li><a href="#adr-ADR1" class="adr-link">ADR1</a> · Replicated cloud object storage <span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:C1">C1</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:1">Repository storage</span> → <span class="vref" data-node="z:1.1">Replicated immutable Git objects in cloud object storage</span></span></span></li>
+        <li><a href="#adr-ADR2" class="adr-link">ADR2</a> · Commit-aware stateless gateways <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q2">Q2</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:C2">C2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:2">Serving topology</span> → <span class="vref" data-node="z:2.4">Stateless Git protocol gateways across regions with commit-aware caches</span></span></span></li>
+        <li><a href="#adr-ADR3" class="adr-link">ADR3</a> · Quorum metadata and cache invalidation with partial clone <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:Q4">Q4</span><span class="chip small" data-node="r:C2">C2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:3">Consistency</span> → <span class="vref" data-node="z:3.4">Quorum-committed push metadata with cache invalidation before success</span></span><span class="pair"><span class="dref" data-node="z:4">Large repository access</span> → <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></span></span></li>
+      </ul>
+<p class="muted">As a whole: Git objects are replicated immutably in cloud object storage, while stateless regional gateways serve Git traffic through commit-aware caches. A push succeeds only after metadata reaches quorum and affected caches are invalidated; clients can use partial clone to fetch only required blobs.</p>    </div>
+    <div class="solution" data-alt="B1" tabindex="0"><strong>B1 · Synchronous multi-zone storage with regional gateways</strong>
+<p>Use synchronously replicated block storage across three zones and a single metadata writer, with stateless regional Git gateways and standard partial clone.</p>      <p class="muted">Composed of 3 partial design points, one per ADR:</p>
+      <ul class="parts">
+        <li><a href="#adr-ADR1" class="adr-link">ADR1</a> · Synchronous three-zone block storage <span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:C1">C1</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:1">Repository storage</span> → <span class="vref" data-node="z:1.2">Synchronously replicated block storage across three zones</span></span></span></li>
+        <li><a href="#adr-ADR2" class="adr-link">ADR2</a> · Stateless gateways with a synchronous writer <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q2">Q2</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:C2">C2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:2">Serving topology</span> → <span class="vref" data-node="z:2.1">Stateless Git protocol gateways across regions</span></span></span></li>
+        <li><a href="#adr-ADR3" class="adr-link">ADR3</a> · Synchronous single-writer metadata with partial clone <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:Q4">Q4</span><span class="chip small" data-node="r:C2">C2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:3">Consistency</span> → <span class="vref" data-node="z:3.2">Single-writer repository metadata with synchronous replication</span></span><span class="pair"><span class="dref" data-node="z:4">Large repository access</span> → <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></span></span></li>
+      </ul>
+<p class="muted">As a whole: Repositories reside on block storage synchronously replicated across three zones, while a single authoritative metadata writer replicates its updates synchronously. Stateless Git gateways in each region serve clients and route operations to that writer and storage, with partial-clone filtering limiting large-repository data transfer.</p>    </div>
+    <div class="solution" data-alt="D1" tabindex="0"><strong>D1 · Fenced leader with regional read replicas</strong>
+<p>Store immutable objects in replicated cloud storage, accept pushes through a designated leader, and serve reads from regional replicas with fencing and read barriers. Use standard partial clone.</p>      <p class="muted">Composed of 3 partial design points, one per ADR:</p>
+      <ul class="parts">
+        <li><a href="#adr-ADR1" class="adr-link">ADR1</a> · Replicated cloud object storage <span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:C1">C1</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:1">Repository storage</span> → <span class="vref" data-node="z:1.1">Replicated immutable Git objects in cloud object storage</span></span></span></li>
+        <li><a href="#adr-ADR2" class="adr-link">ADR2</a> · Regional read replicas with push leader <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q2">Q2</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:C2">C2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:2">Serving topology</span> → <span class="vref" data-node="z:2.5">Regional read replicas and a designated push leader</span></span></span></li>
+        <li><a href="#adr-ADR3" class="adr-link">ADR3</a> · Fenced leader and read barriers with partial clone <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:Q4">Q4</span><span class="chip small" data-node="r:C2">C2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:3">Consistency</span> → <span class="vref" data-node="z:3.5">Leader-committed metadata with fencing and read barriers</span></span><span class="pair"><span class="dref" data-node="z:4">Large repository access</span> → <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></span></span></li>
+      </ul>
+<p class="muted">As a whole: The system stores immutable Git objects in replicated cloud object storage, with a designated leader accepting pushes and regional replicas serving reads. The leader commits metadata under fencing, while read barriers ensure replicas expose committed state; partial-clone clients fetch only the blobs they request.</p>    </div>
+    <article class="adr" id="adr-ADR1">
+      <h3>ADR1 · Choose durable repository object storage <span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:C1">C1</span></h3>
+<p><strong>Context.</strong> A single machine or disk loss must not lose a pushed commit, and five engineers must operate the platform. Managed replicated object storage limits storage operations; synchronous multi-zone block storage offers a direct durability model but introduces a tightly coordinated write path.</p>      <p><strong>Decision.</strong> Replicated cloud object storage <span class="muted">(A1, D1)</span>; Synchronous three-zone block storage <span class="muted">(B1)</span>.</p>
+      <div class="option chosen" data-option="ADR1:O1" tabindex="0">
+        <div class="head"><strong>Replicated cloud object storage</strong> <span class="badge accepted">chosen in A1, D1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:1">Repository storage</span> → <span class="vref" data-node="z:1.1">Replicated immutable Git objects in cloud object storage</span></span></p>
+<ul class="pc"><li class="pro">Replicated immutable objects tolerate individual machine or disk loss.</li><li class="pro">Managed storage reduces custom storage operations.</li><li class="con">The service depends on object-storage availability and replication behavior.</li></ul><p>It supports durability while reducing storage maintenance for the small team.</p>      </div>
+      <div class="option chosen" data-option="ADR1:O2" tabindex="0">
+        <div class="head"><strong>Synchronous three-zone block storage</strong> <span class="badge accepted">chosen in B1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:1">Repository storage</span> → <span class="vref" data-node="z:1.2">Synchronously replicated block storage across three zones</span></span></p>
+<ul class="pc"><li class="pro">Synchronous zone replication protects persisted data.</li><li class="con">Synchronous writes and recovery coordination add latency and operations work.</li></ul><p>This option favors a direct replicated volume model and is retained as a distinct durability trade-off.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR2">
+      <h3>ADR2 · Serve standard Git traffic and recover from a server failure <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q2">Q2</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:C2">C2</span></h3>
+<p><strong>Context.</strong> The service must use standard Git protocol and clients, continue after a server failure within one minute, and serve CI quickly in four regions. Stateless regional gateways offer replaceable serving capacity; regional read replicas improve locality but depend on leader and replica coordination.</p>      <p><strong>Decision.</strong> Commit-aware stateless gateways <span class="muted">(A1)</span>; Stateless gateways with a synchronous writer <span class="muted">(B1)</span>; Regional read replicas with push leader <span class="muted">(D1)</span>.</p>
+      <div class="option chosen" data-option="ADR2:O1" tabindex="0">
+        <div class="head"><strong>Commit-aware stateless gateways</strong> <span class="badge accepted">chosen in A1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:2">Serving topology</span> → <span class="vref" data-node="z:2.4">Stateless Git protocol gateways across regions with commit-aware caches</span></span></p>
+<ul class="pc"><li class="pro">Regional stateless endpoints support standard Git traffic and automated failover.</li><li class="pro">Commit-aware caches can serve recent refs near CI.</li><li class="con">Cache management adds coordination, and latency targets need load evidence.</li></ul><p>This pairs regional serving with pre-success invalidation for freshness.</p>      </div>
+      <div class="option chosen" data-option="ADR2:O2" tabindex="0">
+        <div class="head"><strong>Stateless gateways with a synchronous writer</strong> <span class="badge accepted">chosen in B1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:2">Serving topology</span> → <span class="vref" data-node="z:2.1">Stateless Git protocol gateways across regions</span></span></p>
+<ul class="pc"><li class="pro">Regional gateways distribute Git reads and remain replaceable.</li><li class="con">The writer remains a common dependency and can constrain throughput.</li></ul><p>This keeps Git serving stateless while retaining a synchronous central writer.</p>      </div>
+      <div class="option chosen" data-option="ADR2:O3" tabindex="0">
+        <div class="head"><strong>Regional read replicas with push leader</strong> <span class="badge accepted">chosen in D1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:2">Serving topology</span> → <span class="vref" data-node="z:2.5">Regional read replicas and a designated push leader</span></span></p>
+<ul class="pc"><li class="pro">Local replicas can serve regional fetches.</li><li class="con">Replica lag, leader failover, and barriers need operational handling.</li></ul><p>This prioritizes local reads while using leader coordination to preserve commit order.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR3">
+      <h3>ADR3 · Make pushes visible and keep large repositories usable <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:Q4">Q4</span><span class="chip small" data-node="r:C2">C2</span></h3>
+<p><strong>Context.</strong> The largest repository is about 200 GB, so engineers need selective access through standard Git clients. A fetch after a successful push must see that push. Quorum commits with invalidation and leader commits with read barriers can preserve visibility, while partial clone reduces initial transfers but deferred object reads may affect latency.</p>      <p><strong>Decision.</strong> Quorum metadata and cache invalidation with partial clone <span class="muted">(A1)</span>; Synchronous single-writer metadata with partial clone <span class="muted">(B1)</span>; Fenced leader and read barriers with partial clone <span class="muted">(D1)</span>.</p>
+      <div class="option chosen" data-option="ADR3:O1" tabindex="0">
+        <div class="head"><strong>Quorum metadata and cache invalidation with partial clone</strong> <span class="badge accepted">chosen in A1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:3">Consistency</span> → <span class="vref" data-node="z:3.4">Quorum-committed push metadata with cache invalidation before success</span></span><span class="pair"><span class="dref" data-node="z:4">Large repository access</span> → <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></span></p>
+<ul class="pc"><li class="pro">Pre-success invalidation and quorum commit make pushed refs authoritative.</li><li class="pro">Partial clone avoids downloading unneeded blobs with standard Git.</li><li class="con">Quorum coordination and invalidation can add push latency; deferred blobs can affect fetch time.</li></ul><p>This directly addresses post-push visibility and large-repository access.</p>      </div>
+      <div class="option chosen" data-option="ADR3:O2" tabindex="0">
+        <div class="head"><strong>Synchronous single-writer metadata with partial clone</strong> <span class="badge accepted">chosen in B1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:3">Consistency</span> → <span class="vref" data-node="z:3.2">Single-writer repository metadata with synchronous replication</span></span><span class="pair"><span class="dref" data-node="z:4">Large repository access</span> → <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></span></p>
+<ul class="pc"><li class="pro">Synchronous single-writer ordering gives a clear read-after-write path.</li><li class="pro">Partial clone limits initial transfer.</li><li class="con">Synchronous writes can add latency and the writer can bottleneck.</li></ul><p>This trades write latency for straightforward metadata ordering.</p>      </div>
+      <div class="option chosen" data-option="ADR3:O3" tabindex="0">
+        <div class="head"><strong>Fenced leader and read barriers with partial clone</strong> <span class="badge accepted">chosen in D1</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:3">Consistency</span> → <span class="vref" data-node="z:3.5">Leader-committed metadata with fencing and read barriers</span></span><span class="pair"><span class="dref" data-node="z:4">Large repository access</span> → <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></span></p>
+<ul class="pc"><li class="pro">Fencing and barriers keep reads ordered behind committed writes.</li><li class="pro">Partial clone limits initial transfer.</li><li class="con">Leader coordination may add latency and complicates failover.</li></ul><p>This separates push leadership from regional reads while preserving visibility.</p>      </div>
+      <div class="option discarded" data-option="ADR3:O4" tabindex="0">
+        <div class="head"><strong>Asynchronous regional propagation</strong> <span class="badge rejected">discarded</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:3">Consistency</span> → <span class="vref" data-node="z:3.3">Asynchronous metadata propagation between regions</span></span></p>
+<ul class="pc"><li class="pro">Asynchronous replication can keep regional reads responsive.</li><li class="con">A regional fetch can observe stale refs after a successful push.</li></ul><p>It fails the required post-push visibility guarantee.</p>      </div>
+    </article>
+    <h2 class="sec">Requirements not addressed</h2>
+    <p>Every requirement is addressed by an ADR.</p>
+  </section>
+
+  <section class="panel" data-panel="trajectory" hidden>
+    <p class="hint">How the agent searched the space: 9 design points evaluated of a budget of 12, in 3 rounds over 4 approaches. The lanes give the overview; the strip shows how each point met each requirement; the story below follows the agent's thinking round by round. Select a point anywhere to see it in the graph.</p>
+
+    <h2 class="sec">Approaches and rounds</h2>
+    <div class="scroll lanes-wrap">
+      <svg class="lane-arrows" aria-hidden="true"></svg>
+      <table class="lanes">
+        <thead><tr><th>Approach</th><th>Round 1</th><th>Round 2</th><th>Round 3</th><th>Outcome</th></tr></thead>
+        <tbody>
+          <tr class="lane live">
+            <th><b>A</b> <span class="idea">What if replicated immutable cloud objects and quorum commits anchor regional stateless serving?</span></th>
+<td><button type="button" class="node-chip vb-mixed" data-step="1" title="Replicated storage and committed metadata directly address durability and read-after-write. Regional gateways support availability and locality; neither failover timing nor the 30-second p95 target is measured. Partial clone addresses the large repository with standard clients.">#1 <small>seed</small></button></td><td><button type="button" class="node-chip vb-mixed" data-step="4" title="Add commit-aware caches and invalidate affected views before push success to improve regional fetch speed while preserving Q4.">#4 <small>exploit</small></button></td><td><button type="button" class="node-chip vb-mixed" data-step="7" title="Add sparse checkout to the cache-aware quorum design to reduce large-repository materialization further.">#7 <small>exploit</small></button></td>            <td class="outcome"><span class="alt-chip">→ A1</span></td>
+          </tr>
+          <tr class="lane live">
+            <th><b>B</b> <span class="idea">What if synchronous multi-zone storage and a single writer make ordering and recovery direct?</span></th>
+<td><button type="button" class="node-chip vb-mixed" data-step="2" title="Synchronous three-zone replication with active-passive Git servers should protect commits and support automatic failover, while partial clone limits large transfers.">#2 <small>seed</small></button></td><td><button type="button" class="node-chip vb-mixed" data-step="5" title="Move the synchronous block-storage/single-writer approach to stateless regional gateways to improve regional serving and failure handling.">#5 <small>exploit</small></button></td><td><button type="button" class="node-chip vb-mixed" data-step="8" title="Add sparse checkout to the synchronous single-writer design to reduce large-repository transfers.">#8 <small>exploit</small></button></td>            <td class="outcome"><span class="alt-chip">→ B1</span></td>
+          </tr>
+          <tr class="lane dropped">
+            <th><b>C</b> <span class="idea">What if asynchronous regional replicas and caches optimize local reads?</span></th>
+<td><button type="button" class="node-chip vb-weak" data-step="3" title="Asynchronous regional replicas should improve local read latency and partial clone should reduce transfer; replication delay may compromise post-push visibility.">#3 <small>seed</small></button></td><td></td><td></td>            <td class="outcome"><span class="dropped-mark">✕ dropped</span> <span class="muted">Asynchronous metadata propagation can let a fetch started after a successful push observe stale refs, violating Q4.</span></td>
+          </tr>
+          <tr class="lane live">
+            <th><b>D</b> <span class="idea">What if one fenced push leader and regional read replicas provide a clear commit point with local reads?</span></th>
+<td></td><td><button type="button" class="node-chip vb-mixed" data-step="6" title="Explore a designated push leader with regional read replicas, fencing and read barriers to preserve ref order while serving reads locally.">#6 <small>explore</small></button></td><td><button type="button" class="node-chip vb-mixed" data-step="9" title="Use stateless gateways with the leader, fencing and read barriers, and server-side sparse filtering to reduce serving state and transfer.">#9 <small>exploit</small></button></td>            <td class="outcome"><span class="alt-chip">→ D1</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="legend"><span><b style="color:var(--accepted)">strong</b> · <b style="color:var(--mixed)">mixed</b> · <b style="color:var(--rejected)">weak</b> points</span><span>— refine, on its lane</span><span>- - a new approach started from a point</span><span>··· an ablation</span></div>
+
+    <h2 class="sec">Requirements, point by point</h2>
+    <div class="scroll"><table class="heat">
+      <thead>
+        <tr><th></th><th class="heat-r" colspan="3">Round 1</th><th class="heat-r" colspan="3">Round 2</th><th class="heat-r" colspan="3">Round 3</th></tr>
+        <tr><th></th><th class="heat-h" data-step="1" title="mixed">#1</th><th class="heat-h" data-step="2" title="mixed">#2</th><th class="heat-h" data-step="3" title="weak">#3</th><th class="heat-h rb" data-step="4" title="mixed">#4</th><th class="heat-h" data-step="5" title="mixed">#5</th><th class="heat-h" data-step="6" title="mixed">#6</th><th class="heat-h rb" data-step="7" title="mixed">#7</th><th class="heat-h" data-step="8" title="mixed">#8</th><th class="heat-h" data-step="9" title="mixed">#9</th></tr>
+      </thead>
+      <tbody>
+        <tr><th><span class="chip-sm" data-node="r:R1" title="Accept pushes and serve fetches and clones for every repository over the standard Git protocol.">R1</span></th>
+<td class="h h-meets" data-step="1" title="#1 · R1: meets"></td><td class="h h-meets" data-step="2" title="#2 · R1: meets"></td><td class="h h-meets" data-step="3" title="#3 · R1: meets"></td><td class="h h-meets rb" data-step="4" title="#4 · R1: meets"></td><td class="h h-meets" data-step="5" title="#5 · R1: meets"></td><td class="h h-meets" data-step="6" title="#6 · R1: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · R1: meets"></td><td class="h h-meets" data-step="8" title="#8 · R1: meets"></td><td class="h h-meets" data-step="9" title="#9 · R1: meets"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:R2" title="Let engineers work on the largest repository without downloading all of it.">R2</span></th>
+<td class="h h-meets" data-step="1" title="#1 · R2: meets"></td><td class="h h-meets" data-step="2" title="#2 · R2: meets"></td><td class="h h-meets" data-step="3" title="#3 · R2: meets"></td><td class="h h-meets rb" data-step="4" title="#4 · R2: meets"></td><td class="h h-meets" data-step="5" title="#5 · R2: meets"></td><td class="h h-meets" data-step="6" title="#6 · R2: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · R2: meets"></td><td class="h h-meets" data-step="8" title="#8 · R2: meets"></td><td class="h h-meets" data-step="9" title="#9 · R2: meets"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:Q1" title="When any single machine or disk is lost, no pushed commit is lost.">Q1</span></th>
+<td class="h h-meets" data-step="1" title="#1 · Q1: meets"></td><td class="h h-meets" data-step="2" title="#2 · Q1: meets"></td><td class="h h-partly" data-step="3" title="#3 · Q1: partly"></td><td class="h h-meets rb" data-step="4" title="#4 · Q1: meets"></td><td class="h h-meets" data-step="5" title="#5 · Q1: meets"></td><td class="h h-meets" data-step="6" title="#6 · Q1: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · Q1: meets"></td><td class="h h-meets" data-step="8" title="#8 · Q1: meets"></td><td class="h h-meets" data-step="9" title="#9 · Q1: meets"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:Q2" title="When one server fails during working hours, pushes and fetches continue within one minute, without an operator.">Q2</span></th>
+<td class="h h-partly" data-step="1" title="#1 · Q2: partly"></td><td class="h h-meets" data-step="2" title="#2 · Q2: meets"></td><td class="h h-partly" data-step="3" title="#3 · Q2: partly"></td><td class="h h-meets rb" data-step="4" title="#4 · Q2: meets"></td><td class="h h-partly" data-step="5" title="#5 · Q2: partly"></td><td class="h h-partly" data-step="6" title="#6 · Q2: partly"></td><td class="h h-meets rb" data-step="7" title="#7 · Q2: meets"></td><td class="h h-partly" data-step="8" title="#8 · Q2: partly"></td><td class="h h-partly" data-step="9" title="#9 · Q2: partly"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:Q3" title="A CI job in any region fetches the latest state of a repository within 30 seconds at the 95th percentile, even right after a push.">Q3</span></th>
+<td class="h h-partly" data-step="1" title="#1 · Q3: partly"></td><td class="h h-partly" data-step="2" title="#2 · Q3: partly"></td><td class="h h-partly" data-step="3" title="#3 · Q3: partly"></td><td class="h h-partly rb" data-step="4" title="#4 · Q3: partly"></td><td class="h h-partly" data-step="5" title="#5 · Q3: partly"></td><td class="h h-partly" data-step="6" title="#6 · Q3: partly"></td><td class="h h-partly rb" data-step="7" title="#7 · Q3: partly"></td><td class="h h-partly" data-step="8" title="#8 · Q3: partly"></td><td class="h h-partly" data-step="9" title="#9 · Q3: partly"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:Q4" title="A fetch that starts after a push has succeeded always sees that push.">Q4</span></th>
+<td class="h h-meets" data-step="1" title="#1 · Q4: meets"></td><td class="h h-meets" data-step="2" title="#2 · Q4: meets"></td><td class="h h-misses" data-step="3" title="#3 · Q4: misses"></td><td class="h h-meets rb" data-step="4" title="#4 · Q4: meets"></td><td class="h h-meets" data-step="5" title="#5 · Q4: meets"></td><td class="h h-meets" data-step="6" title="#6 · Q4: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · Q4: meets"></td><td class="h h-meets" data-step="8" title="#8 · Q4: meets"></td><td class="h h-meets" data-step="9" title="#9 · Q4: meets"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:C1" title="Five engineers build and run the service.">C1</span></th>
+<td class="h h-partly" data-step="1" title="#1 · C1: partly"></td><td class="h h-partly" data-step="2" title="#2 · C1: partly"></td><td class="h h-partly" data-step="3" title="#3 · C1: partly"></td><td class="h h-partly rb" data-step="4" title="#4 · C1: partly"></td><td class="h h-partly" data-step="5" title="#5 · C1: partly"></td><td class="h h-partly" data-step="6" title="#6 · C1: partly"></td><td class="h h-partly rb" data-step="7" title="#7 · C1: partly"></td><td class="h h-partly" data-step="8" title="#8 · C1: partly"></td><td class="h h-partly" data-step="9" title="#9 · C1: partly"></td>        </tr>
+        <tr><th><span class="chip-sm" data-node="r:C2" title="Engineers keep using standard Git clients; no custom client may be required.">C2</span></th>
+<td class="h h-meets" data-step="1" title="#1 · C2: meets"></td><td class="h h-meets" data-step="2" title="#2 · C2: meets"></td><td class="h h-meets" data-step="3" title="#3 · C2: meets"></td><td class="h h-meets rb" data-step="4" title="#4 · C2: meets"></td><td class="h h-meets" data-step="5" title="#5 · C2: meets"></td><td class="h h-meets" data-step="6" title="#6 · C2: meets"></td><td class="h h-meets rb" data-step="7" title="#7 · C2: meets"></td><td class="h h-meets" data-step="8" title="#8 · C2: meets"></td><td class="h h-meets" data-step="9" title="#9 · C2: meets"></td>        </tr>
+      </tbody>
+    </table></div>
+    <div class="legend"><span><i class="sw h-meets"></i> meets</span><span><i class="sw h-partly"></i> partly</span><span><i class="sw h-misses"></i> misses</span><span><i class="sw h-none"></i> not judged by that point</span></div>
+
+
+    <h2 class="sec">The search, round by round</h2>
+    <div class="round-head"><b>Round 1</b> · 3 points: seed A, seed B, seed C</div>
+    <article class="story-step mv-seed" data-step="1">
+      <div class="story-head"><b>#1</b> Seed of approach A <span class="vd-chip vb-mixed">mixed</span></div>
+<p><span class="lbl">Thought</span> Replicated storage and committed metadata directly address durability and read-after-write. Regional gateways support availability and locality; neither failover timing nor the 30-second p95 target is measured. Partial clone addresses the large repository with standard clients.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Repository storage</span> → <span class="vref" data-node="z:1.1">Replicated immutable Git objects in cloud object storage</span></li><li><span class="dref" data-node="z:2">Serving topology</span> → <span class="vref" data-node="z:2.1">Stateless Git protocol gateways across regions</span></li><li><span class="dref" data-node="z:3">Consistency</span> → <span class="vref" data-node="z:3.1">Quorum-committed push metadata with authoritative post-push reads</span></li><li><span class="dref" data-node="z:4">Large repository access</span> → <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The architecture is plausible but quantitative availability, performance and staffing fit remain unverified.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:Q1">Q1 meets</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-partly" data-node="r:C1">C1 partly</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:3.1">Quorum-committed push metadata with authoritative post-push reads</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q1">Q1</span>, <span class="vref" data-node="r:Q4">Q4</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Quorum and authoritative reads protect durable, current refs but add latency.</span></li><li><span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R2">R2</span>, <span class="vref" data-node="r:C2">C2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Filtering reduces transfers with standard clients but later blob retrieval can affect fetch time.</span></li><li><span class="vref" data-node="z:2.1">Stateless Git protocol gateways across regions</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q2">Q2</span>, <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:C1">C1</span>: <span class="muted">Regional stateless gateways improve locality and failover while adding operational coordination.</span></li></ul><p class="muted">Replicated immutable Git objects are stored in cloud object storage, while stateless gateways in multiple regions serve Git clients. Pushes become visible after quorum-committed metadata updates, and authoritative post-push reads ensure clients observe the committed state; partial clone blob filtering limits large-repository transfers.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides durable, horizontally scalable, multi-region access and efficient large-repository checkout, but pays replication and quorum latency/costs and depends on object-storage availability. Partial clones also shift some cost and complexity to later blob retrieval.</p>    </article>
+    <article class="story-step mv-seed" data-step="2">
+      <div class="story-head"><b>#2</b> Seed of approach B <span class="vd-chip vb-mixed">mixed</span></div>
+<p><span class="lbl">Thought</span> Synchronous three-zone replication with active-passive Git servers should protect commits and support automatic failover, while partial clone limits large transfers.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Repository storage</span> → <span class="vref" data-node="z:1.2">Synchronously replicated block storage across three zones</span></li><li><span class="dref" data-node="z:2">Serving topology</span> → <span class="vref" data-node="z:2.2">Active-passive Git servers with automatic leader failover</span></li><li><span class="dref" data-node="z:3">Consistency</span> → <span class="vref" data-node="z:3.2">Single-writer repository metadata with synchronous replication</span></li><li><span class="dref" data-node="z:4">Large repository access</span> → <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The single writer and synchronous path simplify ordering but raise latency and create failover and operations work.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:Q1">Q1 meets</span><span class="j j-meets" data-node="r:Q2">Q2 meets</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-partly" data-node="r:C1">C1 partly</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:1.2">Synchronously replicated block storage across three zones</span>, <span class="vref" data-node="z:3.2">Single-writer repository metadata with synchronous replication</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q1">Q1</span>, <span class="vref" data-node="r:Q4">Q4</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Synchronous replication and single-writer ordering protect data and read-after-write behavior but add write latency.</span></li><li><span class="vref" data-node="z:2.2">Active-passive Git servers with automatic leader failover</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q2">Q2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:C1">C1</span>: <span class="muted">Automatic standby takeover aids recovery but maintaining failover behavior adds operational work.</span></li><li><span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R2">R2</span>, <span class="vref" data-node="r:C2">C2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Partial clone limits transferred data but later blob requests add work.</span></li></ul><p class="muted">The system stores repositories on block storage synchronously replicated across three zones, with one active Git server serving writes and a passive server ready to assume leadership. Repository metadata remains single-writer and synchronously replicated, while clients use partial clone blob filtering for large repositories.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides strong metadata consistency, zone-level durability, automatic failover, and reduced large-clone transfer. It gives up write latency and operational simplicity due to synchronous cross-zone replication, keeps standby capacity underused, and makes clients depend on fetching omitted blobs when needed.</p>    </article>
+    <article class="story-step mv-seed" data-step="3">
+      <div class="story-head"><b>#3</b> Seed of approach C <span class="vd-chip vb-weak">weak</span></div>
+<p><span class="lbl">Thought</span> Asynchronous regional replicas should improve local read latency and partial clone should reduce transfer; replication delay may compromise post-push visibility.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Repository storage</span> → <span class="vref" data-node="z:1.3">Eventually replicated object storage with regional caches</span></li><li><span class="dref" data-node="z:2">Serving topology</span> → <span class="vref" data-node="z:2.3">Regional read replicas with a central push endpoint</span></li><li><span class="dref" data-node="z:3">Consistency</span> → <span class="vref" data-node="z:3.3">Asynchronous metadata propagation between regions</span></li><li><span class="dref" data-node="z:4">Large repository access</span> → <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The point misses Q4 by design: a fetch can start after the central push succeeds and still reach a lagging regional replica.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-misses" data-node="r:Q4">Q4 misses</span><span class="j j-partly" data-node="r:C1">C1 partly</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:1.3">Eventually replicated object storage with regional caches</span>, <span class="vref" data-node="z:3.3">Asynchronous metadata propagation between regions</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q4">Q4</span>, <span class="vref" data-node="r:Q1">Q1</span>: <span class="muted">Regional asynchronous propagation favors local read speed but cannot guarantee that a post-success fetch sees the push.</span></li><li><span class="vref" data-node="z:2.3">Regional read replicas with a central push endpoint</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q2">Q2</span>: <span class="muted">Regional read replicas aid local reads but the central push endpoint remains a failure and throughput focus.</span></li></ul><p class="muted">Repositories are stored in eventually replicated object storage, with regional caches serving regional read replicas while pushes go through a central endpoint. Metadata propagates asynchronously between regions, and clients use Git partial clone with blob filtering to fetch only needed large-repository content.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This improves regional read performance, storage scalability, and large-repository transfer efficiency. It gives up immediate cross-region metadata freshness and local write latency, while central pushes remain a potential bottleneck and cached or replica data may temporarily lag.</p>    </article>
+    <div class="round-head"><b>Round 2</b> · 3 points: refine A, refine B, new approach D</div>
+    <article class="story-step mv-exploit" data-step="4">
+      <div class="story-head"><b>#4</b> Refined #1 (approach A) <span class="vd-chip vb-mixed">mixed</span> <span class="alt-chip">→ A1</span></div>
+<p><span class="lbl">Thought</span> Add commit-aware caches and invalidate affected views before push success to improve regional fetch speed while preserving Q4.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:2">Serving topology</span>: <span class="vref" data-node="z:2.1">Stateless Git protocol gateways across regions</span> → <span class="vref" data-node="z:2.4">Stateless Git protocol gateways across regions with commit-aware caches</span></li><li>change <span class="dref" data-node="z:3">Consistency</span>: <span class="vref" data-node="z:3.1">Quorum-committed push metadata with authoritative post-push reads</span> → <span class="vref" data-node="z:3.4">Quorum-committed push metadata with cache invalidation before success</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Cache invalidation before acknowledgement strengthens freshness but adds push latency and coordination. The numeric performance objective remains unmeasured.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:Q1">Q1 meets</span><span class="j j-meets" data-node="r:Q2">Q2 meets</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-partly" data-node="r:C1">C1 partly</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:3.4">Quorum-committed push metadata with cache invalidation before success</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q1">Q1</span>, <span class="vref" data-node="r:Q4">Q4</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Invalidating caches before acknowledging a quorum commit makes new refs visible but adds push-path delay.</span></li><li><span class="vref" data-node="z:2.4">Stateless Git protocol gateways across regions with commit-aware caches</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q2">Q2</span>, <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:C1">C1</span>: <span class="muted">Regional cached gateways improve locality while their coordination adds operations burden.</span></li></ul><p class="muted">Git objects are replicated immutably in cloud object storage, while stateless regional gateways serve Git traffic through commit-aware caches. A push succeeds only after metadata reaches quorum and affected caches are invalidated; clients can use partial clone to fetch only required blobs.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides durable storage, regional scalability, and fresher read results, but quorum coordination and invalidation increase push latency and operational complexity. Partial clone reduces initial transfer costs but can add on-demand fetch latency and depends on client support.</p>    </article>
+    <article class="story-step mv-exploit" data-step="5">
+      <div class="story-head"><b>#5</b> Refined #2 (approach B) <span class="vd-chip vb-mixed">mixed</span> <span class="alt-chip">→ B1</span></div>
+<p><span class="lbl">Thought</span> Move the synchronous block-storage/single-writer approach to stateless regional gateways to improve regional serving and failure handling.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:2">Serving topology</span>: <span class="vref" data-node="z:2.2">Active-passive Git servers with automatic leader failover</span> → <span class="vref" data-node="z:2.1">Stateless Git protocol gateways across regions</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Regional gateways improve distribution, while single-writer synchronous replication remains a performance and failover dependency.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:Q1">Q1 meets</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-partly" data-node="r:C1">C1 partly</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:1.2">Synchronously replicated block storage across three zones</span>, <span class="vref" data-node="z:3.2">Single-writer repository metadata with synchronous replication</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q1">Q1</span>, <span class="vref" data-node="r:Q4">Q4</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Synchronous three-zone storage and one ordered writer protect commits but increase write latency.</span></li><li><span class="vref" data-node="z:2.1">Stateless Git protocol gateways across regions</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q2">Q2</span>, <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:C1">C1</span>: <span class="muted">Regional stateless gateways spread serving but do not remove the single-writer dependency.</span></li><li><span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R2">R2</span>, <span class="vref" data-node="r:C2">C2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Partial clone reduces bulk transfer but may defer required blob transfer.</span></li></ul><p class="muted">Repositories reside on block storage synchronously replicated across three zones, while a single authoritative metadata writer replicates its updates synchronously. Stateless Git gateways in each region serve clients and route operations to that writer and storage, with partial-clone filtering limiting large-repository data transfer.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides durable multi-zone storage, horizontally scalable regional serving, and reduced clone bandwidth, but synchronous writes and single-writer coordination add latency and make writer or quorum availability a bottleneck; partial clone still requires fetching requested blobs.</p>    </article>
+    <article class="story-step mv-explore" data-step="6">
+      <div class="story-head"><b>#6</b> New approach D <span class="vd-chip vb-mixed">mixed</span> <span class="alt-chip">→ D1</span></div>
+<p><span class="lbl">Thought</span> Explore a designated push leader with regional read replicas, fencing and read barriers to preserve ref order while serving reads locally.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Repository storage</span> → <span class="vref" data-node="z:1.1">Replicated immutable Git objects in cloud object storage</span></li><li><span class="dref" data-node="z:2">Serving topology</span> → <span class="vref" data-node="z:2.5">Regional read replicas and a designated push leader</span></li><li><span class="dref" data-node="z:3">Consistency</span> → <span class="vref" data-node="z:3.5">Leader-committed metadata with fencing and read barriers</span></li><li><span class="dref" data-node="z:4">Large repository access</span> → <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Fencing and barriers offer a clear read-after-write mechanism, though leader coordination still needs failover and latency evidence.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:Q1">Q1 meets</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-partly" data-node="r:C1">C1 partly</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:3.5">Leader-committed metadata with fencing and read barriers</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q1">Q1</span>, <span class="vref" data-node="r:Q4">Q4</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Leader commits, fencing and barriers protect ref order but add coordination latency.</span></li><li><span class="vref" data-node="z:2.5">Regional read replicas and a designated push leader</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q2">Q2</span>: <span class="muted">Regional replicas improve reads but require leader recovery and replica coordination.</span></li><li><span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R2">R2</span>, <span class="vref" data-node="r:C2">C2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Partial clone cuts initial transfer while making later reads dependent on object retrieval.</span></li></ul><p class="muted">The system stores immutable Git objects in replicated cloud object storage, with a designated leader accepting pushes and regional replicas serving reads. The leader commits metadata under fencing, while read barriers ensure replicas expose committed state; partial-clone clients fetch only the blobs they request.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This gains durable storage, scalable regional reads, and consistent ref visibility, but gives up local write availability and adds replication, fencing, and barrier complexity. Partial clones reduce initial transfer and local storage while making some operations depend on later blob fetches.</p>    </article>
+    <div class="round-head"><b>Round 3</b> · 3 points: refine A, refine B, refine D</div>
+    <article class="story-step mv-exploit" data-step="7">
+      <div class="story-head"><b>#7</b> Refined #4 (approach A) <span class="vd-chip vb-mixed">mixed</span></div>
+<p><span class="lbl">Thought</span> Add sparse checkout to the cache-aware quorum design to reduce large-repository materialization further.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:4">Large repository access</span>: <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span> → <span class="vref" data-node="z:4.2">Standard Git partial clone with blob filtering and sparse checkout</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The refinement can reduce transferred or checked-out content, but adds deferred retrieval behavior and does not establish the latency target.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:Q1">Q1 meets</span><span class="j j-meets" data-node="r:Q2">Q2 meets</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-partly" data-node="r:C1">C1 partly</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:3.4">Quorum-committed push metadata with cache invalidation before success</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q1">Q1</span>, <span class="vref" data-node="r:Q4">Q4</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Cache invalidation before success improves visibility at the cost of extra push latency.</span></li><li><span class="vref" data-node="z:4.2">Standard Git partial clone with blob filtering and sparse checkout</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R2">R2</span>, <span class="vref" data-node="r:C2">C2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Sparse checkout further narrows worktree materialization but can add client workflow complexity and deferred transfers.</span></li></ul><p class="muted">Replicated immutable Git objects in cloud object storage are served through stateless, cross-region protocol gateways using commit-aware caches. Pushes succeed only after metadata is quorum-committed and relevant caches are invalidated, while clients can use Git partial clone and sparse checkout to avoid downloading unnecessary blobs.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This gains durable replication, scalable regional serving, and reduced large-repository transfer costs. It gives up some push latency and operational simplicity because quorum commits and coordinated cache invalidation are required; partial clones also make access dependent on later blob retrieval.</p>    </article>
+    <article class="story-step mv-exploit" data-step="8">
+      <div class="story-head"><b>#8</b> Refined #5 (approach B) <span class="vd-chip vb-mixed">mixed</span></div>
+<p><span class="lbl">Thought</span> Add sparse checkout to the synchronous single-writer design to reduce large-repository transfers.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:4">Large repository access</span>: <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span> → <span class="vref" data-node="z:4.2">Standard Git partial clone with blob filtering and sparse checkout</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Sparse checkout helps local working sets but leaves synchronous write latency and a single metadata writer unchanged.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:Q1">Q1 meets</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-partly" data-node="r:C1">C1 partly</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:1.2">Synchronously replicated block storage across three zones</span>, <span class="vref" data-node="z:3.2">Single-writer repository metadata with synchronous replication</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q1">Q1</span>, <span class="vref" data-node="r:Q4">Q4</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Strong synchronous replication and ordered writes add latency to pushes and the single writer may bottleneck.</span></li><li><span class="vref" data-node="z:4.2">Standard Git partial clone with blob filtering and sparse checkout</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R2">R2</span>, <span class="vref" data-node="r:C2">C2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Sparse checkout limits materialization with standard Git but can defer needed data retrieval.</span></li></ul><p class="muted">Three-zone synchronous block storage provides durable repository data, while a single writer serializes metadata updates and synchronously replicates them. Stateless gateways in each region serve Git clients and use partial clone, blob filtering, and sparse checkout to limit large-repository transfer.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This gains strong durability, metadata consistency, and regional serving with reduced large-repository bandwidth, but synchronous replication and the single writer add write latency and can constrain write availability or throughput. Partial clone also shifts some complexity to clients and later object retrieval.</p>    </article>
+    <article class="story-step mv-exploit" data-step="9">
+      <div class="story-head"><b>#9</b> Refined #6 (approach D) <span class="vd-chip vb-mixed">mixed</span></div>
+<p><span class="lbl">Thought</span> Use stateless gateways with the leader, fencing and read barriers, and server-side sparse filtering to reduce serving state and transfer.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:2">Serving topology</span>: <span class="vref" data-node="z:2.5">Regional read replicas and a designated push leader</span> → <span class="vref" data-node="z:2.1">Stateless Git protocol gateways across regions</span></li><li>change <span class="dref" data-node="z:4">Large repository access</span>: <span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span> → <span class="vref" data-node="z:4.3">Standard Git partial clone with server-side sparse filtering</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The refinements preserve the leader/barrier trade-off and improve transfer efficiency, but do not outperform the previous best on measured evidence because no targets have been benchmarked.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:Q1">Q1 meets</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-partly" data-node="r:C1">C1 partly</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:3.5">Leader-committed metadata with fencing and read barriers</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q1">Q1</span>, <span class="vref" data-node="r:Q4">Q4</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Fencing and read barriers ensure committed refs are visible, but leader coordination can add latency.</span></li><li><span class="vref" data-node="z:4.3">Standard Git partial clone with server-side sparse filtering</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R2">R2</span>, <span class="vref" data-node="r:C2">C2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Server-side sparse filtering reduces transfers but adds server work and depends on the filtering implementation.</span></li></ul><p class="muted">Stateless Git protocol gateways in each region serve clients, reading replicated immutable Git objects from cloud object storage. A leader commits metadata, while fencing and read barriers ensure gateways observe authorized, ordered state; standard partial clone with server-side sparse filtering limits large-repository transfers.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides regional horizontal scalability, durable object replication, and consistent metadata while reducing bandwidth for partial consumers. It gives up simpler serving and some availability or latency during leader coordination, and object-storage access plus filtering add operational complexity.</p>    </article>
+    <p class="round-end">Stopped after round 3: 9 of 12 points used.</p>
+
+
+    <details class="grid-details"><summary>Dimension grid: every point, dimension by dimension</summary>
+    <div class="legend">
+<span><b class="mv-seed" style="color:var(--dimension)">seed</b> a starting point</span><span><b style="color:var(--accent)">exploit</b> options added or changed against the step it starts from (outlined)</span><span><b style="color:var(--novel)">explore</b> a new part of the space (new options in bold)</span>
+    </div>
+    <div class="scroll traj-wrap">
+      <svg class="lineage" aria-hidden="true"></svg>
+      <table class="traj">
+        <thead><tr><th class="row-h">Dimension</th>
+<th class="step-h mv-seed" data-step="1" title="Replicated storage and committed metadata directly address durability and read-after-write. Regional gateways support availability and locality; neither failover timing nor the 30-second p95 target is measured. Partial clone addresses the large repository with standard clients."><b>1</b><span class="mv">seed</span><span class="vd vd-mixed">mixed</span></th><th class="step-h mv-seed" data-step="2" title="Synchronous three-zone replication with active-passive Git servers should protect commits and support automatic failover, while partial clone limits large transfers."><b>2</b><span class="mv">seed</span><span class="vd vd-mixed">mixed</span></th><th class="step-h mv-seed" data-step="3" title="Asynchronous regional replicas should improve local read latency and partial clone should reduce transfer; replication delay may compromise post-push visibility."><b>3</b><span class="mv">seed</span><span class="vd vd-weak">weak</span></th><th class="step-h mv-exploit" data-step="4" title="Add commit-aware caches and invalidate affected views before push success to improve regional fetch speed while preserving Q4."><b>4</b><span class="mv">exploit</span><span class="vd vd-mixed">mixed</span><span class="alt">→ A1</span></th><th class="step-h mv-exploit" data-step="5" title="Move the synchronous block-storage/single-writer approach to stateless regional gateways to improve regional serving and failure handling."><b>5</b><span class="mv">exploit</span><span class="vd vd-mixed">mixed</span><span class="alt">→ B1</span></th><th class="step-h mv-explore" data-step="6" title="Explore a designated push leader with regional read replicas, fencing and read barriers to preserve ref order while serving reads locally."><b>6</b><span class="mv">explore</span><span class="vd vd-mixed">mixed</span><span class="alt">→ D1</span></th><th class="step-h mv-exploit" data-step="7" title="Add sparse checkout to the cache-aware quorum design to reduce large-repository materialization further."><b>7</b><span class="mv">exploit</span><span class="vd vd-mixed">mixed</span></th><th class="step-h mv-exploit" data-step="8" title="Add sparse checkout to the synchronous single-writer design to reduce large-repository transfers."><b>8</b><span class="mv">exploit</span><span class="vd vd-mixed">mixed</span></th><th class="step-h mv-exploit" data-step="9" title="Use stateless gateways with the leader, fencing and read barriers, and server-side sparse filtering to reduce serving state and transfer."><b>9</b><span class="mv">exploit</span><span class="vd vd-mixed">mixed</span></th>        </tr></thead>
+        <tbody>
+          <tr><th class="row-h"><span class="dref" data-node="z:1">Repository storage</span></th>
+            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:1.1" title="Replicated immutable Git objects in cloud object storage">Replicated immutable Git …</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:1.2" title="Synchronously replicated block storage across three zones">Synchronously replicated …</span></td>
+            <td class="c dropped" data-step="3"><span class="vref cell-v " data-node="z:1.3" title="Eventually replicated object storage with regional caches">Eventually replicated obj…</span></td>
+            <td class="c" data-step="4"><span class="vref cell-v " data-node="z:1.1" title="Replicated immutable Git objects in cloud object storage">Replicated immutable Git …</span></td>
+            <td class="c" data-step="5"><span class="vref cell-v " data-node="z:1.2" title="Synchronously replicated block storage across three zones">Synchronously replicated …</span></td>
+            <td class="c" data-step="6"><span class="vref cell-v " data-node="z:1.1" title="Replicated immutable Git objects in cloud object storage">Replicated immutable Git …</span></td>
+            <td class="c" data-step="7"><span class="vref cell-v " data-node="z:1.1" title="Replicated immutable Git objects in cloud object storage">Replicated immutable Git …</span></td>
+            <td class="c" data-step="8"><span class="vref cell-v " data-node="z:1.2" title="Synchronously replicated block storage across three zones">Synchronously replicated …</span></td>
+            <td class="c" data-step="9"><span class="vref cell-v " data-node="z:1.1" title="Replicated immutable Git objects in cloud object storage">Replicated immutable Git …</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:2">Serving topology</span></th>
+            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:2.1" title="Stateless Git protocol gateways across regions">Stateless Git protocol ga…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:2.2" title="Active-passive Git servers with automatic leader failover">Active-passive Git server…</span></td>
+            <td class="c dropped" data-step="3"><span class="vref cell-v " data-node="z:2.3" title="Regional read replicas with a central push endpoint">Regional read replicas wi…</span></td>
+            <td class="c changed" data-step="4"><span class="vref cell-v " data-node="z:2.4" title="Stateless Git protocol gateways across regions with commit-aware caches">Stateless Git protocol ga…</span></td>
+            <td class="c changed" data-step="5"><span class="vref cell-v " data-node="z:2.1" title="Stateless Git protocol gateways across regions">Stateless Git protocol ga…</span></td>
+            <td class="c novel" data-step="6"><span class="vref cell-v " data-node="z:2.5" title="Regional read replicas and a designated push leader">Regional read replicas an…</span></td>
+            <td class="c" data-step="7"><span class="vref cell-v " data-node="z:2.4" title="Stateless Git protocol gateways across regions with commit-aware caches">Stateless Git protocol ga…</span></td>
+            <td class="c" data-step="8"><span class="vref cell-v " data-node="z:2.1" title="Stateless Git protocol gateways across regions">Stateless Git protocol ga…</span></td>
+            <td class="c changed" data-step="9"><span class="vref cell-v " data-node="z:2.1" title="Stateless Git protocol gateways across regions">Stateless Git protocol ga…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:3">Consistency</span></th>
+            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:3.1" title="Quorum-committed push metadata with authoritative post-push reads">Quorum-committed push met…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:3.2" title="Single-writer repository metadata with synchronous replication">Single-writer repository …</span></td>
+            <td class="c dropped" data-step="3"><span class="vref cell-v " data-node="z:3.3" title="Asynchronous metadata propagation between regions">Asynchronous metadata pro…</span></td>
+            <td class="c changed" data-step="4"><span class="vref cell-v " data-node="z:3.4" title="Quorum-committed push metadata with cache invalidation before success">Quorum-committed push met…</span></td>
+            <td class="c" data-step="5"><span class="vref cell-v " data-node="z:3.2" title="Single-writer repository metadata with synchronous replication">Single-writer repository …</span></td>
+            <td class="c novel" data-step="6"><span class="vref cell-v " data-node="z:3.5" title="Leader-committed metadata with fencing and read barriers">Leader-committed metadata…</span></td>
+            <td class="c" data-step="7"><span class="vref cell-v " data-node="z:3.4" title="Quorum-committed push metadata with cache invalidation before success">Quorum-committed push met…</span></td>
+            <td class="c" data-step="8"><span class="vref cell-v " data-node="z:3.2" title="Single-writer repository metadata with synchronous replication">Single-writer repository …</span></td>
+            <td class="c" data-step="9"><span class="vref cell-v " data-node="z:3.5" title="Leader-committed metadata with fencing and read barriers">Leader-committed metadata…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:4">Large repository access</span></th>
+            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:4.1" title="Standard Git partial clone with blob filtering">Standard Git partial clon…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:4.1" title="Standard Git partial clone with blob filtering">Standard Git partial clon…</span></td>
+            <td class="c dropped" data-step="3"><span class="vref cell-v " data-node="z:4.1" title="Standard Git partial clone with blob filtering">Standard Git partial clon…</span></td>
+            <td class="c" data-step="4"><span class="vref cell-v " data-node="z:4.1" title="Standard Git partial clone with blob filtering">Standard Git partial clon…</span></td>
+            <td class="c" data-step="5"><span class="vref cell-v " data-node="z:4.1" title="Standard Git partial clone with blob filtering">Standard Git partial clon…</span></td>
+            <td class="c" data-step="6"><span class="vref cell-v " data-node="z:4.1" title="Standard Git partial clone with blob filtering">Standard Git partial clon…</span></td>
+            <td class="c changed" data-step="7"><span class="vref cell-v " data-node="z:4.2" title="Standard Git partial clone with blob filtering and sparse checkout">Standard Git partial clon…</span></td>
+            <td class="c changed" data-step="8"><span class="vref cell-v " data-node="z:4.2" title="Standard Git partial clone with blob filtering and sparse checkout">Standard Git partial clon…</span></td>
+            <td class="c changed" data-step="9"><span class="vref cell-v " data-node="z:4.3" title="Standard Git partial clone with server-side sparse filtering">Standard Git partial clon…</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </details>
+  </section>
+  <section class="panel" data-panel="compare" hidden>
+    <p class="hint">One row per dimension involved; the rows where the alternatives differ come first.</p>
+    <div class="scroll"><table class="compare">
+      <thead><tr><th>Dimension</th><th>A1 · Quorum commits with regional commit-aware caches</th><th>B1 · Synchronous multi-zone storage with regional gateways</th><th>D1 · Fenced leader with regional read replicas</th></tr></thead>
+      <tbody>
+        <tr class="row differs" data-dimension="z:1">
+          <th><span class="dref" data-node="z:1">Repository storage</span></th>
+<td><span class="vref" data-node="z:1.1">Replicated immutable Git objects in cloud object storage</span></td><td><span class="vref" data-node="z:1.2">Synchronously replicated block storage across three zones</span></td><td><span class="vref" data-node="z:1.1">Replicated immutable Git objects in cloud object storage</span></td>        </tr>
+        <tr class="row differs" data-dimension="z:2">
+          <th><span class="dref" data-node="z:2">Serving topology</span></th>
+<td><span class="vref" data-node="z:2.4">Stateless Git protocol gateways across regions with commit-aware caches</span></td><td><span class="vref" data-node="z:2.1">Stateless Git protocol gateways across regions</span></td><td><span class="vref" data-node="z:2.5">Regional read replicas and a designated push leader</span></td>        </tr>
+        <tr class="row differs" data-dimension="z:3">
+          <th><span class="dref" data-node="z:3">Consistency</span></th>
+<td><span class="vref" data-node="z:3.4">Quorum-committed push metadata with cache invalidation before success</span></td><td><span class="vref" data-node="z:3.2">Single-writer repository metadata with synchronous replication</span></td><td><span class="vref" data-node="z:3.5">Leader-committed metadata with fencing and read barriers</span></td>        </tr>
+        <tr class="row" data-dimension="z:4">
+          <th><span class="dref" data-node="z:4">Large repository access</span></th>
+<td><span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></td><td><span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></td><td><span class="vref" data-node="z:4.1">Standard Git partial clone with blob filtering</span></td>        </tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="gaps" id="gaps">
+  <h2 class="sec">Gaps in the space</h2>
+  <p>No space was provided: the agent worked zero-shot, naming dimensions and values from its own knowledge, so nothing can fall short of a space.</p>
+  </section>
+</main>
+<div class="splitter-v" role="separator" aria-orientation="vertical" aria-label="Resize the text and the graph" tabindex="0" title="Drag to resize (double-click to reset)"></div>
+<aside class="ex-side">
+  <div id="canvas"><svg id="svg" role="img" aria-label="The dimensions this rationale involves"></svg>
+    <label class="graph-toggle"><input type="checkbox" id="show-all"> Show every value the agent named</label>
+    <div class="zoom-ctl"><button type="button" data-zoom="in" title="Zoom in" aria-label="Zoom in">+</button><button type="button" data-zoom="out" title="Zoom out" aria-label="Zoom out">−</button><button type="button" data-zoom="fit" title="Fit the graph" aria-label="Fit the graph">⤢</button></div></div>
+  <div class="splitter-h" role="separator" aria-orientation="horizontal" aria-label="Resize the graph and its details" tabindex="0" title="Drag to resize (double-click to reset)"></div>
+  <div class="graph-key"><span>from the centre: dimensions, values, <b>design points</b> (▲, one per step, coloured by its rating), requirements (■, linked by how each point meets them)</span><span><b>blue</b>: explored paths</span><span><b>outlined</b>: the design point shown</span><span>select a node: its path to the centre and the paths from it to design points and requirements</span></div>
+  <div id="info"><p class="hint">Select a dimension, value or requirement (in the graph or the text) to see its details.</p></div>
+</aside>
+</div>
+<script type="application/json" id="explainer-data">{"adrs": [{"consequences": "", "context": "A single machine or disk loss must not lose a pushed commit, and five engineers must operate the platform. Managed replicated object storage limits storage operations; synchronous multi-zone block storage offers a direct durability model but introduces a tightly coordinated write path.", "drivers": ["Q1", "C1"], "id": "ADR1", "options": [{"cons": ["The service depends on object-storage availability and replication behavior."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["A1", "D1"], "key": "ADR1:O1", "name": "Replicated cloud object storage", "point": {"z:1": "z:1.1"}, "pros": ["Replicated immutable objects tolerate individual machine or disk loss.", "Managed storage reduces custom storage operations."], "quotes": [], "reason": "It supports durability while reducing storage maintenance for the small team.", "status": "chosen", "step": 4}, {"cons": ["Synchronous writes and recovery coordination add latency and operations work."], "fit": "exact", "fit_note": "", "id": "O2", "in": ["B1"], "key": "ADR1:O2", "name": "Synchronous three-zone block storage", "point": {"z:1": "z:1.2"}, "pros": ["Synchronous zone replication protects persisted data."], "quotes": [], "reason": "This option favors a direct replicated volume model and is retained as a distinct durability trade-off.", "status": "chosen", "step": 5}], "title": "Choose durable repository object storage"}, {"consequences": "", "context": "The service must use standard Git protocol and clients, continue after a server failure within one minute, and serve CI quickly in four regions. Stateless regional gateways offer replaceable serving capacity; regional read replicas improve locality but depend on leader and replica coordination.", "drivers": ["R1", "Q2", "Q3", "C2"], "id": "ADR2", "options": [{"cons": ["Cache management adds coordination, and latency targets need load evidence."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["A1"], "key": "ADR2:O1", "name": "Commit-aware stateless gateways", "point": {"z:2": "z:2.4"}, "pros": ["Regional stateless endpoints support standard Git traffic and automated failover.", "Commit-aware caches can serve recent refs near CI."], "quotes": [], "reason": "This pairs regional serving with pre-success invalidation for freshness.", "status": "chosen", "step": 4}, {"cons": ["The writer remains a common dependency and can constrain throughput."], "fit": "exact", "fit_note": "", "id": "O2", "in": ["B1"], "key": "ADR2:O2", "name": "Stateless gateways with a synchronous writer", "point": {"z:2": "z:2.1"}, "pros": ["Regional gateways distribute Git reads and remain replaceable."], "quotes": [], "reason": "This keeps Git serving stateless while retaining a synchronous central writer.", "status": "chosen", "step": 5}, {"cons": ["Replica lag, leader failover, and barriers need operational handling."], "fit": "exact", "fit_note": "", "id": "O3", "in": ["D1"], "key": "ADR2:O3", "name": "Regional read replicas with push leader", "point": {"z:2": "z:2.5"}, "pros": ["Local replicas can serve regional fetches."], "quotes": [], "reason": "This prioritizes local reads while using leader coordination to preserve commit order.", "status": "chosen", "step": 6}], "title": "Serve standard Git traffic and recover from a server failure"}, {"consequences": "", "context": "The largest repository is about 200 GB, so engineers need selective access through standard Git clients. A fetch after a successful push must see that push. Quorum commits with invalidation and leader commits with read barriers can preserve visibility, while partial clone reduces initial transfers but deferred object reads may affect latency.", "drivers": ["R2", "Q1", "Q3", "Q4", "C2"], "id": "ADR3", "options": [{"cons": ["Quorum coordination and invalidation can add push latency; deferred blobs can affect fetch time."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["A1"], "key": "ADR3:O1", "name": "Quorum metadata and cache invalidation with partial clone", "point": {"z:3": "z:3.4", "z:4": "z:4.1"}, "pros": ["Pre-success invalidation and quorum commit make pushed refs authoritative.", "Partial clone avoids downloading unneeded blobs with standard Git."], "quotes": [], "reason": "This directly addresses post-push visibility and large-repository access.", "status": "chosen", "step": 4}, {"cons": ["Synchronous writes can add latency and the writer can bottleneck."], "fit": "exact", "fit_note": "", "id": "O2", "in": ["B1"], "key": "ADR3:O2", "name": "Synchronous single-writer metadata with partial clone", "point": {"z:3": "z:3.2", "z:4": "z:4.1"}, "pros": ["Synchronous single-writer ordering gives a clear read-after-write path.", "Partial clone limits initial transfer."], "quotes": [], "reason": "This trades write latency for straightforward metadata ordering.", "status": "chosen", "step": 5}, {"cons": ["Leader coordination may add latency and complicates failover."], "fit": "exact", "fit_note": "", "id": "O3", "in": ["D1"], "key": "ADR3:O3", "name": "Fenced leader and read barriers with partial clone", "point": {"z:3": "z:3.5", "z:4": "z:4.1"}, "pros": ["Fencing and barriers keep reads ordered behind committed writes.", "Partial clone limits initial transfer."], "quotes": [], "reason": "This separates push leadership from regional reads while preserving visibility.", "status": "chosen", "step": 6}, {"cons": ["A regional fetch can observe stale refs after a successful push."], "fit": "exact", "fit_note": "", "id": "O4", "in": [], "key": "ADR3:O4", "name": "Asynchronous regional propagation", "point": {"z:3": "z:3.3"}, "pros": ["Asynchronous replication can keep regional reads responsive."], "quotes": [], "reason": "It fails the required post-push visibility guarantee.", "status": "discarded", "step": 3}], "title": "Make pushes visible and keep large repositories usable"}], "alternatives": [{"approach": "A", "choices": [{"dimension": "z:1", "drivers": ["Q1", "C1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Managed replicated storage protects objects while limiting bespoke storage operations.", "value": "z:1.1"}, {"dimension": "z:2", "drivers": ["R1", "Q2", "Q3"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Stateless regional gateways serve Git operations near users and support automatic failover and locality.", "value": "z:2.4"}, {"dimension": "z:3", "drivers": ["Q1", "Q4"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "The service acknowledges only after quorum commit and cache invalidation, so later fetches see committed refs.", "value": "z:3.4"}, {"dimension": "z:4", "drivers": ["R2", "C2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Standard partial clone avoids transferring unneeded blobs without a custom client.", "value": "z:4.1"}], "considered": [], "id": "A1", "name": "Quorum commits with regional commit-aware caches", "open": [], "parts": [{"adr": "ADR1", "drivers": ["Q1", "C1"], "name": "Replicated cloud object storage", "option": "O1", "point": {"z:1": "z:1.1"}, "title": "Choose durable repository object storage"}, {"adr": "ADR2", "drivers": ["R1", "Q2", "Q3", "C2"], "name": "Commit-aware stateless gateways", "option": "O1", "point": {"z:2": "z:2.4"}, "title": "Serve standard Git traffic and recover from a server failure"}, {"adr": "ADR3", "drivers": ["R2", "Q1", "Q3", "Q4", "C2"], "name": "Quorum metadata and cache invalidation with partial clone", "option": "O1", "point": {"z:3": "z:3.4", "z:4": "z:4.1"}, "title": "Make pushes visible and keep large repositories usable"}], "point": "Git objects are replicated immutably in cloud object storage, while stateless regional gateways serve Git traffic through commit-aware caches. A push succeeds only after metadata reaches quorum and affected caches are invalidated; clients can use partial clone to fetch only required blobs.", "relations": [], "step": 4, "summary": "Store immutable objects in replicated cloud storage and use regional stateless gateways with commit-aware caches. A push succeeds after quorum commit and cache invalidation; clients use partial clone."}, {"approach": "B", "choices": [{"dimension": "z:1", "drivers": ["Q1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Synchronous zone replication protects repository data from a single machine or disk loss.", "value": "z:1.2"}, {"dimension": "z:2", "drivers": ["R1", "Q2", "Q3"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Regional stateless gateways support standard Git access and distribute fetch serving.", "value": "z:2.1"}, {"dimension": "z:3", "drivers": ["Q1", "Q4"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "One synchronously replicated writer orders updates and keeps acknowledged pushes visible.", "value": "z:3.2"}, {"dimension": "z:4", "drivers": ["R2", "C2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Standard partial clone narrows the initial transfer.", "value": "z:4.1"}], "considered": [{"dimension": "z:2", "drivers": ["Q2"], "reason": "The active-passive seed ties serving to fewer servers and leaves standby capacity unused.", "value": "z:2.2"}], "id": "B1", "name": "Synchronous multi-zone storage with regional gateways", "open": [], "parts": [{"adr": "ADR1", "drivers": ["Q1", "C1"], "name": "Synchronous three-zone block storage", "option": "O2", "point": {"z:1": "z:1.2"}, "title": "Choose durable repository object storage"}, {"adr": "ADR2", "drivers": ["R1", "Q2", "Q3", "C2"], "name": "Stateless gateways with a synchronous writer", "option": "O2", "point": {"z:2": "z:2.1"}, "title": "Serve standard Git traffic and recover from a server failure"}, {"adr": "ADR3", "drivers": ["R2", "Q1", "Q3", "Q4", "C2"], "name": "Synchronous single-writer metadata with partial clone", "option": "O2", "point": {"z:3": "z:3.2", "z:4": "z:4.1"}, "title": "Make pushes visible and keep large repositories usable"}], "point": "Repositories reside on block storage synchronously replicated across three zones, while a single authoritative metadata writer replicates its updates synchronously. Stateless Git gateways in each region serve clients and route operations to that writer and storage, with partial-clone filtering limiting large-repository data transfer.", "relations": [], "step": 5, "summary": "Use synchronously replicated block storage across three zones and a single metadata writer, with stateless regional Git gateways and standard partial clone."}, {"approach": "D", "choices": [{"dimension": "z:1", "drivers": ["Q1", "C1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Replicated managed object storage provides durable objects without operating a bespoke storage cluster.", "value": "z:1.1"}, {"dimension": "z:2", "drivers": ["R1", "Q2", "Q3"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Regional read replicas can serve local fetches while the leader accepts pushes.", "value": "z:2.5"}, {"dimension": "z:3", "drivers": ["Q1", "Q4"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Fencing and read barriers keep regional reads behind the committed leader state.", "value": "z:3.5"}, {"dimension": "z:4", "drivers": ["R2", "C2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "", "reason": "Standard partial clone limits data transfer without custom clients.", "value": "z:4.1"}], "considered": [], "id": "D1", "name": "Fenced leader with regional read replicas", "open": [], "parts": [{"adr": "ADR1", "drivers": ["Q1", "C1"], "name": "Replicated cloud object storage", "option": "O1", "point": {"z:1": "z:1.1"}, "title": "Choose durable repository object storage"}, {"adr": "ADR2", "drivers": ["R1", "Q2", "Q3", "C2"], "name": "Regional read replicas with push leader", "option": "O3", "point": {"z:2": "z:2.5"}, "title": "Serve standard Git traffic and recover from a server failure"}, {"adr": "ADR3", "drivers": ["R2", "Q1", "Q3", "Q4", "C2"], "name": "Fenced leader and read barriers with partial clone", "option": "O3", "point": {"z:3": "z:3.5", "z:4": "z:4.1"}, "title": "Make pushes visible and keep large repositories usable"}], "point": "The system stores immutable Git objects in replicated cloud object storage, with a designated leader accepting pushes and regional replicas serving reads. The leader commits metadata under fencing, while read barriers ensure replicas expose committed state; partial-clone clients fetch only the blobs they request.", "relations": [], "step": 6, "summary": "Store immutable objects in replicated cloud storage, accept pushes through a designated leader, and serve reads from regional replicas with fencing and read barriers. Use standard partial clone."}], "approaches": [{"dropped_because": "", "id": "A", "idea": "What if replicated immutable cloud objects and quorum commits anchor regional stateless serving?", "status": "live"}, {"dropped_because": "", "id": "B", "idea": "What if synchronous multi-zone storage and a single writer make ordering and recovery direct?", "status": "live"}, {"dropped_because": "Asynchronous metadata propagation can let a fetch started after a successful push observe stale refs, violating Q4.", "id": "C", "idea": "What if asynchronous regional replicas and caches optimize local reads?", "status": "dropped"}, {"dropped_because": "", "id": "D", "idea": "What if one fenced push leader and regional read replicas provide a clear commit point with local reads?", "status": "live"}], "budget": {"max_points": 12, "used": 9}, "context": "A software company hosts its own Git service for 3,000 engineers in four regions. Its CI system starts about 40,000 jobs a day, each fetching a repository. The largest repository has 15 years of history and is about 200 GB; most engineers touch only a small part of it. The service runs in the company's cloud account, and a team of five engineers builds and operates it.", "dimensions": {"z:1": {"core": false, "href": null, "id": "z:1", "label": "Repository storage", "question": "", "values": ["z:1.1", "z:1.2", "z:1.3"]}, "z:2": {"core": false, "href": null, "id": "z:2", "label": "Serving topology", "question": "", "values": ["z:2.1", "z:2.2", "z:2.3", "z:2.4", "z:2.5"]}, "z:3": {"core": false, "href": null, "id": "z:3", "label": "Consistency", "question": "", "values": ["z:3.1", "z:3.2", "z:3.3", "z:3.4", "z:3.5"]}, "z:4": {"core": false, "href": null, "id": "z:4", "label": "Large repository access", "question": "", "values": ["z:4.1", "z:4.2", "z:4.3"]}}, "fits": [], "graph_changed": false, "id": "toy-hosting-search", "lanes": {"lanes": [{"alternative": "A1", "approach": "A", "cells": {"1": [{"move": "seed", "step": 1, "verdict": "mixed", "why": "Replicated storage and committed metadata directly address durability and read-after-write. Regional gateways support availability and locality; neither failover timing nor the 30-second p95 target is measured. Partial clone addresses the large repository with standard clients."}], "2": [{"move": "exploit", "step": 4, "verdict": "mixed", "why": "Add commit-aware caches and invalidate affected views before push success to improve regional fetch speed while preserving Q4."}], "3": [{"move": "exploit", "step": 7, "verdict": "mixed", "why": "Add sparse checkout to the cache-aware quorum design to reduce large-repository materialization further."}]}, "dropped_because": "", "idea": "What if replicated immutable cloud objects and quorum commits anchor regional stateless serving?", "status": "live"}, {"alternative": "B1", "approach": "B", "cells": {"1": [{"move": "seed", "step": 2, "verdict": "mixed", "why": "Synchronous three-zone replication with active-passive Git servers should protect commits and support automatic failover, while partial clone limits large transfers."}], "2": [{"move": "exploit", "step": 5, "verdict": "mixed", "why": "Move the synchronous block-storage/single-writer approach to stateless regional gateways to improve regional serving and failure handling."}], "3": [{"move": "exploit", "step": 8, "verdict": "mixed", "why": "Add sparse checkout to the synchronous single-writer design to reduce large-repository transfers."}]}, "dropped_because": "", "idea": "What if synchronous multi-zone storage and a single writer make ordering and recovery direct?", "status": "live"}, {"alternative": null, "approach": "C", "cells": {"1": [{"move": "seed", "step": 3, "verdict": "weak", "why": "Asynchronous regional replicas should improve local read latency and partial clone should reduce transfer; replication delay may compromise post-push visibility."}], "2": [], "3": []}, "dropped_because": "Asynchronous metadata propagation can let a fetch started after a successful push observe stale refs, violating Q4.", "idea": "What if asynchronous regional replicas and caches optimize local reads?", "status": "dropped"}, {"alternative": "D1", "approach": "D", "cells": {"1": [], "2": [{"move": "explore", "step": 6, "verdict": "mixed", "why": "Explore a designated push leader with regional read replicas, fencing and read barriers to preserve ref order while serving reads locally."}], "3": [{"move": "exploit", "step": 9, "verdict": "mixed", "why": "Use stateless gateways with the leader, fencing and read barriers, and server-side sparse filtering to reduce serving state and transfer."}]}, "dropped_because": "", "idea": "What if one fenced push leader and regional read replicas provide a clear commit point with local reads?", "status": "live"}], "rounds": [1, 2, 3]}, "links": {"graph": null, "index": null}, "mode": "search", "qoc": [], "regions": [], "relations": [], "requirements": [{"attribute": "", "id": "R1", "kind": "functional", "text": "Accept pushes and serve fetches and clones for every repository over the standard Git protocol."}, {"attribute": "", "id": "R2", "kind": "functional", "text": "Let engineers work on the largest repository without downloading all of it."}, {"attribute": "durability", "id": "Q1", "kind": "quality", "text": "When any single machine or disk is lost, no pushed commit is lost."}, {"attribute": "availability", "id": "Q2", "kind": "quality", "text": "When one server fails during working hours, pushes and fetches continue within one minute, without an operator."}, {"attribute": "performance", "id": "Q3", "kind": "quality", "text": "A CI job in any region fetches the latest state of a repository within 30 seconds at the 95th percentile, even right after a push."}, {"attribute": "consistency", "id": "Q4", "kind": "quality", "text": "A fetch that starts after a push has succeeded always sees that push."}, {"attribute": "", "id": "C1", "kind": "constraint", "text": "Five engineers build and run the service."}, {"attribute": "", "id": "C2", "kind": "constraint", "text": "Engineers keep using standard Git clients; no custom client may be required."}], "rows": [{"cells": [{"kind": "choice", "reason": "Managed replicated storage protects objects while limiting bespoke storage operations.", "value": "z:1.1"}, {"kind": "choice", "reason": "Synchronous zone replication protects repository data from a single machine or disk loss.", "value": "z:1.2"}, {"kind": "choice", "reason": "Replicated managed object storage provides durable objects without operating a bespoke storage cluster.", "value": "z:1.1"}], "differs": true, "dimension": "z:1", "note": ""}, {"cells": [{"kind": "choice", "reason": "Stateless regional gateways serve Git operations near users and support automatic failover and locality.", "value": "z:2.4"}, {"kind": "choice", "reason": "Regional stateless gateways support standard Git access and distribute fetch serving.", "value": "z:2.1"}, {"kind": "choice", "reason": "Regional read replicas can serve local fetches while the leader accepts pushes.", "value": "z:2.5"}], "differs": true, "dimension": "z:2", "note": ""}, {"cells": [{"kind": "choice", "reason": "The service acknowledges only after quorum commit and cache invalidation, so later fetches see committed refs.", "value": "z:3.4"}, {"kind": "choice", "reason": "One synchronously replicated writer orders updates and keeps acknowledged pushes visible.", "value": "z:3.2"}, {"kind": "choice", "reason": "Fencing and read barriers keep regional reads behind the committed leader state.", "value": "z:3.5"}], "differs": true, "dimension": "z:3", "note": ""}, {"cells": [{"kind": "choice", "reason": "Standard partial clone avoids transferring unneeded blobs without a custom client.", "value": "z:4.1"}, {"kind": "choice", "reason": "Standard partial clone narrows the initial transfer.", "value": "z:4.1"}, {"kind": "choice", "reason": "Standard partial clone limits data transfer without custom clients.", "value": "z:4.1"}], "differs": false, "dimension": "z:4", "note": ""}], "space": null, "title": "Git hosting for a fast-growing engineering organization", "trajectory": [{"alternative": null, "approach": "A", "assessment": {"C1": "partly", "C2": "meets", "Q1": "meets", "Q2": "partly", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets"}, "attested_by": [], "changed": [], "description": "Replicated immutable Git objects are stored in cloud object storage, while stateless gateways in multiple regions serve Git clients. Pushes become visible after quorum-committed metadata updates, and authoritative post-push reads ensure clients observe the committed state; partial clone blob filtering limits large-repository transfers.", "diff": [{"after": "z:1.1", "before": null, "dimension": "z:1"}, {"after": "z:2.1", "before": null, "dimension": "z:2"}, {"after": "z:3.1", "before": null, "dimension": "z:3"}, {"after": "z:4.1", "before": null, "dimension": "z:4"}], "drivers": ["R1", "R2", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "seed", "novel": ["z:1", "z:2", "z:3", "z:4"], "observation": "The architecture is plausible but quantitative availability, performance and staffing fit remain unverified.", "own_tradeoff": "This provides durable, horizontally scalable, multi-region access and efficient large-repository checkout, but pays replication and quorum latency/costs and depends on object-storage availability. Partial clones also shift some cost and complexity to later blob retrieval.", "parent": null, "point": {"z:1": "z:1.1", "z:2": "z:2.1", "z:3": "z:3.1", "z:4": "z:4.1"}, "point_id": "P1", "reuses": null, "round": 1, "step": 1, "tradeoffs": [{"causes": ["z:3.1"], "costs": ["Q3"], "gains": ["Q1", "Q4"], "note": "Quorum and authoritative reads protect durable, current refs but add latency."}, {"causes": ["z:4.1"], "costs": ["Q3"], "gains": ["R2", "C2"], "note": "Filtering reduces transfers with standard clients but later blob retrieval can affect fetch time."}, {"causes": ["z:2.1"], "costs": ["C1"], "gains": ["Q2", "Q3"], "note": "Regional stateless gateways improve locality and failover while adding operational coordination."}], "verdict": "mixed", "why": "Replicated storage and committed metadata directly address durability and read-after-write. Regional gateways support availability and locality; neither failover timing nor the 30-second p95 target is measured. Partial clone addresses the large repository with standard clients."}, {"alternative": null, "approach": "B", "assessment": {"C1": "partly", "C2": "meets", "Q1": "meets", "Q2": "meets", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets"}, "attested_by": [], "changed": [], "description": "The system stores repositories on block storage synchronously replicated across three zones, with one active Git server serving writes and a passive server ready to assume leadership. Repository metadata remains single-writer and synchronously replicated, while clients use partial clone blob filtering for large repositories.", "diff": [{"after": "z:1.2", "before": null, "dimension": "z:1"}, {"after": "z:2.2", "before": null, "dimension": "z:2"}, {"after": "z:3.2", "before": null, "dimension": "z:3"}, {"after": "z:4.1", "before": null, "dimension": "z:4"}], "drivers": ["R1", "R2", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "seed", "novel": ["z:1", "z:2", "z:3"], "observation": "The single writer and synchronous path simplify ordering but raise latency and create failover and operations work.", "own_tradeoff": "This provides strong metadata consistency, zone-level durability, automatic failover, and reduced large-clone transfer. It gives up write latency and operational simplicity due to synchronous cross-zone replication, keeps standby capacity underused, and makes clients depend on fetching omitted blobs when needed.", "parent": null, "point": {"z:1": "z:1.2", "z:2": "z:2.2", "z:3": "z:3.2", "z:4": "z:4.1"}, "point_id": "P2", "reuses": null, "round": 1, "step": 2, "tradeoffs": [{"causes": ["z:1.2", "z:3.2"], "costs": ["Q3"], "gains": ["Q1", "Q4"], "note": "Synchronous replication and single-writer ordering protect data and read-after-write behavior but add write latency."}, {"causes": ["z:2.2"], "costs": ["C1"], "gains": ["Q2"], "note": "Automatic standby takeover aids recovery but maintaining failover behavior adds operational work."}, {"causes": ["z:4.1"], "costs": ["Q3"], "gains": ["R2", "C2"], "note": "Partial clone limits transferred data but later blob requests add work."}], "verdict": "mixed", "why": "Synchronous three-zone replication with active-passive Git servers should protect commits and support automatic failover, while partial clone limits large transfers."}, {"alternative": null, "approach": "C", "assessment": {"C1": "partly", "C2": "meets", "Q1": "partly", "Q2": "partly", "Q3": "partly", "Q4": "misses", "R1": "meets", "R2": "meets"}, "attested_by": [], "changed": [], "description": "Repositories are stored in eventually replicated object storage, with regional caches serving regional read replicas while pushes go through a central endpoint. Metadata propagates asynchronously between regions, and clients use Git partial clone with blob filtering to fetch only needed large-repository content.", "diff": [{"after": "z:1.3", "before": null, "dimension": "z:1"}, {"after": "z:2.3", "before": null, "dimension": "z:2"}, {"after": "z:3.3", "before": null, "dimension": "z:3"}, {"after": "z:4.1", "before": null, "dimension": "z:4"}], "drivers": ["R1", "R2", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "seed", "novel": ["z:1", "z:2", "z:3"], "observation": "The point misses Q4 by design: a fetch can start after the central push succeeds and still reach a lagging regional replica.", "own_tradeoff": "This improves regional read performance, storage scalability, and large-repository transfer efficiency. It gives up immediate cross-region metadata freshness and local write latency, while central pushes remain a potential bottleneck and cached or replica data may temporarily lag.", "parent": null, "point": {"z:1": "z:1.3", "z:2": "z:2.3", "z:3": "z:3.3", "z:4": "z:4.1"}, "point_id": "P3", "reuses": null, "round": 1, "step": 3, "tradeoffs": [{"causes": ["z:1.3", "z:3.3"], "costs": ["Q4", "Q1"], "gains": ["Q3"], "note": "Regional asynchronous propagation favors local read speed but cannot guarantee that a post-success fetch sees the push."}, {"causes": ["z:2.3"], "costs": ["Q2"], "gains": ["Q3"], "note": "Regional read replicas aid local reads but the central push endpoint remains a failure and throughput focus."}], "verdict": "weak", "why": "Asynchronous regional replicas should improve local read latency and partial clone should reduce transfer; replication delay may compromise post-push visibility."}, {"alternative": "A1", "approach": "A", "assessment": {"C1": "partly", "C2": "meets", "Q1": "meets", "Q2": "meets", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets"}, "attested_by": [], "changed": ["z:2", "z:3"], "description": "Git objects are replicated immutably in cloud object storage, while stateless regional gateways serve Git traffic through commit-aware caches. A push succeeds only after metadata reaches quorum and affected caches are invalidated; clients can use partial clone to fetch only required blobs.", "diff": [{"after": "z:2.4", "before": "z:2.1", "dimension": "z:2"}, {"after": "z:3.4", "before": "z:3.1", "dimension": "z:3"}], "drivers": ["R1", "R2", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "exploit", "novel": ["z:2", "z:3"], "observation": "Cache invalidation before acknowledgement strengthens freshness but adds push latency and coordination. The numeric performance objective remains unmeasured.", "own_tradeoff": "This provides durable storage, regional scalability, and fresher read results, but quorum coordination and invalidation increase push latency and operational complexity. Partial clone reduces initial transfer costs but can add on-demand fetch latency and depends on client support.", "parent": 1, "point": {"z:1": "z:1.1", "z:2": "z:2.4", "z:3": "z:3.4", "z:4": "z:4.1"}, "point_id": "P4", "reuses": null, "round": 2, "step": 4, "tradeoffs": [{"causes": ["z:3.4"], "costs": ["Q3"], "gains": ["Q1", "Q4"], "note": "Invalidating caches before acknowledging a quorum commit makes new refs visible but adds push-path delay."}, {"causes": ["z:2.4"], "costs": ["C1"], "gains": ["Q2", "Q3"], "note": "Regional cached gateways improve locality while their coordination adds operations burden."}], "verdict": "mixed", "why": "Add commit-aware caches and invalidate affected views before push success to improve regional fetch speed while preserving Q4."}, {"alternative": "B1", "approach": "B", "assessment": {"C1": "partly", "C2": "meets", "Q1": "meets", "Q2": "partly", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets"}, "attested_by": [], "changed": ["z:2"], "description": "Repositories reside on block storage synchronously replicated across three zones, while a single authoritative metadata writer replicates its updates synchronously. Stateless Git gateways in each region serve clients and route operations to that writer and storage, with partial-clone filtering limiting large-repository data transfer.", "diff": [{"after": "z:2.1", "before": "z:2.2", "dimension": "z:2"}], "drivers": ["R1", "R2", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "exploit", "novel": [], "observation": "Regional gateways improve distribution, while single-writer synchronous replication remains a performance and failover dependency.", "own_tradeoff": "This provides durable multi-zone storage, horizontally scalable regional serving, and reduced clone bandwidth, but synchronous writes and single-writer coordination add latency and make writer or quorum availability a bottleneck; partial clone still requires fetching requested blobs.", "parent": 2, "point": {"z:1": "z:1.2", "z:2": "z:2.1", "z:3": "z:3.2", "z:4": "z:4.1"}, "point_id": "P5", "reuses": null, "round": 2, "step": 5, "tradeoffs": [{"causes": ["z:1.2", "z:3.2"], "costs": ["Q3"], "gains": ["Q1", "Q4"], "note": "Synchronous three-zone storage and one ordered writer protect commits but increase write latency."}, {"causes": ["z:2.1"], "costs": ["C1"], "gains": ["Q2", "Q3"], "note": "Regional stateless gateways spread serving but do not remove the single-writer dependency."}, {"causes": ["z:4.1"], "costs": ["Q3"], "gains": ["R2", "C2"], "note": "Partial clone reduces bulk transfer but may defer required blob transfer."}], "verdict": "mixed", "why": "Move the synchronous block-storage/single-writer approach to stateless regional gateways to improve regional serving and failure handling."}, {"alternative": "D1", "approach": "D", "assessment": {"C1": "partly", "C2": "meets", "Q1": "meets", "Q2": "partly", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets"}, "attested_by": [], "changed": [], "description": "The system stores immutable Git objects in replicated cloud object storage, with a designated leader accepting pushes and regional replicas serving reads. The leader commits metadata under fencing, while read barriers ensure replicas expose committed state; partial-clone clients fetch only the blobs they request.", "diff": [{"after": "z:1.1", "before": null, "dimension": "z:1"}, {"after": "z:2.5", "before": null, "dimension": "z:2"}, {"after": "z:3.5", "before": null, "dimension": "z:3"}, {"after": "z:4.1", "before": null, "dimension": "z:4"}], "drivers": ["R1", "R2", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "explore", "novel": ["z:2", "z:3"], "observation": "Fencing and barriers offer a clear read-after-write mechanism, though leader coordination still needs failover and latency evidence.", "own_tradeoff": "This gains durable storage, scalable regional reads, and consistent ref visibility, but gives up local write availability and adds replication, fencing, and barrier complexity. Partial clones reduce initial transfer and local storage while making some operations depend on later blob fetches.", "parent": null, "point": {"z:1": "z:1.1", "z:2": "z:2.5", "z:3": "z:3.5", "z:4": "z:4.1"}, "point_id": "P6", "reuses": null, "round": 2, "step": 6, "tradeoffs": [{"causes": ["z:3.5"], "costs": ["Q3"], "gains": ["Q1", "Q4"], "note": "Leader commits, fencing and barriers protect ref order but add coordination latency."}, {"causes": ["z:2.5"], "costs": ["Q2"], "gains": ["Q3"], "note": "Regional replicas improve reads but require leader recovery and replica coordination."}, {"causes": ["z:4.1"], "costs": ["Q3"], "gains": ["R2", "C2"], "note": "Partial clone cuts initial transfer while making later reads dependent on object retrieval."}], "verdict": "mixed", "why": "Explore a designated push leader with regional read replicas, fencing and read barriers to preserve ref order while serving reads locally."}, {"alternative": null, "approach": "A", "assessment": {"C1": "partly", "C2": "meets", "Q1": "meets", "Q2": "meets", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets"}, "attested_by": [], "changed": ["z:4"], "description": "Replicated immutable Git objects in cloud object storage are served through stateless, cross-region protocol gateways using commit-aware caches. Pushes succeed only after metadata is quorum-committed and relevant caches are invalidated, while clients can use Git partial clone and sparse checkout to avoid downloading unnecessary blobs.", "diff": [{"after": "z:4.2", "before": "z:4.1", "dimension": "z:4"}], "drivers": ["R1", "R2", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "exploit", "novel": ["z:4"], "observation": "The refinement can reduce transferred or checked-out content, but adds deferred retrieval behavior and does not establish the latency target.", "own_tradeoff": "This gains durable replication, scalable regional serving, and reduced large-repository transfer costs. It gives up some push latency and operational simplicity because quorum commits and coordinated cache invalidation are required; partial clones also make access dependent on later blob retrieval.", "parent": 4, "point": {"z:1": "z:1.1", "z:2": "z:2.4", "z:3": "z:3.4", "z:4": "z:4.2"}, "point_id": "P7", "reuses": null, "round": 3, "step": 7, "tradeoffs": [{"causes": ["z:3.4"], "costs": ["Q3"], "gains": ["Q1", "Q4"], "note": "Cache invalidation before success improves visibility at the cost of extra push latency."}, {"causes": ["z:4.2"], "costs": ["Q3"], "gains": ["R2", "C2"], "note": "Sparse checkout further narrows worktree materialization but can add client workflow complexity and deferred transfers."}], "verdict": "mixed", "why": "Add sparse checkout to the cache-aware quorum design to reduce large-repository materialization further."}, {"alternative": null, "approach": "B", "assessment": {"C1": "partly", "C2": "meets", "Q1": "meets", "Q2": "partly", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets"}, "attested_by": [], "changed": ["z:4"], "description": "Three-zone synchronous block storage provides durable repository data, while a single writer serializes metadata updates and synchronously replicates them. Stateless gateways in each region serve Git clients and use partial clone, blob filtering, and sparse checkout to limit large-repository transfer.", "diff": [{"after": "z:4.2", "before": "z:4.1", "dimension": "z:4"}], "drivers": ["R1", "R2", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "exploit", "novel": [], "observation": "Sparse checkout helps local working sets but leaves synchronous write latency and a single metadata writer unchanged.", "own_tradeoff": "This gains strong durability, metadata consistency, and regional serving with reduced large-repository bandwidth, but synchronous replication and the single writer add write latency and can constrain write availability or throughput. Partial clone also shifts some complexity to clients and later object retrieval.", "parent": 5, "point": {"z:1": "z:1.2", "z:2": "z:2.1", "z:3": "z:3.2", "z:4": "z:4.2"}, "point_id": "P8", "reuses": null, "round": 3, "step": 8, "tradeoffs": [{"causes": ["z:1.2", "z:3.2"], "costs": ["Q3"], "gains": ["Q1", "Q4"], "note": "Strong synchronous replication and ordered writes add latency to pushes and the single writer may bottleneck."}, {"causes": ["z:4.2"], "costs": ["Q3"], "gains": ["R2", "C2"], "note": "Sparse checkout limits materialization with standard Git but can defer needed data retrieval."}], "verdict": "mixed", "why": "Add sparse checkout to the synchronous single-writer design to reduce large-repository transfers."}, {"alternative": null, "approach": "D", "assessment": {"C1": "partly", "C2": "meets", "Q1": "meets", "Q2": "partly", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets"}, "attested_by": [], "changed": ["z:2", "z:4"], "description": "Stateless Git protocol gateways in each region serve clients, reading replicated immutable Git objects from cloud object storage. A leader commits metadata, while fencing and read barriers ensure gateways observe authorized, ordered state; standard partial clone with server-side sparse filtering limits large-repository transfers.", "diff": [{"after": "z:2.1", "before": "z:2.5", "dimension": "z:2"}, {"after": "z:4.3", "before": "z:4.1", "dimension": "z:4"}], "drivers": ["R1", "R2", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "exploit", "novel": ["z:4"], "observation": "The refinements preserve the leader/barrier trade-off and improve transfer efficiency, but do not outperform the previous best on measured evidence because no targets have been benchmarked.", "own_tradeoff": "This provides regional horizontal scalability, durable object replication, and consistent metadata while reducing bandwidth for partial consumers. It gives up simpler serving and some availability or latency during leader coordination, and object-storage access plus filtering add operational complexity.", "parent": 6, "point": {"z:1": "z:1.1", "z:2": "z:2.1", "z:3": "z:3.5", "z:4": "z:4.3"}, "point_id": "P9", "reuses": null, "round": 3, "step": 9, "tradeoffs": [{"causes": ["z:3.5"], "costs": ["Q3"], "gains": ["Q1", "Q4"], "note": "Fencing and read barriers ensure committed refs are visible, but leader coordination can add latency."}, {"causes": ["z:4.3"], "costs": ["Q3"], "gains": ["R2", "C2"], "note": "Server-side sparse filtering reduces transfers but adds server work and depends on the filtering implementation."}], "verdict": "mixed", "why": "Use stateless gateways with the leader, fencing and read barriers, and server-side sparse filtering to reduce serving state and transfer."}], "trajectory_dimensions": ["z:1", "z:2", "z:3", "z:4"], "unaddressed": [], "uncovered": [], "values": {"z:1.1": {"description": "", "dimension": "z:1", "href": null, "id": "z:1.1", "label": "Replicated immutable Git objects in cloud object storage", "passages": [], "roles": {"A1": "chosen", "D1": "chosen"}, "sources": [], "status": "", "steps": [1, 4, 6, 7, 9]}, "z:1.2": {"description": "", "dimension": "z:1", "href": null, "id": "z:1.2", "label": "Synchronously replicated block storage across three zones", "passages": [], "roles": {"B1": "chosen"}, "sources": [], "status": "", "steps": [2, 5, 8]}, "z:1.3": {"description": "", "dimension": "z:1", "href": null, "id": "z:1.3", "label": "Eventually replicated object storage with regional caches", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [3]}, "z:2.1": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.1", "label": "Stateless Git protocol gateways across regions", "passages": [], "roles": {"B1": "chosen"}, "sources": [], "status": "", "steps": [1, 5, 8, 9]}, "z:2.2": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.2", "label": "Active-passive Git servers with automatic leader failover", "passages": [], "roles": {"B1": "considered"}, "sources": [], "status": "", "steps": [2]}, "z:2.3": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.3", "label": "Regional read replicas with a central push endpoint", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [3]}, "z:2.4": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.4", "label": "Stateless Git protocol gateways across regions with commit-aware caches", "passages": [], "roles": {"A1": "chosen"}, "sources": [], "status": "", "steps": [4, 7]}, "z:2.5": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.5", "label": "Regional read replicas and a designated push leader", "passages": [], "roles": {"D1": "chosen"}, "sources": [], "status": "", "steps": [6]}, "z:3.1": {"description": "", "dimension": "z:3", "href": null, "id": "z:3.1", "label": "Quorum-committed push metadata with authoritative post-push reads", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [1]}, "z:3.2": {"description": "", "dimension": "z:3", "href": null, "id": "z:3.2", "label": "Single-writer repository metadata with synchronous replication", "passages": [], "roles": {"B1": "chosen"}, "sources": [], "status": "", "steps": [2, 5, 8]}, "z:3.3": {"description": "", "dimension": "z:3", "href": null, "id": "z:3.3", "label": "Asynchronous metadata propagation between regions", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [3]}, "z:3.4": {"description": "", "dimension": "z:3", "href": null, "id": "z:3.4", "label": "Quorum-committed push metadata with cache invalidation before success", "passages": [], "roles": {"A1": "chosen"}, "sources": [], "status": "", "steps": [4, 7]}, "z:3.5": {"description": "", "dimension": "z:3", "href": null, "id": "z:3.5", "label": "Leader-committed metadata with fencing and read barriers", "passages": [], "roles": {"D1": "chosen"}, "sources": [], "status": "", "steps": [6, 9]}, "z:4.1": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.1", "label": "Standard Git partial clone with blob filtering", "passages": [], "roles": {"A1": "chosen", "B1": "chosen", "D1": "chosen"}, "sources": [], "status": "", "steps": [1, 2, 3, 4, 5, 6]}, "z:4.2": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.2", "label": "Standard Git partial clone with blob filtering and sparse checkout", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [7, 8]}, "z:4.3": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.3", "label": "Standard Git partial clone with server-side sparse filtering", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [9]}}, "wiki": false, "with_space": true}</script>
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById("theme-toggle");
+    function current() {
+      return root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    }
+    function label() { btn.textContent = current() === "dark" ? "☀" : "☾"; }
+    btn.addEventListener("click", function () {
+      var next = current() === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      try { localStorage.setItem("ddspace-wiki-theme", next); } catch (e) {}
+      label();
+      document.dispatchEvent(new CustomEvent("themechange"));
+    });
+    label();
+  })();
+</script>
+<script src="../assets/d3.min.js"></script>
+<script src="../assets/graph-layout.js"></script>
+<script>
+(function () {
+  const data = JSON.parse(document.getElementById("explainer-data").textContent);
+  const COLOR = {};
+  function readColors() {
+    const cs = getComputedStyle(document.documentElement), get = (name) => cs.getPropertyValue(name).trim();
+    ["dimension", "source", "accepted", "mixed", "rejected", "outcome", "muted", "fg", "accent", "novel"]
+      .forEach((k) => { COLOR[k] = get("--" + k); });
+  }
+  readColors();
+  const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const alts = data.alternatives;
+  const altName = (a) => a.id + " · " + a.name;
+
+  // The subgraph, as a tree from the centre: the domain, the involved dimensions, their values, then the design
+  // points the agent evaluated (one per step), then the requirements on the outer ring, linked to the points
+  // whose assessment judges them.
+  const steps = data.trajectory || [];
+  const pointValues = new Set();  // explored: every value a design point of the page takes (a step's or a choice's)
+  steps.forEach((s) => Object.values(s.point).forEach((v) => pointValues.add(v)));
+  alts.forEach((a) => a.choices.forEach((c) => c.value && pointValues.add(c.value)));
+  const consideredValues = new Set();
+  alts.forEach((a) => a.considered.forEach((c) => c.value && consideredValues.add(c.value)));
+  const options = new Map();  // "ADR:option" -> option, from every ADR
+  (data.adrs || []).forEach((r) => r.options.forEach((o) => {
+    options.set(o.key, o); Object.values(o.point).forEach((v) => consideredValues.add(v)); }));
+  const exploredDims = new Set([...pointValues].map((v) => (data.values[v] || {}).dimension).filter(Boolean));
+  const nodes = [{ id: "domain", kind: "domain", label: data.space ? (data.space.domain || "") : data.title }];
+  const edges = [];
+  Object.values(data.dimensions).forEach((dm) => {
+    nodes.push({ ...dm, kind: "dimension" });
+    edges.push({ source: "domain", target: dm.id, type: "domain" });
+    dm.values.forEach((vid) => edges.push({ source: dm.id, target: vid, type: "has_value" }));
+  });
+  Object.values(data.values).forEach((v) => nodes.push({ ...v, kind: "value" }));
+  const pid = (n) => "p:" + n;
+  steps.forEach((s) => {
+    nodes.push({ id: pid(s.step), kind: "point", step: s.step, verdict: s.verdict, values: Object.values(s.point),
+      label: (s.alternative ? s.alternative + " · " : "") + "#" + s.step, description: s.description });
+    Object.values(s.point).forEach((v) => edges.push({ source: v, target: pid(s.step), type: "member" }));
+    Object.entries(s.assessment || {}).forEach(([r, judged]) =>
+      edges.push({ source: pid(s.step), target: "r:" + r, type: "assess", judged }));
+  });
+  data.relations.forEach((r) => edges.push({ source: r.source, target: r.target, type: "relation", relation: r.type,
+    directed: r.directed, reading: r.reading }));
+  data.requirements.forEach((r) => nodes.push({ ...r, id: "r:" + r.id, req: r.id, kind: "requirement", label: r.id }));
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const links = edges.filter((e) => byId.has(e.source) && byId.has(e.target));
+  const TREE = new Set(["domain", "has_value", "member"]);
+
+  const SYMBOL = { domain: d3.symbolCircle, dimension: d3.symbolCircle, value: d3.symbolDiamond, point: d3.symbolTriangle,
+    requirement: d3.symbolSquare };
+  const radius = (n) => n.kind === "domain" ? 14 : n.kind === "dimension" ? 10 : n.kind === "value" ? 6 : n.kind === "point" ? 8 : 7;
+  const shapePath = (n) => d3.symbol().type(SYMBOL[n.kind] || d3.symbolCircle)
+    .size(Math.PI * radius(n) * radius(n) * (n.kind === "value" ? 1.25 : 1))();
+  const JUDGED = { strong: "accepted", grounded: "accepted", mixed: "mixed", partial: "mixed", weak: "rejected",
+    ungrounded: "rejected", meets: "accepted", partly: "mixed", misses: "rejected" };
+  const nodeColor = (n) => n.kind === "value" ? (COLOR[n.status] || COLOR.accent) : n.kind === "domain" ? COLOR.fg
+    : n.kind === "requirement" ? COLOR.novel : n.kind === "point" ? (COLOR[JUDGED[n.verdict]] || COLOR.accent) : COLOR.dimension;
+
+  // The shared radial layout (graph-layout.js). Dimension labels point inwards, so each dimension sits just inside
+  // its values; the other rings start beyond the longest label of the ring inside them. Points (in step order,
+  // clockwise from the top) and requirements sit evenly around their rings.
+  const LABEL_MAX = 22;  // short labels keep the rings tight, so the graph (and its text) is drawn larger
+  const shortLabel = (s) => { s = String(s ?? ""); return s.length > LABEL_MAX ? s.slice(0, LABEL_MAX - 1).trimEnd() + "…" : s; };
+  const measure = (() => {
+    const ctx = document.createElement("canvas").getContext("2d");
+    ctx.font = "15px " + getComputedStyle(document.body).fontFamily;
+    return (s) => ctx ? ctx.measureText(s).width : s.length * 6.5;
+  })();
+  const labelReach = (ns) => d3.max(ns, (n) => radius(n) + 4 + measure(shortLabel(n.label)) + 3) || 0;
+  const radialTargets = (nodes, links, cx, cy) => DelveLayout.radialTargets(nodes, links, cx, cy, {
+    rings: ["domain", "dimension", "value", "point", "requirement"],
+    spacing: { dimension: 90, value: 30, point: 34, requirement: 40 }, ringGap: 70,
+    labelReach, restJitter: 0.04, inward: ["dimension"], inset: { dimension: 36 }, even: ["point", "requirement"] });
+
+  const svg = d3.select("#svg"), g = svg.append("g");
+  svg.append("defs").append("marker").attr("id", "arrow").attr("viewBox", "0 -5 10 10").attr("refX", 20).attr("refY", 0)
+    .attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto")
+    .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", COLOR.dimension);
+  const zoom = d3.zoom().scaleExtent([0.2, 6]).on("zoom", (ev) => g.attr("transform", ev.transform));
+  svg.call(zoom);
+  const linkLayer = g.append("g"), nodeLayer = g.append("g");
+  const REL_DASH = { requires: null, affects: "7,3", constrains: "2,3", co_occurs_with: "1,5", refines: "9,3,2,3" };
+  function edgeStyle(e) {
+    if (e.type === "relation") return { stroke: COLOR.dimension, width: 2, dash: REL_DASH[e.relation] || null, op: 0.85, arrow: e.directed !== false };
+    if (e.type === "assess") return { stroke: COLOR[JUDGED[e.judged]] || COLOR.muted, width: 1.2, dash: e.judged === "misses" ? "4,3" : null, op: 0.22 };
+    if (e.type === "member") return { stroke: COLOR.muted, width: 1, dash: null, op: 0.12 };
+    if (e.type === "domain") return { stroke: COLOR.muted, width: 0.8, dash: null, op: 0.3 };
+    return { stroke: COLOR.muted, width: 1, dash: null, op: 0.5 };
+  }
+  const width = () => document.getElementById("canvas").clientWidth;
+  const height = () => document.getElementById("canvas").clientHeight;
+  const cx = 0, cy = 0;  // the layout's own frame; fit() maps it onto the canvas
+  const pos = (id) => byId.get(id);
+  const linkSel = linkLayer.selectAll("line").data(links).enter().append("line")
+    .attr("class", (d) => "link" + (TREE.has(d.type) ? " tree" : ""));
+  function styleLinks() {
+    linkSel.each(function (d) { const st = edgeStyle(d); d3.select(this).attr("stroke", st.stroke).attr("stroke-width", st.width)
+      .attr("stroke-dasharray", st.dash).attr("stroke-opacity", st.op).attr("marker-end", st.arrow ? "url(#arrow)" : null); });
+  }
+  styleLinks();
+  linkSel.filter((d) => d.reading).append("title").text((d) => d.reading);
+  linkSel.filter((d) => d.type === "assess").append("title").text((d) => byId.get(d.source).label + " " + d.judged + " " + d.target.slice(2));
+  const nodeSel = nodeLayer.selectAll("g.node").data(nodes).enter().append("g").attr("class", "node")
+    .style("cursor", "pointer").on("click", (ev, d) => { ev.stopPropagation(); select(d.id); });
+  nodeSel.append("circle").attr("r", (d) => Math.max(radius(d), 10)).attr("fill", "transparent");
+  nodeSel.append("path").attr("class", "shape").attr("d", shapePath);
+  nodeSel.append("text").text((d) => d.kind === "domain" ? d.label : shortLabel(d.label));
+  // A selected path shows its nodes' full labels (the rest of the graph is faded); otherwise labels are short.
+  function labels(keep) {
+    nodeSel.select("text").text((d) => d.kind === "domain" || (keep && keep.has(d.id)) ? d.label : shortLabel(d.label));
+  }
+  nodeSel.append("title").text((d) => d.kind === "requirement" ? d.req + ": " + d.text
+    : d.kind === "point" ? "Step " + d.step + " · " + d.verdict + (d.description ? ": " + d.description : "")
+    : d.label + (d.status ? " (" + d.status + ")" : ""));
+  const orientLabels = () => DelveLayout.orientLabels(nodeSel.select("text"), cx, cy, { radius, centreDy: "-1.4em",
+    inward: (d) => d.kind === "dimension" });
+  function fit() {
+    const shown = nodes.filter(visible);
+    const xs = shown.map((d) => d.x), ys = shown.map((d) => d.y), pad = 70;
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const k = Math.min(2.5, 0.95 / Math.max((x1 - x0 + 2 * pad) / (width() || 1), (y1 - y0 + 2 * pad) / (height() || 1)));
+    svg.call(zoom.transform, d3.zoomIdentity.translate(width() / 2, height() / 2).scale(k).translate(-(x0 + x1) / 2, -(y0 + y1) / 2));
+  }
+  // Shown: every node but the values no design point takes and no alternative considered, unless the reader asks
+  // for every value the space offers. The layout is computed over the shown nodes only.
+  let showAll = false;
+  const visible = (d) => d.kind !== "value" || showAll || pointValues.has(d.id) || consideredValues.has(d.id);
+  function layout() {
+    const shown = nodes.filter(visible), ids = new Set(shown.map((n) => n.id));
+    const target = radialTargets(shown, links.filter((l) => ids.has(l.source) && ids.has(l.target)), cx, cy);
+    shown.forEach((n) => { const t = target.get(n.id); n.x = t.x; n.y = t.y; });
+    nodeSel.style("display", (d) => ids.has(d.id) ? null : "none").attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
+    linkSel.style("display", (d) => ids.has(d.source) && ids.has(d.target) ? null : "none")
+      .attr("x1", (d) => pos(d.source).x).attr("y1", (d) => pos(d.source).y)
+      .attr("x2", (d) => pos(d.target).x).attr("y2", (d) => pos(d.target).y);
+    orientLabels();
+    fit();
+  }
+  layout();
+  document.querySelectorAll("[data-zoom]").forEach((b) => b.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (b.dataset.zoom === "fit") fit(); else svg.transition().duration(200).call(zoom.scaleBy, b.dataset.zoom === "in" ? 1.4 : 1 / 1.4);
+  }));
+  // A requirement no design point is judged against: drawn hollow, with a dashed outline.
+  const judgedReqs = new Set(links.filter((e) => e.type === "assess").map((e) => e.target));
+  nodeSel.classed("unjudged", (d) => d.kind === "requirement" && !judgedReqs.has(d.id));
+  nodeSel.filter((d) => d.kind === "requirement" && !judgedReqs.has(d.id)).select("title")
+    .text((d) => d.req + ": " + d.text + " (no design point is judged against it)");
+  const toggle = document.getElementById("show-all");
+  if (toggle) toggle.addEventListener("change", () => { showAll = toggle.checked; layout(); });
+
+  // The active view: the trajectory (every step's point, or the selected step's), one alternative, or the compare
+  // view (every alternative). Explored dimensions and values stay coloured in every view; the point shown is outlined.
+  let view = "adrs", selected = null, selectedStep = null, selectedAlt = null, selectedOption = null;
+  const explored = (d) => d.kind === "value" ? pointValues.has(d.id) : d.kind === "dimension" ? exploredDims.has(d.id) : true;
+  linkSel.classed("explored", (d) => (d.type === "has_value" && pointValues.has(d.target))
+    || (d.type === "domain" && exploredDims.has(d.target)));
+  const stepOf = (n) => steps.find((s) => s.step === n);
+  function shownPoint() {
+    const lit = new Set();
+    const add = (s) => { if (!s) return; lit.add(pid(s.step)); Object.values(s.point).forEach((v) => lit.add(v)); };
+    if (view === "trajectory") { if (selectedStep !== null) add(stepOf(selectedStep)); return lit; }
+    if (view === "adrs" && selectedOption) {
+      const o = options.get(selectedOption); Object.values(o.point).forEach((v) => lit.add(v)); if (o.step) lit.add(pid(o.step));
+      return lit;
+    }
+    alts.filter((a) => view === "compare" || (view === "adrs" && a.id === selectedAlt)).forEach((a) => {
+      add(stepOf(a.step)); a.choices.forEach((c) => c.value && lit.add(c.value)); });
+    return lit;
+  }
+  function applyView() {
+    const lit = shownPoint();
+    nodeSel.classed("greyed", (d) => !explored(d)).classed("in-point", (d) => lit.has(d.id))
+      .select("path.shape").attr("fill", (d) => explored(d) ? nodeColor(d) : COLOR.muted)
+      .attr("stroke", (d) => d.id === selected || lit.has(d.id) ? COLOR.fg : d.kind === "dimension" ? "#fff" : "none")
+      .attr("stroke-width", (d) => d.id === selected ? 3 : lit.has(d.id) ? 2.2 : 1.5)
+      .attr("transform", (d) => lit.has(d.id) ? "scale(1.45)" : null);
+    // The point shown: its links to its values and to the requirements stand out.
+    linkSel.classed("shown", (d) => (d.type === "member" && lit.has(d.target)) || (d.type === "assess" && lit.has(d.source)));
+    document.querySelectorAll("[data-step]").forEach((el) =>
+      el.classList.toggle("sel", view === "trajectory" && selectedStep !== null && Number(el.dataset.step) === selectedStep));
+    document.querySelectorAll(".solution").forEach((el) => el.classList.toggle("sel", el.dataset.alt === selectedAlt));
+    document.querySelectorAll(".option").forEach((el) => el.classList.toggle("sel", el.dataset.option === selectedOption));
+  }
+  // A selected node's lineage in the tree (domain -> dimension -> value -> design point -> requirement): its
+  // ancestors up to the centre, and the paths down from it through design points to the requirements they are
+  // judged against. A requirement lights the points judged against it and their ancestors.
+  function lineage(id) {
+    const keep = new Set([id, "domain"]);
+    const up = (vid) => { keep.add(vid); const v = data.values[vid]; if (v) keep.add(v.dimension); };
+    const pointUp = (p) => { keep.add(p); (byId.get(p).values || []).forEach(up); };
+    const pointsWith = (vid) => links.filter((e) => e.type === "member" && e.source === vid).forEach((e) => keep.add(e.target));
+    const n = byId.get(id);
+    if (!n) return keep;
+    if (n.kind === "domain") { pointValues.forEach(up); steps.forEach((s) => keep.add(pid(s.step))); }
+    else if (n.kind === "dimension") (data.dimensions[id].values || []).filter((v) => pointValues.has(v))
+      .forEach((v) => { up(v); pointsWith(v); });
+    else if (n.kind === "value") { up(id); pointsWith(id); }
+    else if (n.kind === "point") pointUp(id);
+    else if (n.kind === "requirement") links.filter((e) => e.type === "assess" && e.target === id).forEach((e) => pointUp(e.source));
+    if (n.kind !== "requirement")  // down to the requirements the kept points are judged against
+      links.filter((e) => e.type === "assess" && keep.has(e.source)).forEach((e) => keep.add(e.target));
+    return keep;
+  }
+  function highlight(id) {
+    const keep = lineage(id);
+    labels(keep);
+    nodeSel.classed("dim-out", (d) => !keep.has(d.id));
+    linkSel.classed("dim-out", (d) => !(keep.has(d.source) && keep.has(d.target)))
+      .classed("on-path", (d) => d.type !== "relation" && keep.has(d.source) && keep.has(d.target));
+  }
+  const HINT = '<p class="hint">Select anything in the graph or the text (a dimension, a value, a design point, a requirement, an alternative or an option) to see what it is and the part it plays in this rationale.</p>';
+  function clearSelection() {
+    selected = null; selectedStep = null; selectedAlt = null; selectedOption = null;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    document.querySelectorAll(".chip.sel").forEach((c) => c.classList.remove("sel"));
+    document.getElementById("info").innerHTML = HINT;
+    applyView();
+  }
+  // The details panel: every kind of element reads the same way: what it is (kind, name, one sentence), then
+  // sections named as on the page (in the decisions, in the alternatives, in the trajectory, requirements, sources).
+  const EXPLAIN = data.mode === "explain";
+  const link = (n) => n.href ? '<p class="info-link"><a class="open-page" href="' + esc(n.href) + '">Open its page in the wiki →</a></p>' : "";
+  const vlabel = (vid) => { const v = data.values[vid]; return v ? '<span data-id="' + esc(v.id) + '" class="vref">' + esc(v.label) + "</span>" : "—"; };
+  const dlabel = (did) => { const x = data.dimensions[did]; return x ? '<span data-id="' + esc(x.id) + '" class="dref">' + esc(x.label) + "</span>" : "—"; };
+  const rlabel = (rid) => '<span data-id="r:' + esc(rid) + '" class="vref">' + esc(rid) + "</span>";
+  const pair = (did, vid) => dlabel(did) + " → " + vlabel(vid);
+  const head = (kind, title, sub) => '<div class="kind">' + kind + "</div><h2>" + title + "</h2>" + (sub ? '<p class="info-sub">' + sub + "</p>" : "");
+  const sec = (title, body) => body ? '<h3 class="info-h">' + esc(title) + "</h3>" + body : "";
+  const list = (items) => items.length ? "<ul>" + items.map((i) => "<li>" + i + "</li>").join("") + "</ul>" : "";
+  const para = (text) => text ? "<p>" + text + "</p>" : "";
+  // A step's trade-off against the requirements, and the one the point's description names.
+  const tradeoffLine = (t) => (t.causes && t.causes.length ? t.causes.map(vlabel).join(", ") + ": " : "") + '<span class="t-gain">gains</span> ' + t.gains.map(rlabel).join(", ")
+    + ' <span class="t-cost">gives up</span> ' + t.costs.map(rlabel).join(", ") + (t.note ? '<br><span class="muted">' + esc(t.note) + "</span>" : "");
+  const tradeoffSecs = (s) => sec("Trade-offs against the requirements", list((s.tradeoffs || []).map(tradeoffLine)))
+    + sec("The point's own trade-off", para(esc(s.own_tradeoff || "")));
+  const judgedChip = (rid, j) => '<span class="j j-' + esc(j) + '" data-id="r:' + esc(rid) + '">' + esc(rid) + " " + esc(j) + "</span>";
+  const judgedWord = (j) => '<span class="j j-' + esc(j) + '">' + esc(j) + "</span>";  // inside a requirement's own panel
+  const chips = (assessment) => { const e = Object.entries(assessment || {}); return e.length ? '<div class="judged">' + e.map(([r, j]) => judgedChip(r, j)).join("") + "</div>" : ""; };
+  const stepChip = (s) => '<span class="node-chip vb-' + esc(s.verdict) + '" data-step-ref="' + s.step + '" title="' + esc(s.verdict) + '">#' + s.step + "</span>";
+  const MEANS = {
+    strong: "it meets every constraint and serves every requirement at least partly",
+    mixed: "good on some requirements, but it misses one or carries a conflict",
+    weak: "it breaks a constraint or misses a key requirement",
+    grounded: "the requirements call for these values and what is known supports them",
+    partial: "only part of that holds: the requirements or what is known support it, not both",
+    ungrounded: "neither the requirements nor what is known support it" };
+  const STATUS = { accepted: "The sources accept this value.", mixed: "The sources are divided on this value.",
+    rejected: "The sources reject this value.", outcome: "The sources report this as an outcome." };
+  const STANCE = { accepts: "accepts it", rejects: "rejects it", supports: "supports it", both: "both accepts and rejects it" };
+  function phrase(s) {
+    const p = s.parent ? "#" + s.parent : "";
+    return { seed: "Seed of approach " + s.approach, exploit: "Refined " + p + (s.approach ? " (approach " + s.approach + ")" : ""),
+      explore: "New approach " + s.approach + (s.parent ? ", started from " + p : ""), ablate: "Ablation of " + p + ": which value made it work?",
+      solution: "The solution as one design point", region: "A region of " + p + ": part of the solution",
+      contrast: "A contrast on " + p + ": one option changed" }[s.move] || s.move;
+  }
+  function moveItems(s) {
+    if (["seed", "solution", "region"].includes(s.move) || !s.parent || !(s.diff || []).length)
+      return Object.entries(s.point).map(([d, v]) => pair(d, v));
+    return s.diff.map((c) => c.before == null ? "add " + pair(c.dimension, c.after)
+      : c.after == null ? "drop " + dlabel(c.dimension) + ' <span class="muted">(was ' + vlabel(c.before) + ")</span>"
+      : "change " + dlabel(c.dimension) + ": " + vlabel(c.before) + " → " + vlabel(c.after));
+  }
+  const adrOptions = [];  // [{r, o}] over every ADR option
+  (data.adrs || []).forEach((r) => r.options.forEach((o) => adrOptions.push({ r, o })));
+  const statusBadge = (o) => o.status === "chosen"
+    ? '<span class="badge accepted">chosen' + (EXPLAIN ? "" : " in " + esc(o.in.join(", "))) + "</span>"
+    : '<span class="badge rejected">discarded</span>';
+  const adrRef = (id, title) => '<a href="#adr-' + esc(id) + '" class="adr-link">' + esc(id) + "</a> · " + esc(title);
+  const optLine = ({ r, o }) => adrRef(r.id, r.title) + ": <b>" + esc(o.name) + "</b> " + statusBadge(o);
+  const altsTitle = EXPLAIN ? "In the solution" : "In the alternatives";
+  const ev = (list) => list.map((e) => esc(e.doc) + (e.stance ? " (" + esc(e.stance) + ")" : "")).join(", ");
+  const taking = (vid) => steps.filter((s) => Object.values(s.point).includes(vid));
+
+  function details(n) {
+    if (n.kind === "dimension") {
+      const dm = data.dimensions[n.id];
+      const explored = (dm.values || []).filter((v) => pointValues.has(v));
+      return head("Dimension · a design concern", esc(n.label), esc(n.question || ""))
+        + sec("In the decisions", list(adrOptions.filter(({ o }) => o.point[n.id]).map((x) => optLine(x) + "<br>" + pair(n.id, x.o.point[n.id]))))
+        + sec(altsTitle, list(alts.map((a) => {
+            const c = a.choices.find((x) => x.dimension === n.id), o = a.open.find((x) => x.dimension === n.id);
+            return "<b>" + esc(a.id) + "</b> " + (c ? vlabel(c.value) + (c.reason ? '<br><span class="muted">' + esc(c.reason) + "</span>" : "")
+              : o ? "leaves it open" + (o.reason ? ': <span class="muted">' + esc(o.reason) + "</span>" : "") : '<span class="muted">does not settle it</span>');
+          })))
+        + sec("In the trajectory", explored.length
+            ? para(explored.length + " of the " + dm.values.length + " values " + (data.wiki ? "the space offers" : "the agent named") + " were taken by some design point:")
+              + list(explored.map((v) => vlabel(v) + " " + taking(v).map(stepChip).join("")))
+            : para('<span class="muted">No design point settled this dimension.</span>'))
+        + sec("Relations", list(data.relations.filter((r) => r.source === n.id || r.target === n.id)
+            .map((r) => dlabel(r.source) + " <em>" + esc(r.type) + "</em> " + dlabel(r.target) + ' <span class="muted">(in the space)</span>')
+            .concat(alts.flatMap((a) => a.relations.filter((r) => r.source === n.id || r.target === n.id).map((r) =>
+              (r.source ? dlabel(r.source) : esc(r.source_label)) + " <em>" + esc(r.type) + "</em> " + (r.target ? dlabel(r.target) : esc(r.target_label))
+              + ' <span class="muted">(' + esc(a.id) + (r.holds ? ": holds" : ": does not hold") + (r.note ? ", " + esc(r.note) : "") + ")</span>")))))
+        + link(n);
+    }
+    if (n.kind === "value") {
+      const points = taking(n.id);
+      const roles = [];
+      alts.forEach((a) => {
+        const c = a.choices.find((x) => x.value === n.id), k = a.considered.find((x) => x.value === n.id);
+        if (c) roles.push("<b>Chosen in " + esc(a.id) + "</b>" + (c.drivers.length ? " for " + c.drivers.map(rlabel).join(", ") : "")
+          + (c.reason ? "<br>" + esc(c.reason) : "") + (c.quote ? '<div class="quote">“' + esc(c.quote) + "”</div>" : "")
+          + (c.evidence.length ? '<br><span class="ev">Cited evidence: ' + ev(c.evidence) + "</span>" : ""));
+        else if (k) roles.push("<b>Weighed and set aside in " + esc(a.id) + "</b>" + (k.reason ? "<br>" + esc(k.reason) : ""));
+      });
+      return head("Value · an option for " + dlabel(n.dimension), esc(n.label), esc(n.description || ""))
+        + (n.status && STATUS[n.status] ? para('<span class="badge ' + esc(n.status) + '">' + esc(n.status) + "</span> " + STATUS[n.status]) : "")
+        + sec("In the decisions", list(adrOptions.filter(({ o }) => Object.values(o.point).includes(n.id)).map(optLine)))
+        + sec(altsTitle, list(roles))
+        + sec("In the trajectory", points.length
+            ? para("Taken by " + points.length + " design point" + (points.length > 1 ? "s" : "") + ": " + points.map(stepChip).join("")
+              + "<br>First tried in #" + points[0].step + ": " + esc(phrase(points[0])) + ".")
+            : para('<span class="muted">No design point took it: ' + (data.wiki ? "the space offers it, but the agent did not try it." : "the agent named it as an option, but did not try it.") + "</span>"))
+        + sec("What the sources say", list(n.sources.map((s) => (s.href ? '<a href="' + esc(s.href) + '">' + esc(s.label) + "</a>" : esc(s.label))
+            + (s.stance ? " " + esc(STANCE[s.stance] || s.stance) : "")))
+            + (n.passages.length ? '<p class="ev">Passages: ' + ev(n.passages) + "</p>" : ""))
+        + link(n);
+    }
+    if (n.kind === "requirement") {
+      const rq = data.requirements.find((r) => r.id === n.req) || {};
+      const adrsFor = (data.adrs || []).filter((r) => r.drivers.includes(n.req));
+      const judged = steps.filter((s) => s.assessment && s.assessment[n.req]);
+      const drives = [];
+      alts.forEach((a) => a.choices.filter((c) => c.drivers.includes(n.req)).forEach((c) =>
+        drives.push("<b>" + esc(a.id) + "</b> " + pair(c.dimension, c.value))));
+      return head("Requirement · " + esc(rq.kind || "requirement") + (rq.attribute ? ": " + esc(rq.attribute) : ""), esc(n.req), esc(n.text))
+        + sec("In the decisions", adrsFor.length
+            ? list(adrsFor.map((r) => adrRef(r.id, r.title) + ": "
+                + r.options.filter((o) => o.status === "chosen").map((o) => "<b>" + esc(o.name) + "</b>" + (EXPLAIN ? "" : " (" + esc(o.in.join(", ")) + ")")).join("; ")))
+            : para('<span class="muted">No ADR addresses it.</span>'))
+        + sec(altsTitle, list(alts.map((a) => { const s = stepOf(a.step), j = s && s.assessment ? s.assessment[n.req] : null;
+            return "<b>" + esc(a.id) + "</b> " + (j ? judgedWord(j) : '<span class="muted">not judged</span>'); })))
+        + sec("In the trajectory", judged.length
+            ? para(judged.length + " design point" + (judged.length > 1 ? "s were" : " was") + " judged against it:")
+              + '<div class="judged">' + judged.map((s) => '<span class="pair-chip">' + stepChip(s) + judgedWord(s.assessment[n.req]) + "</span>").join(" ") + "</div>"
+            : para('<span class="muted">No design point was judged against it.</span>'))
+        + sec("Choices that name it as a driver", list(drives));
+    }
+    return head("Design space", esc(n.label || data.title),
+        data.space ? "The centre of the graph. Around it: the dimensions this rationale involves, their values, the design points the agent evaluated and the requirements."
+          : "The problem. Around it: the dimensions the agent named, their values, the design points it evaluated and the requirements.")
+      + sec("At a glance", list([exploredDims.size + " of " + Object.keys(data.dimensions).length + " dimensions settled by some design point",
+          pointValues.size + " values taken by some design point", steps.length + " design points evaluated"
+          + (data.budget && data.budget.max_points ? " (budget " + data.budget.max_points + ")" : ""),
+          alts.length + (EXPLAIN ? " solution explained" : " alternative" + (alts.length > 1 ? "s" : "") + " proposed"),
+          (data.adrs || []).length + " ADRs"]))
+      + link(n);
+  }
+  function select(id) {
+    const n = byId.get(id); if (!n) return;
+    if (n.kind === "point") { selectStep(n.step); return; }
+    selected = id; applyView(); highlight(id);
+    document.querySelectorAll(".chip.sel").forEach((c) => c.classList.remove("sel"));
+    if (n.kind === "requirement") document.querySelectorAll('[data-requirement="' + n.req + '"]').forEach((c) => c.classList.add("sel"));
+    showInfo(details(n));
+  }
+  svg.on("click", () => clearSelection());
+
+  // The trajectory: selecting a step (its column, its entry or its point in the graph) lights its point and its lineage.
+  function stepInfo(s) {
+    const sub = (s.approach ? "Approach " + esc(s.approach) + (s.round ? ", round " + esc(s.round) : "") + ". " : "") + esc(s.description || "");
+    const inAdrs = adrOptions.filter(({ o }) => o.step === s.step);
+    return head("Design point" + (s.point_id ? " · " + esc(s.point_id) : ""), "#" + s.step + " · " + esc(phrase(s)),
+        sub + (s.reuses ? " The same point as #" + s.reuses + ": reused, not evaluated again." : ""))
+      + para('<span class="vd-chip vb-' + esc(s.verdict) + '">' + esc(s.verdict) + "</span> " + esc(MEANS[s.verdict] || "")
+        + (s.alternative ? '<br><span class="alt-chip">' + (EXPLAIN ? "This is the solution." : "It became alternative " + esc(s.alternative) + ".") + "</span>" : ""))
+      + sec("Thought", para(esc(s.why)))
+      + sec("Move", list(moveItems(s)))
+      + sec("Observed", para(esc(s.observation)))
+      + sec("Requirements", chips(s.assessment))
+      + tradeoffSecs(s)
+      + (["seed", "solution", "region"].includes(s.move) ? "" : sec("The whole point", list(Object.entries(s.point).map(([d, v]) => pair(d, v)))))
+      + sec("In the decisions", list(inAdrs.map(optLine)))
+      + (data.wiki ? sec("What the sources say", s.attested_by.length
+          ? para("Attested by " + s.attested_by.map((a) => a.href ? '<a href="' + esc(a.href) + '">' + esc(a.label) + "</a>" : esc(a.label)).join("; ") + ".")
+          : para('<span class="muted">No source attests this combination.</span>')) : "");
+  }
+  function selectStep(n) {
+    const s = stepOf(n); if (!s) return;
+    selected = null; selectedStep = n;
+    if (view !== "trajectory") document.querySelector('.tab[data-tab="trajectory"]')?.click();
+    selectedStep = n; applyView(); highlight(pid(n));
+    showInfo(stepInfo(s));
+  }
+  document.querySelectorAll(".step-h, .region, .node-chip, .heat-h, td.h, .story-step, .opt").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    selectStep(Number(el.dataset.step));
+  }));
+  // The ADRs tab: an alternative or an option lights its point in the graph.
+  function altInfo(a) {
+    const s = stepOf(a.step);
+    return head(EXPLAIN ? "The solution" : "Alternative" + (a.approach ? " · from approach " + esc(a.approach) : ""), esc(altName(a)), esc(a.summary || ""))
+      + sec("Composed of", list((a.parts || []).map((p) => adrRef(p.adr, p.name)
+          + "<br>" + Object.entries(p.point).map(([d, v]) => pair(d, v)).join("<br>"))))
+      + sec("Requirements", s ? chips(s.assessment) : "")
+      + (s ? tradeoffSecs(s) : "")
+      + sec("Left open", list(a.open.map((o) => dlabel(o.dimension) + (o.reason ? ': <span class="muted">' + esc(o.reason) + "</span>" : ""))))
+      + sec("Each choice", list(a.choices.map((c) => pair(c.dimension, c.value) + (c.drivers.length ? " · for " + c.drivers.map(rlabel).join(", ") : "")
+          + (c.reason ? '<br><span class="muted">' + esc(c.reason) + "</span>" : "")
+          + (c.fit === "approximate" ? '<br><span class="badge mixed approx">approximate fit</span> ' + esc(c.fit_note || "") : "") + (c.quote ? '<div class="quote">“' + esc(c.quote) + "”</div>" : "")
+          + (c.evidence.length ? '<br><span class="ev">Cited evidence: ' + ev(c.evidence) + "</span>" : ""))));
+  }
+  function optionInfo(o) {
+    const { r } = adrOptions.find((x) => x.o === o) || {};
+    return head("Option · " + (r ? esc(r.id) + " " + esc(r.title) : "ADR"), esc(o.name), statusBadge(o) + " " + esc(o.reason || ""))
+      + sec("Values", list(Object.entries(o.point).map(([d, v]) => pair(d, v))))
+      + (o.fit === "approximate" ? sec("Approximate fit", para(esc(o.fit_note || "The values only roughly match this option."))) : "")
+      + sec("Pros", list(o.pros.map(esc))) + sec("Cons", list(o.cons.map(esc)))
+      + (o.quotes && o.quotes.length ? sec("In the solution's words", o.quotes.map((q) => '<div class="quote">“' + esc(q) + "”</div>").join("")) : "")
+      + (r ? sec("The decision it answers", para(esc(r.context)) + '<div class="judged">' + r.drivers.map((d) => '<span class="chip-sm">' + rlabel(d) + "</span>").join(" ") + "</div>") : "");
+  }
+  function showInfo(html) {
+    const info = document.getElementById("info"); info.innerHTML = html; info.scrollTop = 0;
+    info.querySelectorAll("[data-id]").forEach((el) => el.addEventListener("click", () => select(el.dataset.id)));
+    info.querySelectorAll("[data-step-ref]").forEach((el) => el.addEventListener("click", () => selectStep(Number(el.dataset.stepRef))));
+    info.querySelectorAll("a.adr-link").forEach((el) => el.addEventListener("click", () => {
+      if (view !== "adrs") document.querySelector('.tab[data-tab="adrs"]')?.click(); }));
+  }
+  document.querySelectorAll(".solution").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    const a = alts.find((x) => x.id === el.dataset.alt); if (!a) return;
+    selected = null; selectedOption = null; selectedAlt = a.id;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    applyView(); showInfo(altInfo(a));
+  }));
+  document.querySelectorAll(".option").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    const o = options.get(el.dataset.option); if (!o) return;
+    selected = null; selectedAlt = null; selectedOption = o.key;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    applyView(); showInfo(optionInfo(o));
+  }));
+  // A gap's approximate fit selects its ADR option (or its alternative) in the ADRs tab.
+  document.querySelectorAll("[data-gap-option], [data-gap-alt]").forEach((el) => {
+    const go = () => {
+      if (view !== "adrs") document.querySelector('.tab[data-tab="adrs"]')?.click();
+      const target = el.dataset.gapOption ? document.querySelector('.option[data-option="' + CSS.escape(el.dataset.gapOption) + '"]')
+        : document.querySelector('.solution[data-alt="' + CSS.escape(el.dataset.gapAlt) + '"]');
+      if (target) { target.click(); target.scrollIntoView({ block: "center", behavior: "smooth" }); }
+    };
+    el.addEventListener("click", (e) => { if (!e.target.closest("a") && !e.target.closest("[data-node]")) go(); });
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+  });
+  // The lanes: an arrow from each point's parent to it (refine along a lane, a new approach across lanes,
+  // an ablation dotted).
+  function overlay(wrapSel, svgSel) {
+    const wrap = document.querySelector(wrapSel), svgEl = wrap && wrap.querySelector(svgSel);
+    if (!wrap || !svgEl || !wrap.offsetParent) return null;
+    svgEl.setAttribute("width", wrap.scrollWidth); svgEl.setAttribute("height", wrap.scrollHeight);
+    const box = wrap.getBoundingClientRect();
+    const at = (el, side) => { const r = el.getBoundingClientRect();
+      return [(side === "left" ? r.left : side === "right" ? r.right : r.left + r.width / 2) - box.left + wrap.scrollLeft,
+        r.top + r.height / 2 - box.top]; };
+    return { svgEl, at };
+  }
+  const MOVE_COLOR = (m) => m === "explore" || m === "contrast" ? COLOR.novel : m === "seed" || m === "solution" ? COLOR.dimension : COLOR.accent;
+  function drawLanes() {
+    const o = overlay(".lanes-wrap", "svg.lane-arrows"); if (!o) return;
+    let html = "";
+    steps.forEach((s) => {
+      if (!s.parent) return;
+      const a = document.querySelector('.node-chip[data-step="' + s.parent + '"]'), b = document.querySelector('.node-chip[data-step="' + s.step + '"]');
+      if (!a || !b) return;
+      const [x0, y0] = o.at(a, "right"), [x1, y1] = o.at(b, "left");
+      const mx = (x0 + x1) / 2, dash = s.move === "ablate" ? "2,3" : s.move === "explore" ? "6,4" : null;
+      html += '<path d="M' + x0 + "," + y0 + " C" + mx + "," + y0 + " " + mx + "," + y1 + " " + x1 + "," + y1 + '" fill="none" stroke="'
+        + MOVE_COLOR(s.move) + '" stroke-width="1.8"' + (dash ? ' stroke-dasharray="' + dash + '"' : "") + ' marker-end="url(#lane-arrow)"></path>';
+    });
+    o.svgEl.innerHTML = '<defs><marker id="lane-arrow" viewBox="0 -5 10 10" refX="9" refY="0" markerWidth="6" markerHeight="6" orient="auto">'
+      + '<path d="M0,-5L10,0L0,5" fill="' + COLOR.muted + '"></path></marker></defs>' + html;
+  }
+  // The questions, options and criteria: a link from each option to each requirement its point was judged against.
+  const JUDGE_STYLE = { meets: [() => COLOR.accepted, null], partly: [() => COLOR.mixed, null], misses: [() => COLOR.rejected, "5,4"] };
+  function drawQoc() {
+    const o = overlay(".qoc-wrap", "svg.qoc-links"); if (!o) return;
+    let html = "";
+    document.querySelectorAll(".opt[data-qoc]").forEach((el) => {
+      const [qi, oi] = el.dataset.qoc.split(":").map(Number), opt = (data.qoc[qi] || { options: [] }).options[oi];
+      if (!opt) return;
+      const [x0, y0] = o.at(el, "right");
+      Object.entries(opt.assessment || {}).forEach(([rid, judged]) => {
+        const c = document.querySelector('.crit[data-crit="' + rid + '"]'); if (!c) return;
+        const [x1, y1] = o.at(c, "left"), st = JUDGE_STYLE[judged] || [() => COLOR.muted, null], mx = (x0 + x1) / 2;
+        html += '<path data-from="' + el.dataset.qoc + '" d="M' + x0 + "," + y0 + " C" + mx + "," + y0 + " " + mx + "," + y1 + " " + x1 + "," + y1
+          + '" fill="none" stroke="' + st[0]() + '" stroke-width="1.5" stroke-opacity="' + (opt.specific ? 0.8 : 0.14) + '"'
+          + (st[1] ? ' stroke-dasharray="' + st[1] + '"' : "") + "></path>";
+      });
+    });
+    o.svgEl.innerHTML = html;
+  }
+  document.querySelectorAll(".opt[data-qoc]").forEach((el) => {
+    const mark = (on) => document.querySelectorAll('svg.qoc-links path[data-from="' + el.dataset.qoc + '"]')
+      .forEach((p) => p.classList.toggle("traced", on));
+    el.addEventListener("mouseenter", () => mark(true)); el.addEventListener("mouseleave", () => mark(false));
+  });
+  function drawTrajectory() { drawLanes(); drawQoc(); drawLineage(); }
+  document.querySelector("details.grid-details")?.addEventListener("toggle", drawLineage);
+  // The lineage: an arc from each step's parent column to its own, above the grid.
+  function drawLineage() {
+    const svgL = document.querySelector("svg.lineage"); if (!svgL) return;
+    const box = svgL.getBoundingClientRect(), table = document.querySelector("table.traj");
+    svgL.style.width = table.scrollWidth + "px";
+    const x = (n) => { const th = document.querySelector('.step-h[data-step="' + n + '"]'); if (!th) return null;
+      const r = th.getBoundingClientRect(); return r.left - box.left + r.width / 2; };
+    const colorOf = (m) => m === "explore" || m === "contrast" ? COLOR.novel : m === "exploit" || m === "region" ? COLOR.accent : COLOR.dimension;
+    let html = "";
+    steps.forEach((s) => {
+      const x1 = x(s.step); if (x1 === null) return;
+      html += '<circle cx="' + x1 + '" cy="40" r="3" fill="' + colorOf(s.move) + '"></circle>';
+      const x0 = s.parent ? x(s.parent) : null; if (x0 === null) return;
+      const h = Math.min(36, 10 + Math.abs(x1 - x0) / 8);
+      html += '<path d="M' + x0 + ",40 C" + x0 + "," + (40 - h) + " " + x1 + "," + (40 - h) + " " + x1 + ',40" fill="none" stroke="'
+        + colorOf(s.move) + '" stroke-width="1.6"></path>';
+    });
+    svgL.innerHTML = html;
+  }
+  document.querySelectorAll("main [data-node]").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a")) return;  // a wiki link opens its page
+    e.preventDefault(); select(el.dataset.node);
+  }));
+
+  // Tabs: switching shows the tab's panel, re-lights the graph and drops the selection fade.
+  document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => {
+    view = t.dataset.tab;
+    document.querySelectorAll(".tab").forEach((x) => x.setAttribute("aria-selected", x === t ? "true" : "false"));
+    document.querySelectorAll(".panel").forEach((p) => { p.hidden = p.dataset.panel !== view; });
+    clearSelection();
+    if (view === "trajectory") drawTrajectory();
+  }));
+  applyView();
+  drawTrajectory();
+  // The dividers: drag (or use the arrow keys on) the vertical one to share the width between the text and the
+  // graph, the horizontal one to share the height between the graph and its details. Double-click resets. The
+  // split is kept in this browser only (a convenience; the page works without storage).
+  (function splitters() {
+    const KEY = "delve-explainer-split", root = document.documentElement, wrap = document.querySelector(".ex-wrap");
+    const side = document.querySelector(".ex-side");
+    const LIMITS = { left: [20, 80], canvas: [20, 85] }, DEFAULT = { left: 50, canvas: 60 };
+    let split = { ...DEFAULT };
+    try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) split = { ...split, ...s }; } catch (e) { /* no storage */ }
+    const clamp = (k, v) => Math.min(LIMITS[k][1], Math.max(LIMITS[k][0], v));
+    let pending = null;
+    function apply(save) {
+      root.style.setProperty("--split-left", clamp("left", split.left) + "%");
+      root.style.setProperty("--split-canvas", clamp("canvas", split.canvas) + "%");
+      if (!pending) pending = requestAnimationFrame(() => { pending = null; fit(); drawTrajectory(); });
+      if (save) { try { localStorage.setItem(KEY, JSON.stringify(split)); } catch (e) { /* no storage */ } }
+    }
+    function drag(handle, key, axis) {
+      if (!handle) return;
+      handle.addEventListener("pointerdown", (e) => {
+        e.preventDefault(); handle.setPointerCapture(e.pointerId); handle.classList.add("dragging");
+        document.body.classList.add("resizing", axis === "x" ? "col" : "row");
+        const move = (ev) => {
+          if (axis === "x") { const r = wrap.getBoundingClientRect(); split.left = clamp("left", (ev.clientX - r.left) / r.width * 100); }
+          else { const r = side.getBoundingClientRect(); split.canvas = clamp("canvas", (ev.clientY - r.top) / r.height * 100); }
+          apply(false);
+        };
+        const up = () => { handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up);
+          handle.classList.remove("dragging"); document.body.classList.remove("resizing", "col", "row"); apply(true); };
+        handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up);
+      });
+      handle.addEventListener("keydown", (e) => {
+        const step = e.shiftKey ? 10 : 2;
+        const delta = { ArrowLeft: -step, ArrowUp: -step, ArrowRight: step, ArrowDown: step }[e.key];
+        if (delta === undefined) return;
+        e.preventDefault(); split[key] = clamp(key, split[key] + delta); apply(true);
+      });
+      handle.addEventListener("dblclick", () => { split[key] = DEFAULT[key]; apply(true); });
+    }
+    drag(document.querySelector(".splitter-v"), "left", "x");
+    drag(document.querySelector(".splitter-h"), "canvas", "y");
+    apply(false);
+  })();
+
+  let lastSize = width() + "x" + height(), timer = null;
+  window.addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(() => {
+    const size = width() + "x" + height(); if (size !== lastSize) { lastSize = size; fit(); drawTrajectory(); } }, 200); });
+  document.addEventListener("themechange", () => { readColors(); styleLinks(); applyView(); drawTrajectory(); });
+})();
+</script>
+</body>
+</html>

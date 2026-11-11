@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>arch-design-wiki: searching and explaining designs with a design space</title>
+<meta name="description" content="Design spaces as wikis, the rationale an agent wrote with and without them, and how to reproduce the study.">
+<link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+<style>
+  :root {
+    --bg: #f7f8fa; --panel: #ffffff; --ink: #17212b; --muted: #5a6876; --line: #dde3ea;
+    --accent: #1f3a5f; --accent-2: #b7791f; --chip: #eef2f7; --chip-ink: #2c4560;
+    --e: #1f5f8b; --n: #7a5a1f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11161c; --panel: #18202a; --ink: #e6ebf0; --muted: #9aa8b6; --line: #2a3542;
+      --accent: #9fc2e8; --accent-2: #f2b84b; --chip: #223040; --chip-ink: #c9d8e8; --e: #7fb6e0; --n: #e0b56f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11161c; --panel: #18202a; --ink: #e6ebf0; --muted: #9aa8b6; --line: #2a3542;
+    --accent: #9fc2e8; --accent-2: #f2b84b; --chip: #223040; --chip-ink: #c9d8e8; --e: #7fb6e0; --n: #e0b56f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 40px 0 24px; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand img { width: 52px; height: 52px; flex: none; }
+  .brand .repo { font: 600 14px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); }
+  h1 { font-size: clamp(24px, 4vw, 34px); line-height: 1.2; margin: 18px 0 8px; }
+  .authors { color: var(--muted); margin: 0; }
+  .lead { max-width: 780px; margin: 16px 0 0; }
+  nav.jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  nav.jump a { text-decoration: none; background: var(--chip); color: var(--chip-ink); padding: 6px 12px;
+               border-radius: 999px; font-size: 14px; }
+  section { padding: 32px 0 8px; }
+  h2 { font-size: 22px; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 18px; max-width: 780px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+  .card h3 { margin: 0 0 6px; font-size: 18px; }
+  .card p { margin: 0 0 12px; color: var(--muted); font-size: 15px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .stats span { background: var(--chip); color: var(--chip-ink); border-radius: 6px; padding: 2px 8px; font-size: 13px; }
+  .btn { display: inline-block; text-decoration: none; background: var(--accent); color: var(--bg);
+         padding: 7px 14px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+  .table-scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+  td .mode { display: block; color: var(--muted); font-size: 13px; }
+  .runs a { display: inline-block; margin: 0 8px 4px 0; text-decoration: none; padding: 2px 8px; border-radius: 6px;
+            font-size: 14px; border: 1px solid var(--line); }
+  .runs.e a { color: var(--e); } .runs.n a { color: var(--n); }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; color: var(--muted); font-size: 14px; margin: 12px 0 0; }
+  .legend b.e { color: var(--e); } .legend b.n { color: var(--n); }
+  ol.steps { padding-left: 20px; } ol.steps li { margin-bottom: 8px; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; }
+  pre { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; overflow-x: auto; }
+  footer { border-top: 1px solid var(--line); margin-top: 32px; padding: 20px 0 40px; color: var(--muted); font-size: 14px; }
+  .theme { float: right; background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 8px;
+           padding: 4px 10px; cursor: pointer; font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <button class="theme" type="button" id="theme" aria-label="Switch light or dark theme">Theme</button>
+    <div class="brand">
+      <img src="assets/icon.svg" alt="">
+      <div class="repo">arch-design-wiki</div>
+    </div>
+    <h1>Searching and Explaining Designs with a Design Space</h1>
+    <p class="authors">J. Andrés Díaz-Pace · ISISTAN, CONICET – UNICEN University, Tandil, Argentina</p>
+    <p class="lead">A design space records the decisions of a domain, the alternatives for each, the relations between
+      them and the systems that adopted them. This site holds the material of our paper on how an architect can put a
+      given space to work: <strong>search</strong>, from a system's requirements to a few alternative designs, and
+      <strong>explain</strong>, from an existing solution back to the space's decisions. Both produce a rationale
+      file, rendered as a browsable <strong>explainer</strong> next to the space's wiki.</p>
+    <nav class="jump" aria-label="Sections">
+      <a href="#spaces">The design spaces</a><a href="#explainers">Explainers</a><a href="#study">The study</a>
+      <a href="#reproduce">Reproduce</a><a href="#cite">Cite</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="spaces">
+    <h2>The design spaces</h2>
+    <p class="sub">Each space is a wiki: one page per dimension and value, the relations between dimensions, and the
+      explainers written against it.</p>
+    <div class="cards">
+      <div class="card">
+        <h3>ML workflow (expert)</h3>
+        <div class="stats"><span>28 dimensions</span><span>124 values</span><span>imported decision model</span></div>
+        <p>The architectural decisions of the machine-learning workflow, from Warnett and Zdun's decision model,
+          imported as a design space. The space of the paper's study.</p>
+        <a class="btn" href="spaces/ml-workflow-expert/site/index.html">Open the wiki</a>
+      </div>
+      <div class="card">
+        <h3>Git hosting at scale (toy)</h3>
+        <div class="stats"><span>5 dimensions</span><span>17 values</span><span>written by hand</span></div>
+        <p>A small space written by hand from public engineering descriptions of large Git hosts: the paper's
+          running example.</p>
+        <a class="btn" href="spaces/git-hosting-toy/site/index.html">Open the wiki</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="explainers">
+    <h2>Explainers</h2>
+    <p class="sub">Every session of the study, with the expert space (E) and without a space (N), two repetitions each.
+      An explainer shows the design points the agent examined, its assessment of each requirement, the trade-offs it
+      recorded, the alternatives or the explained solution, and the gaps: unaddressed requirements and uncovered
+      decisions.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Case</th><th>With the expert space (E)</th><th>Without a space (N)</th></tr></thead>
+        <tbody>
+          <tr><td>Card-fraud scoring service<span class="mode">search</span></td>
+            <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/fraud-search-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/fraud-search-E-r2.html">rep. 2</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/fraud-search-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/fraud-search-N-r2.html">rep. 2</a></td></tr>
+          <tr><td>On-device visual inspection<span class="mode">search</span></td>
+            <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/vision-search-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/vision-search-E-r2.html">rep. 2</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/vision-search-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/vision-search-N-r2.html">rep. 2</a></td></tr>
+          <tr><td>Retail demand forecasting<span class="mode">search</span></td>
+            <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/forecast-search-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/forecast-search-E-r2.html">rep. 2</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/forecast-search-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/forecast-search-N-r2.html">rep. 2</a></td></tr>
+          <tr><td>Large-scale document classification<span class="mode">search</span></td>
+            <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/documents-search-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/documents-search-E-r2.html">rep. 2</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/documents-search-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/documents-search-N-r2.html">rep. 2</a></td></tr>
+          <tr><td>Card-fraud scoring service<span class="mode">explain</span></td>
+            <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/fraud-explain-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/fraud-explain-E-r2.html">rep. 2</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/fraud-explain-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/fraud-explain-N-r2.html">rep. 2</a></td></tr>
+          <tr><td>Large-scale document classification<span class="mode">explain</span></td>
+            <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/documents-explain-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/documents-explain-E-r2.html">rep. 2</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/documents-explain-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/documents-explain-N-r2.html">rep. 2</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="legend"><span><b class="e">E</b>: pages inside the expert wiki, linked to its dimensions and values</span>
+      <span><b class="n">N</b>: standalone pages; the agent named its own decisions</span></div>
+
+    <h3 style="margin:28px 0 10px">The running example</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Case</th><th>With the toy space</th><th>Without a space</th></tr></thead>
+        <tbody>
+          <tr><td>Git hosting for a growing engineering organization<span class="mode">search</span></td>
+            <td class="runs e"><a href="spaces/git-hosting-toy/site/explainers/hosting-search.html">explainer</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/toy-hosting-search.html">explainer</a></td></tr>
+          <tr><td>Replicated Git file servers<span class="mode">explain</span></td>
+            <td class="runs e"><a href="spaces/git-hosting-toy/site/explainers/spokes-explain.html">explainer</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/toy-spokes-explain.html">explainer</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="study">
+    <h2>The study</h2>
+    <p class="sub">Six cases for ML-enabled systems: four search problems and two solutions to explain. Each problem
+      has functional requirements, quality-attribute scenarios and constraints. A coding agent (Codex CLI,
+      <code>gpt-6-luna</code>, high reasoning effort) followed the search or explain skill in 24 sessions.</p>
+    <div class="cards">
+      <div class="card"><h3>Cases and prompt</h3><p>The problems, the solutions to explain, and the session prompt.</p>
+        <a href="https://github.com/andresdp/arch-design-wiki/tree/main/study/designing2027/cases">cases</a> ·
+        <a href="https://github.com/andresdp/arch-design-wiki/blob/main/study/designing2027/prompt.md">prompt</a></div>
+      <div class="card"><h3>Rationale files</h3><p>The 24 rationale files the agent wrote, and a summary of each
+        session (commands, design points, checks, tokens, time).</p>
+        <a href="https://github.com/andresdp/arch-design-wiki/tree/main/study/designing2027/results-v2">results</a></div>
+      <div class="card"><h3>Skills and tool</h3><p>The search and explain skills and the <code>ddspace</code> command
+        that serves a space to them (query, check and describe design points).</p>
+        <a href="https://github.com/andresdp/arch-design-wiki/tree/main/src/delvedspace/templates/skills">skills</a> ·
+        <a href="https://github.com/andresdp/arch-design-wiki/blob/main/USAGE.md">commands</a></div>
+    </div>
+  </section>
+
+  <section id="reproduce">
+    <h2>Reproduce</h2>
+    <ol class="steps">
+      <li><strong>Offline, in minutes, no API key:</strong> check every rationale file against its space, rebuild the
+        explainers, and recompute the paper's table with <code>study/designing2027/analyze.py</code>.</li>
+      <li><strong>Full rerun, about three hours, with an OpenAI key:</strong> build the expert workspace and run the
+        24 sessions with Codex CLI.</li>
+    </ol>
+<pre>pip install -e .
+python study/designing2027/analyze.py        # the paper's table, from the kept files</pre>
+    <p><a href="https://github.com/andresdp/arch-design-wiki/blob/main/REPRODUCE.md">REPRODUCE.md</a> has every step.</p>
+  </section>
+
+  <section id="cite">
+    <h2>Cite</h2>
+    <p class="sub">The paper is under review for the 4th International Workshop on Designing Software (Designing 2027,
+      co-located with ICSE 2027). Until it is published, please cite this repository
+      (<a href="https://github.com/andresdp/arch-design-wiki/blob/main/CITATION.cff">CITATION.cff</a>).</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">The expert space is derived from the decision model of Warnett and Zdun, "Architectural Design
+    Decisions for the Machine Learning Workflow" (IEEE Computer, 2022). Code: MIT licence.
+    <a href="https://github.com/andresdp/arch-design-wiki">Repository</a>.</div>
+</footer>
+
+<script>
+  const root = document.documentElement, key = "arch-design-wiki-theme";
+  try { const saved = localStorage.getItem(key); if (saved) root.dataset.theme = saved; } catch (e) {}
+  document.getElementById("theme").addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+  });
+</script>
+</body>
+</html>

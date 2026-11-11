@@ -1,0 +1,482 @@
+{
+ "schema_version": 1,
+ "run": "20261109_000000",
+ "name": "toy-git-hosting",
+ "domain": "toy-git-hosting",
+ "view": "selected",
+ "use_case": "Identify the design decisions practitioners face, the alternatives they consider for each, and the outcomes they report.",
+ "core_rule": "≥ 2 sources",
+ "id": "root",
+ "kind": "root",
+ "label": "toy-git-hosting",
+ "href": "index",
+ "meta": "5 dimensions, 17 values, 5 sources",
+ "children": [
+  {
+   "id": "d:4",
+   "kind": "dimension",
+   "label": "Client data transfer",
+   "href": "concepts/client-data-transfer",
+   "core": true,
+   "description": "What a developer's machine downloads to work on a repository.",
+   "meta": "3 values · evidence: 11 docs from 3 sources",
+   "children": [
+    {
+     "id": "v:4.1",
+     "kind": "value",
+     "label": "Full clone over the Git protocol",
+     "status": "accepted",
+     "href": "entities/full-clone-over-the-git-protocol",
+     "description": "The client fetches the whole history with standard Git.",
+     "meta": "accepted · 4 passages",
+     "children": [
+      {
+       "id": "4.1/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 3 passages"
+      },
+      {
+       "id": "4.1/s:s5",
+       "kind": "source",
+       "label": "Introducing Scalar",
+       "href": "sources/s5",
+       "stance": "accepts",
+       "meta": "accepts, 1 passage"
+      }
+     ]
+    },
+    {
+     "id": "v:4.2",
+     "kind": "value",
+     "label": "Partial clone with sparse checkout",
+     "status": "accepted",
+     "href": "entities/partial-clone-with-sparse-checkout",
+     "description": "The client fetches only the history and files it needs, with standard Git features.",
+     "meta": "accepted · 7 passages",
+     "children": [
+      {
+       "id": "4.2/s:s4",
+       "kind": "source",
+       "label": "Scalar philosophy",
+       "href": "sources/s4",
+       "stance": "accepts",
+       "meta": "accepts, 2 passages"
+      },
+      {
+       "id": "4.2/s:s5",
+       "kind": "source",
+       "label": "Introducing Scalar",
+       "href": "sources/s5",
+       "stance": "accepts",
+       "meta": "accepts, 5 passages"
+      }
+     ]
+    },
+    {
+     "id": "v:4.3",
+     "kind": "value",
+     "label": "Virtualized filesystem with on-demand objects",
+     "status": "mixed",
+     "href": "entities/virtualized-filesystem-with-on-demand-objects",
+     "description": "A virtual filesystem shows every file and downloads objects only when a file is opened.",
+     "meta": "mixed · 6 passages",
+     "children": [
+      {
+       "id": "4.3/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 1 passage"
+      },
+      {
+       "id": "4.3/s:s5",
+       "kind": "source",
+       "label": "Introducing Scalar",
+       "href": "sources/s5",
+       "stance": "both",
+       "meta": "both, 5 passages"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "d:3",
+   "kind": "dimension",
+   "label": "Reference update coordination",
+   "href": "concepts/reference-update-coordination",
+   "core": true,
+   "description": "How concurrent updates to a repository's references are ordered and made atomic.",
+   "meta": "3 values · evidence: 7 docs from 2 sources",
+   "children": [
+    {
+     "id": "v:3.2",
+     "kind": "value",
+     "label": "Compare-and-swap on the log",
+     "status": "accepted",
+     "href": "entities/compare-and-swap-on-the-log",
+     "description": "Writers append to the log with a compare-and-swap, without a consensus protocol.",
+     "meta": "accepted · 2 passages",
+     "children": [
+      {
+       "id": "3.2/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 2 passages"
+      }
+     ]
+    },
+    {
+     "id": "v:3.3",
+     "kind": "value",
+     "label": "One server serializes the updates",
+     "status": "accepted",
+     "href": "entities/one-server-serializes-the-updates",
+     "description": "The single file server holding the repository applies updates one at a time.",
+     "meta": "accepted · 1 passage",
+     "children": [
+      {
+       "id": "3.3/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 1 passage"
+      }
+     ]
+    },
+    {
+     "id": "v:3.1",
+     "kind": "value",
+     "label": "Three-phase commit across replicas",
+     "status": "accepted",
+     "href": "entities/three-phase-commit-across-replicas",
+     "description": "Reference updates run as a transaction that all replicas vote on.",
+     "meta": "accepted · 4 passages",
+     "children": [
+      {
+       "id": "3.1/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 2 passages"
+      },
+      {
+       "id": "3.1/s:s2",
+       "kind": "source",
+       "label": "Stretching Spokes",
+       "href": "sources/s2",
+       "stance": "accepts",
+       "meta": "accepts, 2 passages"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "d:2",
+   "kind": "dimension",
+   "label": "Replication for durability",
+   "href": "concepts/replication-for-durability",
+   "core": true,
+   "description": "How copies of a repository are kept so that a lost machine loses no data.",
+   "meta": "4 values · evidence: 14 docs from 3 sources",
+   "children": [
+    {
+     "id": "v:2.3",
+     "kind": "value",
+     "label": "Durability delegated to object storage",
+     "status": "accepted",
+     "href": "entities/durability-delegated-to-object-storage",
+     "description": "The object store holding the log keeps the data durable; servers hold no unique data.",
+     "meta": "accepted · 4 passages",
+     "children": [
+      {
+       "id": "2.3/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 4 passages"
+      }
+     ]
+    },
+    {
+     "id": "v:2.4",
+     "kind": "value",
+     "label": "Single copy on a file server",
+     "status": "accepted",
+     "href": "entities/single-copy-on-a-file-server",
+     "description": "One file server holds each repository, reached by RPC, with no replica.",
+     "meta": "accepted · 1 passage",
+     "children": [
+      {
+       "id": "2.4/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 1 passage"
+      }
+     ]
+    },
+    {
+     "id": "v:2.2",
+     "kind": "value",
+     "label": "Three Git replicas with majority writes",
+     "status": "accepted",
+     "href": "entities/three-git-replicas-with-majority-writes",
+     "description": "Each repository has three plain Git replicas; a write succeeds once a majority has it.",
+     "meta": "accepted · 8 passages",
+     "children": [
+      {
+       "id": "2.2/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 1 passage"
+      },
+      {
+       "id": "2.2/s:s2",
+       "kind": "source",
+       "label": "Stretching Spokes",
+       "href": "sources/s2",
+       "stance": "accepts",
+       "meta": "accepts, 1 passage"
+      },
+      {
+       "id": "2.2/s:s3",
+       "kind": "source",
+       "label": "Building resilience in Spokes",
+       "href": "sources/s3",
+       "stance": "accepts",
+       "meta": "accepts, 6 passages"
+      }
+     ]
+    },
+    {
+     "id": "v:2.1",
+     "kind": "value",
+     "label": "Block-level filesystem replication",
+     "status": "rejected",
+     "href": "entities/block-level-filesystem-replication",
+     "description": "The filesystem under Git is replicated block by block between paired machines.",
+     "meta": "rejected · 3 passages",
+     "children": [
+      {
+       "id": "2.1/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "rejects",
+       "meta": "rejects, 1 passage"
+      },
+      {
+       "id": "2.1/s:s2",
+       "kind": "source",
+       "label": "Stretching Spokes",
+       "href": "sources/s2",
+       "stance": "rejects",
+       "meta": "rejects, 2 passages"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "d:5",
+   "kind": "dimension",
+   "label": "Serving reads",
+   "href": "concepts/serving-reads",
+   "core": true,
+   "description": "Where read traffic (fetches, clones, CI checkouts) is served from.",
+   "meta": "3 values · evidence: 9 docs from 4 sources",
+   "children": [
+    {
+     "id": "v:5.2",
+     "kind": "value",
+     "label": "Cache servers near the clients",
+     "status": "accepted",
+     "href": "entities/cache-servers-near-the-clients",
+     "description": "Cache servers in each office or region serve objects and forward misses to the origin.",
+     "meta": "accepted · 2 passages",
+     "children": [
+      {
+       "id": "5.2/s:s5",
+       "kind": "source",
+       "label": "Introducing Scalar",
+       "href": "sources/s5",
+       "stance": "accepts",
+       "meta": "accepts, 2 passages"
+      }
+     ]
+    },
+    {
+     "id": "v:5.1",
+     "kind": "value",
+     "label": "Nearest up-to-date replica",
+     "status": "accepted",
+     "href": "entities/nearest-up-to-date-replica",
+     "description": "Reads go to the closest replica that has the latest state.",
+     "meta": "accepted · 4 passages",
+     "children": [
+      {
+       "id": "5.1/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 1 passage"
+      },
+      {
+       "id": "5.1/s:s2",
+       "kind": "source",
+       "label": "Stretching Spokes",
+       "href": "sources/s2",
+       "stance": "accepts",
+       "meta": "accepts, 2 passages"
+      },
+      {
+       "id": "5.1/s:s3",
+       "kind": "source",
+       "label": "Building resilience in Spokes",
+       "href": "sources/s3",
+       "stance": "accepts",
+       "meta": "accepts, 1 passage"
+      }
+     ]
+    },
+    {
+     "id": "v:5.3",
+     "kind": "value",
+     "label": "Stateless servers with a local disk cache",
+     "status": "accepted",
+     "href": "entities/stateless-servers-with-a-local-disk-cache",
+     "description": "Any server can serve any repository, rebuilding a warm copy on its local disk from the log.",
+     "meta": "accepted · 5 passages",
+     "children": [
+      {
+       "id": "5.3/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 4 passages"
+      },
+      {
+       "id": "5.3/s:s5",
+       "kind": "source",
+       "label": "Introducing Scalar",
+       "href": "sources/s5",
+       "stance": "accepts",
+       "meta": "accepts, 1 passage"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "d:1",
+   "kind": "dimension",
+   "label": "Source of truth for repository state",
+   "href": "concepts/source-of-truth-for-repository-state",
+   "core": true,
+   "description": "Where the authoritative copy of each repository's objects and references lives.",
+   "meta": "4 values · evidence: 13 docs from 2 sources",
+   "children": [
+    {
+     "id": "v:1.1",
+     "kind": "value",
+     "label": "Repository files on server disks",
+     "status": "accepted",
+     "href": "entities/repository-files-on-server-disks",
+     "description": "Plain Git repositories on the servers' local disks are the authoritative state.",
+     "meta": "accepted · 6 passages",
+     "children": [
+      {
+       "id": "1.1/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 4 passages"
+      },
+      {
+       "id": "1.1/s:s2",
+       "kind": "source",
+       "label": "Stretching Spokes",
+       "href": "sources/s2",
+       "stance": "accepts",
+       "meta": "accepts, 2 passages"
+      }
+     ]
+    },
+    {
+     "id": "v:1.2",
+     "kind": "value",
+     "label": "Write-ahead log in object storage",
+     "status": "accepted",
+     "href": "entities/write-ahead-log-in-object-storage",
+     "description": "An append-only log in object storage is the authority; repositories on disk are derived from it.",
+     "meta": "accepted · 6 passages",
+     "children": [
+      {
+       "id": "1.2/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "accepts",
+       "meta": "accepts, 6 passages"
+      }
+     ]
+    },
+    {
+     "id": "v:1.3",
+     "kind": "value",
+     "label": "Objects in a distributed hash table",
+     "status": "mixed",
+     "href": "entities/objects-in-a-distributed-hash-table",
+     "description": "Git objects are stored individually in a distributed key-value store.",
+     "meta": "mixed · 2 passages",
+     "children": [
+      {
+       "id": "1.3/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "both",
+       "meta": "both, 2 passages"
+      }
+     ]
+    },
+    {
+     "id": "v:1.4",
+     "kind": "value",
+     "label": "Blobs plus a relational reference database",
+     "status": "rejected",
+     "href": "entities/blobs-plus-a-relational-reference-database",
+     "description": "Pack data in blob storage and references in a relational database, two stores to keep consistent.",
+     "meta": "rejected · 1 passage",
+     "children": [
+      {
+       "id": "1.4/s:s1",
+       "kind": "source",
+       "label": "Git at any scale",
+       "href": "sources/s1",
+       "stance": "rejects",
+       "meta": "rejects, 1 passage"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

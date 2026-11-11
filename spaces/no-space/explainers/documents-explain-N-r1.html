@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Large-scale document classification · Explainer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="../assets/ddspace-icon.svg" type="image/svg+xml">
+<script>
+  // Theme: the reader's choice (kept in this browser) or the system setting.
+  (function () { try { var t = localStorage.getItem("ddspace-wiki-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {} })();
+</script>
+<style>
+  body { background: var(--bg); }
+  .ex-wrap { display: grid; grid-template-columns: minmax(0, var(--split-left, 1fr)) 8px minmax(0, 1fr); gap: 0; min-height: calc(100vh - 50px); }
+  .ex-text { padding: 22px 28px 60px; overflow-wrap: anywhere; }
+  .ex-side { background: var(--panel); display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh; }
+  #canvas { position: relative; flex: 0 0 var(--split-canvas, 60%); min-height: 160px; overflow: hidden; }
+  .splitter-v { position: sticky; top: 0; height: 100vh; cursor: col-resize; background: var(--border);
+    border-left: 3px solid var(--bg); border-right: 3px solid var(--panel); touch-action: none; }
+  .splitter-h { flex: none; height: 8px; cursor: row-resize; background: var(--border);
+    border-top: 3px solid var(--panel); border-bottom: 3px solid var(--panel); touch-action: none; }
+  .splitter-v:hover, .splitter-h:hover, .splitter-v:focus-visible, .splitter-h:focus-visible, .splitter-v.dragging,
+  .splitter-h.dragging { background: var(--accent); outline: none; }
+  body.resizing { user-select: none; }
+  body.resizing.col { cursor: col-resize; } body.resizing.row { cursor: row-resize; }
+  #svg { width: 100%; height: 100%; display: block; cursor: grab; }
+  #info { flex: 1 1 0; min-height: 80px; overflow-y: auto; padding: 12px 16px; border-top: 1px solid var(--border); font-size: 13.5px; }
+  #info h2 { margin: 4px 0; font-size: 17px; border: none; }
+  #info ul { padding-left: 16px; margin: 4px 0 10px; }
+  #info .info-h { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 14px 0 4px; font-weight: 600; }
+  #info .info-sub { color: var(--muted); margin: 2px 0 8px; line-height: 1.45; }
+  #info p { margin: 4px 0; line-height: 1.45; }
+  #info .info-link { margin-top: 14px; }
+  #info .node-chip { padding: 1px 7px; font-size: 11px; margin: 1px 3px 1px 0; }
+  #info .pair-chip { display: inline-block; margin: 0 8px 4px 0; white-space: nowrap; }
+  .muted, .hint { color: var(--muted); font-size: 12.5px; }
+  h1 { margin: 6px 0 4px; font-size: 24px; }
+  h2.sec { font-size: 16px; margin: 22px 0 8px; border: none; }
+  .banner { background: var(--mixed); color: #fff; padding: 9px 14px; border-radius: 8px; margin: 0 0 14px; font-size: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 6px 0; list-style: none; }
+  .chip { display: inline-flex; gap: 6px; align-items: baseline; border: 1px solid var(--border); background: var(--panel);
+    color: var(--fg); border-radius: 999px; padding: 4px 11px; font: inherit; font-size: 13px; cursor: pointer; text-align: left; }
+  .chip strong { color: var(--accent); }
+  /* in a flex chip, the id and the kind keep their width; only the text wraps */
+  .chip > strong, .chip > .muted { flex: none; white-space: nowrap; }
+  .chip { text-align: left; }
+  .chip.small { padding: 0 7px; font-size: 11.5px; margin-right: 3px; }
+  .chip:hover, .chip.sel { border-color: var(--accent); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--border); margin: 18px 0 0; }
+  .tab { font: inherit; font-size: 14px; padding: 7px 14px; border: 1px solid transparent; border-bottom: none;
+    border-radius: 8px 8px 0 0; background: none; color: var(--muted); cursor: pointer; }
+  .tab[aria-selected="true"] { background: var(--panel); border-color: var(--border); color: var(--fg); font-weight: 600;
+    margin-bottom: -1px; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-top: none; padding: 12px 16px 16px;
+    border-radius: 0 0 8px 8px; }
+  .panel[hidden] { display: none; }
+  .choice { border-top: 1px solid var(--border); padding: 9px 0; }
+  .choice:first-of-type { border-top: none; }
+  .choice .head { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+  .choice .arrow { color: var(--muted); }
+  .choice p { margin: 4px 0; line-height: 1.45; font-size: 14px; }
+  .quote { border-left: 3px solid var(--accent); padding: 2px 10px; margin: 6px 0; font-style: italic; }
+  .ev { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .vref, .dref { cursor: pointer; display: inline-flex; gap: 5px; align-items: center; }
+  .others { font-size: 12.5px; color: var(--muted); }
+  .scroll { overflow-x: auto; }
+  table.compare td.open { color: var(--muted); font-style: italic; }
+  tr.differs th { border-left: 3px solid var(--accent); }
+  .node text { font-size: 15px; fill: var(--fg); paint-order: stroke; stroke: var(--panel); stroke-width: 3px; pointer-events: none; }
+  .node.greyed path.shape { opacity: .35; }
+  .node.greyed text { opacity: .5; }
+  .node.in-point text { font-weight: 600; }
+  .link.explored { stroke: var(--accent); stroke-opacity: .7; stroke-width: 3px; }
+  .link.on-path { stroke-opacity: 1; stroke-width: 4px; }
+  .link.on-path.tree { stroke: var(--accent); }
+  .link.on-path:not(.tree) { stroke-width: 1.8px; stroke-opacity: .85; }
+  .zoom-ctl { position: absolute; top: 8px; right: 10px; display: flex; gap: 4px; z-index: 2; }
+  .zoom-ctl button { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel);
+    color: var(--fg); font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
+  .zoom-ctl button:hover { border-color: var(--accent); }
+  .link.shown { stroke-opacity: .95; stroke-width: 2.4px; }
+  .graph-toggle { position: absolute; top: 8px; left: 10px; font-size: 12px; color: var(--muted); background: var(--panel);
+    padding: 2px 6px; border-radius: 6px; display: flex; gap: 5px; align-items: center; cursor: pointer; }
+  .node.dim-out, .link.dim-out { opacity: .1; }
+  .graph-key { font-size: 11.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 12px; padding: 6px 12px;
+    border-top: 1px solid var(--border); }
+  .graph-key b { color: var(--fg); font-weight: 600; }
+  .traj-wrap { position: relative; }
+  svg.lineage { display: block; width: 100%; height: 46px; overflow: visible; }
+  table.traj { border-collapse: separate; border-spacing: 0; font-size: 12.5px; overflow-wrap: normal; word-break: normal; hyphens: none; }
+  table.traj th, table.traj td { padding: 4px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.traj thead th { position: sticky; top: 0; background: var(--panel); }
+  table.traj th.row-h { text-align: left; font-weight: 500; min-width: 140px; max-width: 220px; }
+  table.traj .step-h { cursor: pointer; text-align: center; min-width: 112px; border-top: 3px solid var(--muted); }
+  table.traj .step-h b { display: block; font-size: 14px; }
+  table.traj .step-h .mv, table.traj .step-h .vd, table.traj .step-h .alt { display: block; font-size: 11px; }
+  .mv-seed, .mv-solution { border-top-color: var(--dimension) !important; } .mv-seed .mv, .mv-solution .mv { color: var(--dimension); }
+  .mv-exploit, .mv-region { border-top-color: var(--accent) !important; } .mv-exploit .mv, .mv-region .mv { color: var(--accent); }
+  .mv-explore, .mv-contrast { border-top-color: var(--novel) !important; } .mv-explore .mv, .mv-contrast .mv { color: var(--novel); }
+  .vd-strong, .vd-grounded { color: var(--accepted); } .vd-mixed, .vd-partial { color: var(--mixed); }
+  .vd-weak, .vd-ungrounded { color: var(--rejected); }
+  table.traj .alt { font-weight: 700; color: var(--fg); }
+  table.traj td.c { text-align: left; min-width: 112px; max-width: 150px; }
+  table.traj td.changed { box-shadow: inset 0 0 0 2px var(--accent); border-radius: 4px; }
+  table.traj td.novel .cell-v { font-weight: 700; }
+  table.traj td.contrast { box-shadow: inset 0 0 0 2px var(--novel); border-radius: 4px; }
+  table.traj td.dropped { opacity: .55; }
+  table.traj .sel { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  table.traj .band-h { text-align: center; font-size: 12px; min-width: 40px; }
+  table.traj td.band span { display: block; height: 18px; border-radius: 3px; background: var(--accepted); opacity: .75; }
+  .cell-v { font-size: 12px; }
+  .legend { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0; }
+  .region { border: 1px solid var(--border); border-left: 4px solid var(--accepted); border-radius: 6px; padding: 8px 12px; margin: 8px 0; }
+  .link.off { display: none; }
+  .mode-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px;
+    margin-bottom: 6px; color: #fff; }
+  .mode-icon.mode-search { background: var(--accent); } .mode-icon.mode-explain { background: var(--mixed); }
+  .lanes-wrap, .qoc-wrap { position: relative; }
+  svg.lane-arrows, svg.qoc-links { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+  table.lanes { border-collapse: separate; border-spacing: 0; font-size: 13px; width: 100%; }
+  table.lanes th, table.lanes td { border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: middle; }
+  table.lanes thead th { font-size: 12px; color: var(--muted); font-weight: 600; }
+  table.lanes tbody th { min-width: 160px; max-width: 240px; font-weight: 400; }
+  table.lanes .idea { display: block; color: var(--muted); font-size: 12px; }
+  table.lanes tr.dropped th, table.lanes tr.dropped td:not(.outcome) { opacity: .7; }
+  table.lanes td.outcome { font-size: 12px; max-width: 220px; }
+  .node-chip { font: inherit; font-size: 12px; border-radius: 12px; padding: 3px 9px; margin: 2px 6px 2px 0; cursor: pointer;
+    border: 2px solid var(--border); background: var(--panel); color: var(--fg); position: relative; z-index: 1; white-space: nowrap; }
+  .node-chip small { color: var(--muted); }
+  .vb-strong, .vb-grounded { border-color: var(--accepted) !important; } .vb-mixed, .vb-partial { border-color: var(--mixed) !important; }
+  .vb-weak, .vb-ungrounded { border-color: var(--rejected) !important; }
+  .node-chip.sel, .story-step.sel, .opt.sel { box-shadow: 0 0 0 3px var(--accent); }
+  table.heat td.h.sel, table.heat th.sel { outline: 2px solid var(--fg); }
+  .alt-chip { font-size: 12px; font-weight: 600; color: var(--accepted); }
+  .dropped-mark { color: var(--rejected); font-weight: 600; }
+  table.heat { border-collapse: separate; border-spacing: 2px; font-size: 11px; width: auto; }
+  table.heat th, table.heat td { white-space: nowrap; }
+  table.heat th { color: var(--muted); font-weight: 600; padding: 0 3px; }
+  table.heat th.heat-r { text-align: left; border-bottom: 1px solid var(--border); }
+  table.heat td.h { width: 26px; height: 18px; border-radius: 3px; cursor: pointer; }
+  table.heat .rb { border-left: 6px solid var(--panel); }
+  .h-meets { background: var(--accepted); } .h-partly { background: var(--mixed); } .h-misses { background: var(--rejected); }
+  .h-none { background: var(--border); opacity: .5; }
+  .sw { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 3px; }
+  .chip-sm { cursor: pointer; }
+  .gaps { margin-top: 28px; border-top: 2px solid var(--border); padding-top: 6px; }
+  .gap-summary { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  .gap-count strong { color: var(--accent); font-size: 1.1em; }
+  .gap-h { font-size: 14px; margin: 16px 0 6px; }
+  .choice.gap .head .chip { margin: 0; }
+  .choice.fit { cursor: pointer; }
+  .choice.fit:hover, .choice.fit:focus { border-color: var(--accent); }
+  .badge.neutral { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .fit-note { font-size: 13px; color: var(--muted); }
+  .tradeoffs { margin: 4px 0; padding-left: 18px; font-size: 13px; }
+  .t-gain, .t-cost { font-size: 11px; border-radius: 9px; padding: 0 6px; border: 1px solid; }
+  .t-gain { color: var(--accepted); } .t-cost { color: var(--rejected); }
+  .own-tradeoff { font-size: 13px; border-left: 3px solid var(--mixed); padding-left: 8px; }
+  .round-head { margin: 18px 0 6px; font-size: 14px; border-bottom: 2px solid var(--border); padding-bottom: 4px; }
+  .round-end { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .story-step { border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 8px 0; cursor: pointer; }
+  .story-step.mv-explore, .story-step.mv-contrast { border-left-color: var(--novel); }
+  .story-step.mv-exploit, .story-step.mv-region { border-left-color: var(--accent); }
+  .story-step.mv-ablate { border-left-style: dotted; border-left-color: var(--accent); }
+  .story-step.mv-seed, .story-step.mv-solution { border-left-color: var(--dimension); }
+  .story-head { font-size: 14px; margin-bottom: 4px; }
+  .story-step p { margin: 4px 0; line-height: 1.45; font-size: 13.5px; }
+  .lbl { display: inline-block; min-width: 68px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+  .lbl-row { display: flex; gap: 0; font-size: 13px; } .lbl-row .lbl { padding-top: 2px; }
+  ul.moves { margin: 0; padding-left: 16px; } ul.moves li { margin: 1px 0; }
+  .vd-chip { font-size: 11px; border: 2px solid var(--border); border-radius: 10px; padding: 0 7px; margin-left: 4px; }
+  .judged { margin: 4px 0; } .j { font-size: 11px; border-radius: 9px; padding: 1px 7px; margin: 2px 4px 2px 0; display: inline-block; color: #fff; cursor: pointer; }
+  .j-meets { background: var(--accepted); } .j-partly { background: var(--mixed); } .j-misses { background: var(--rejected); }
+  .qoc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); column-gap: 90px; font-size: 13px; }
+  .qoc-hdr { display: grid; grid-template-columns: 1fr 1fr; color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+  .qoc-crit .qoc-hdr { grid-template-columns: 1fr; }
+  .qoc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid var(--border); padding: 6px 0; align-items: center; }
+  .opt { border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px; margin: 3px 0; cursor: pointer; background: var(--panel); position: relative; z-index: 1; }
+  .opt-solution { border-left: 4px solid var(--accent); } .opt-contrast { border-left: 4px solid var(--novel); }
+  .crit { border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; margin: 6px 0; cursor: pointer; background: var(--panel); position: relative; z-index: 1; }
+  svg.qoc-links path.traced { stroke-opacity: 1; stroke-width: 3px; }
+  details.grid-details { margin-top: 22px; } details.grid-details summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+  .solution, .option { border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 8px 0; cursor: pointer; }
+  .solution.sel, .option.sel { box-shadow: 0 0 0 2px var(--accent); }
+  .adr { border-top: 1px solid var(--border); margin-top: 18px; padding-top: 8px; }
+  .adr h3 { margin: 6px 0; font-size: 16px; }
+  .option.chosen { border-left: 4px solid var(--accepted); }
+  .option.discarded { border-left: 4px solid var(--rejected); opacity: .9; }
+  .option .values { font-size: 13px; margin: 4px 0; }
+  ul.pc { list-style: none; padding: 0; margin: 4px 0; font-size: 13px; }
+  ul.pc li::before { font-weight: 700; margin-right: 6px; }
+  ul.pc li.pro::before { content: "+"; color: var(--accepted); }
+  ul.pc li.con::before { content: "−"; color: var(--rejected); }
+  ul.parts { margin: 4px 0 6px; padding-left: 18px; font-size: 13px; }
+  ul.parts li { margin: 4px 0; }
+  .pairs { display: block; margin: 2px 0; }
+  .pairs .pair { display: block; padding-left: 10px; font-size: 13px; }
+  .node.unjudged path.shape { fill: var(--panel); stroke: var(--rejected); stroke-dasharray: 2,2; stroke-width: 1.5px; }
+  @media (max-width: 900px) {
+    .ex-wrap { grid-template-columns: 1fr; }
+    .splitter-v, .splitter-h { display: none; }
+    .ex-text { padding: 16px 16px 30px; }
+    .ex-side { position: static; height: auto; border-left: none; border-top: 1px solid var(--border); }
+    #canvas { height: 420px; flex: none; }
+    #info { flex: none; }
+  }
+</style>
+</head>
+<body class="page-explainer">
+<header class="top">
+<span class="brand"><img src="../assets/ddspace-icon.svg" alt="" class="brand-icon" width="32" height="32">Design rationale</span>  <nav></nav>
+  <button class="theme-btn" id="theme-toggle" type="button" title="Switch light / dark mode" aria-label="Switch light / dark mode" style="margin-left:auto">◐</button>
+</header>
+<div class="ex-wrap">
+<main class="ex-text">
+  <div class="mode-icon mode-explain" role="img" aria-label="Explain: the rationale of a given solution" title="Explain: the rationale of a given solution">
+<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="kind">Explain · design rationale · no design space</div>
+  <h1>Large-scale document classification</h1>
+<p>An insurer receives between two and eight million documents a day (scanned forms, e-mails, PDFs) and classifies each one into one of 60 claim types with an LLM-based classifier. Volume varies strongly over the year: storm season brings four times the usual load. Three teams use the results: claims handling, fraud investigation and analytics. The documents contain personal data.</p>
+  <h2 class="sec">Requirements</h2>
+  <ul class="chips" id="requirements">
+    <li><button class="chip" type="button" data-requirement="R1" data-node="r:R1"><strong>R1</strong> Classify every incoming document into a claim type, with a confidence. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="R2" data-node="r:R2"><strong>R2</strong> Deliver the results to the three consuming teams. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="R3" data-node="r:R3"><strong>R3</strong> Send the documents the classifier is unsure about to human review, and use the reviewers&#39; corrections to improve the classifier. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q1" data-node="r:Q1"><strong>Q1</strong> During storm season, at eight million documents a day, every document is classified within two hours of arrival. <span class="muted">quality: throughput and scalability</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q2" data-node="r:Q2"><strong>Q2</strong> When classification quality drops for one claim type (for example, after a form changes its layout), operators see it within one day. <span class="muted">quality: observability</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q3" data-node="r:Q3"><strong>Q3</strong> The classification costs less than 0.2 cents per document on average over the year. <span class="muted">quality: cost</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q4" data-node="r:Q4"><strong>Q4</strong> A consuming team can change how it processes the results without the other teams or the classifier having to change. <span class="muted">quality: loose coupling</span></button></li>
+    <li><button class="chip" type="button" data-requirement="C1" data-node="r:C1"><strong>C1</strong> The documents contain personal data and may not leave the EU. <span class="muted">constraint</span></button></li>
+    <li><button class="chip" type="button" data-requirement="C2" data-node="r:C2"><strong>C2</strong> The classifier uses an LLM from the insurer&#39;s approved provider, in its EU region. <span class="muted">constraint</span></button></li>
+  </ul>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" type="button" role="tab" data-tab="adrs" aria-selected="true">Decisions (ADRs)</button>
+<button class="tab" type="button" role="tab" data-tab="trajectory" aria-selected="false">Trajectory</button>  </div>
+
+  <section class="panel" data-panel="adrs">
+    <p class="hint">The solution, then its decisions as architecture decision records: each ADR addresses a few related requirements, with the solution's option and the options it was contrasted with. Select an alternative or an option to see it in the graph.</p>
+    <h2 class="sec">The solution</h2>
+    <div class="solution" data-alt="S" tabindex="0"><strong>S · Document classification as built</strong>
+<p>An EU hosted, event-driven LLM pipeline classifies documents, routes uncertain results to staff, and publishes results for independent team consumption. Prompt changes are based on corrections and quality is monitored per claim type.</p>      <p class="muted">Composed of 4 partial design points, one per ADR:</p>
+      <ul class="parts">
+        <li><a href="#adr-ADR1" class="adr-link">ADR1</a> · EU event intake, elastic Kubernetes workers, and batched approved EU inference <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:C1">C1</span><span class="chip small" data-node="r:C2">C2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:1">Intake</span> → <span class="vref" data-node="z:1.1">EU object storage with Kafka upload events</span></span><span class="pair"><span class="dref" data-node="z:2">Preprocessing</span> → <span class="vref" data-node="z:2.1">OCR, content-hash deduplication, and adjacent extracted text</span></span><span class="pair"><span class="dref" data-node="z:3">Classifier runtime</span> → <span class="vref" data-node="z:3.1">Kubernetes workers autoscaled from 4 to 120 by Kafka backlog</span></span><span class="pair"><span class="dref" data-node="z:4">LLM</span> → <span class="vref" data-node="z:4.1">approved provider in its EU region</span></span><span class="pair"><span class="dref" data-node="z:5">Prompt</span> → <span class="vref" data-node="z:5.1">60 claim definitions and ten labelled examples</span></span><span class="pair"><span class="dref" data-node="z:6">Inference batching</span> → <span class="vref" data-node="z:6.1">batches of 20 small documents</span></span></span></li>
+        <li><a href="#adr-ADR2" class="adr-link">ADR2</a> · Shared Kafka results topic with team consumer groups <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q4">Q4</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:7">Result provenance</span> → <span class="vref" data-node="z:7.1">prompt version and model name stored with each result</span></span><span class="pair"><span class="dref" data-node="z:8">Result delivery</span> → <span class="vref" data-node="z:8.1">second Kafka topic with one consumer group per team</span></span><span class="pair"><span class="dref" data-node="z:9">Analytics delivery</span> → <span class="vref" data-node="z:9.1">hourly warehouse load</span></span></span></li>
+        <li><a href="#adr-ADR3" class="adr-link">ADR3</a> · Confidence threshold, staff labelling, monthly prompt examples, and pre-release check <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:R3">R3</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:10">Human review</span> → <span class="vref" data-node="z:10.1">confidence below 0.7 enters labelling queue</span></span><span class="pair"><span class="dref" data-node="z:11">Prompt learning</span> → <span class="vref" data-node="z:11.1">monthly replacement of examples with corrected documents</span></span><span class="pair"><span class="dref" data-node="z:12">Prompt validation</span> → <span class="vref" data-node="z:12.1">check against 2,000 reviewed documents before switch</span></span></span></li>
+        <li><a href="#adr-ADR4" class="adr-link">ADR4</a> · Per-type dashboard, review-share alert, and weekly sample <span class="chip small" data-node="r:Q2">Q2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:13">Quality monitoring</span> → <span class="vref" data-node="z:13.1">per-claim review share and mean confidence dashboard with doubling alert</span></span><span class="pair"><span class="dref" data-node="z:14">Quality audit</span> → <span class="vref" data-node="z:14.1">weekly random sample of 300 classifications</span></span></span></li>
+      </ul>
+<p class="muted">As a whole: Documents land in EU object storage, with Kafka events triggering preprocessing, deduplication, OCR, and adjacent-text extraction. Autoscaled Kubernetes workers batch 20 small documents for an approved EU-region LLM using the versioned prompt, publish results with provenance to team consumer groups, and feed hourly analytics; low-confidence outputs enter review, while validated monthly example updates and monitoring/audits govern quality.</p>    </div>
+    <article class="adr" id="adr-ADR1">
+      <h3>ADR1 · Scale document inference while keeping data in the EU <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:C1">C1</span><span class="chip small" data-node="r:C2">C2</span></h3>
+<p><strong>Context.</strong> The system must classify every input with confidence, handle the seasonal peak, control average inference cost, and keep personal data within the EU while using the approved EU-region LLM.</p>      <p><strong>Decision.</strong> EU event intake, elastic Kubernetes workers, and batched approved EU inference.</p>
+      <div class="option chosen" data-option="ADR1:O1" tabindex="0">
+        <div class="head"><strong>EU event intake, elastic Kubernetes workers, and batched approved EU inference</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:1">Intake</span> → <span class="vref" data-node="z:1.1">EU object storage with Kafka upload events</span></span><span class="pair"><span class="dref" data-node="z:2">Preprocessing</span> → <span class="vref" data-node="z:2.1">OCR, content-hash deduplication, and adjacent extracted text</span></span><span class="pair"><span class="dref" data-node="z:3">Classifier runtime</span> → <span class="vref" data-node="z:3.1">Kubernetes workers autoscaled from 4 to 120 by Kafka backlog</span></span><span class="pair"><span class="dref" data-node="z:4">LLM</span> → <span class="vref" data-node="z:4.1">approved provider in its EU region</span></span><span class="pair"><span class="dref" data-node="z:5">Prompt</span> → <span class="vref" data-node="z:5.1">60 claim definitions and ten labelled examples</span></span><span class="pair"><span class="dref" data-node="z:6">Inference batching</span> → <span class="vref" data-node="z:6.1">batches of 20 small documents</span></span></p>
+<div class="quote">“Incoming documents land in an object storage bucket in the EU region, and each upload puts a message on a Kafka topic.”</div><div class="quote">“A preprocessing service reads the topic, extracts the text (with OCR for scanned forms), removes duplicates by content hash and writes the text next to the document.”</div><div class="quote">“The number of classifier workers scales with the length of the Kafka topic&#39;s backlog, from 4 to 120.”</div><div class="quote">“A classifier service, running on Kubernetes, sends the text to the approved provider&#39;s LLM in its EU region.”</div><div class="quote">“The prompt lists the 60 claim types with a short definition and ten labelled examples, and asks for a claim type and a confidence between 0 and 1.”</div><div class="quote">“Small documents are sent in batches of 20 to reduce cost.”</div><ul class="pc"><li class="pro">Processes scans and extracts usable text.</li><li class="pro">Backlog-based scaling responds to changing volume.</li><li class="pro">Batching is intended to reduce cost.</li><li class="pro">EU storage and approved EU inference meet the location and provider constraints.</li><li class="con">Batch filling may add latency.</li><li class="con">The worker range and batch size are not backed by throughput or cost measurements.</li></ul><p>The approved EU provider is forced by C2 and EU handling by C1. Event buffering, Kubernetes, the scaling range, prompt format, and batch size are implementation choices; throughput and cost targets remain unverified.</p>      </div>
+      <div class="option discarded" data-option="ADR1:O2" tabindex="0">
+        <div class="head"><strong>Fixed worker pool</strong> <span class="badge rejected">discarded</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:1">Intake</span> → <span class="vref" data-node="z:1.1">EU object storage with Kafka upload events</span></span><span class="pair"><span class="dref" data-node="z:3">Classifier runtime</span> → <span class="vref" data-node="z:3.2">fixed worker count</span></span><span class="pair"><span class="dref" data-node="z:6">Inference batching</span> → <span class="vref" data-node="z:6.1">batches of 20 small documents</span></span><span class="pair"><span class="dref" data-node="z:4">LLM</span> → <span class="vref" data-node="z:4.1">approved provider in its EU region</span></span></p>
+<ul class="pc"><li class="pro">Predictable worker capacity and potentially steadier peak compute spending.</li><li class="con">Does not add capacity as backlog grows during storm season.</li></ul><p>It weakens support for the peak-throughput requirement. The available information does not establish that a correctly sized fixed pool would miss the two-hour target, so the contrast does not prove autoscaling is strictly forced.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR2">
+      <h3>ADR2 · Publish results for independent team consumption <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q4">Q4</span></h3>
+<p><strong>Context.</strong> Claims handling, fraud investigation, and analytics all need results, and each team must be able to change its processing independently.</p>      <p><strong>Decision.</strong> Shared Kafka results topic with team consumer groups.</p>
+      <div class="option chosen" data-option="ADR2:O1" tabindex="0">
+        <div class="head"><strong>Shared Kafka results topic with team consumer groups</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:7">Result provenance</span> → <span class="vref" data-node="z:7.1">prompt version and model name stored with each result</span></span><span class="pair"><span class="dref" data-node="z:8">Result delivery</span> → <span class="vref" data-node="z:8.1">second Kafka topic with one consumer group per team</span></span><span class="pair"><span class="dref" data-node="z:9">Analytics delivery</span> → <span class="vref" data-node="z:9.1">hourly warehouse load</span></span></p>
+<div class="quote">“Every result is stored with the prompt version and the model name that produced it.”</div><div class="quote">“Results go to a second Kafka topic. Each consuming team has its own consumer group and reads at its own pace;”</div><div class="quote">“analytics also loads the topic into the data warehouse every hour.”</div><ul class="pc"><li class="pro">Each team can consume at its own pace.</li><li class="pro">Consumer changes are isolated from the classifier and other teams.</li><li class="pro">Analytics receives a regular warehouse feed.</li><li class="con">Kafka topic and consumer operations add infrastructure and maintenance.</li></ul><p>Independent consumption is required by Q4; Kafka consumer groups and the hourly warehouse schedule are free choices. Stored provenance supports later diagnosis.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR3">
+      <h3>ADR3 · Route uncertain classifications into a correction loop <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:R3">R3</span></h3>
+<p><strong>Context.</strong> The classifier must return a claim type and confidence, send uncertain results to staff, and use corrections to improve future classifications.</p>      <p><strong>Decision.</strong> Confidence threshold, staff labelling, monthly prompt examples, and pre-release check.</p>
+      <div class="option chosen" data-option="ADR3:O1" tabindex="0">
+        <div class="head"><strong>Confidence threshold, staff labelling, monthly prompt examples, and pre-release check</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:10">Human review</span> → <span class="vref" data-node="z:10.1">confidence below 0.7 enters labelling queue</span></span><span class="pair"><span class="dref" data-node="z:11">Prompt learning</span> → <span class="vref" data-node="z:11.1">monthly replacement of examples with corrected documents</span></span><span class="pair"><span class="dref" data-node="z:12">Prompt validation</span> → <span class="vref" data-node="z:12.1">check against 2,000 reviewed documents before switch</span></span></p>
+<div class="quote">“Documents with a confidence below 0.7 go to a review queue in a labelling tool, where claims staff correct the claim type.”</div><div class="quote">“Every month the team replaces the prompt&#39;s examples with recent corrected documents,”</div><div class="quote">“and checks the new prompt against 2,000 reviewed documents before switching to it.”</div><ul class="pc"><li class="pro">Staff corrections feed future prompt examples.</li><li class="pro">A fixed review threshold gives an explicit routing rule.</li><li class="pro">The prompt is checked before a new version is used.</li><li class="con">The threshold and monthly cadence may not match changing uncertainty or drift.</li><li class="con">Review and validation create delay and staff effort.</li></ul><p>Reviewing uncertain items and using corrections are required by R3. The 0.7 cutoff, monthly cadence, replacement strategy, and sample size are freely selected parameters.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR4">
+      <h3>ADR4 · Watch quality by claim type <span class="chip small" data-node="r:Q2">Q2</span></h3>
+<p><strong>Context.</strong> Operators need to notice when classification quality degrades for a particular claim type within one day.</p>      <p><strong>Decision.</strong> Per-type dashboard, review-share alert, and weekly sample.</p>
+      <div class="option chosen" data-option="ADR4:O1" tabindex="0">
+        <div class="head"><strong>Per-type dashboard, review-share alert, and weekly sample</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:13">Quality monitoring</span> → <span class="vref" data-node="z:13.1">per-claim review share and mean confidence dashboard with doubling alert</span></span><span class="pair"><span class="dref" data-node="z:14">Quality audit</span> → <span class="vref" data-node="z:14.1">weekly random sample of 300 classifications</span></span></p>
+<div class="quote">“A dashboard shows, per claim type, the share of documents sent to review and the mean confidence; an alert fires when the share sent to review for a claim type doubles from one week to the next.”</div><div class="quote">“Each week, analysts review a random sample of 300 classified documents.”</div><ul class="pc"><li class="pro">Per-claim measures can reveal localized changes.</li><li class="pro">The weekly human sample checks a signal beyond model confidence.</li><li class="con">Review share and mean confidence are indirect quality measures.</li><li class="con">Weekly comparison and sampling do not establish one-day detection.</li></ul><p>Per-type visibility supports Q2, but the solution does not demonstrate that the alert fires within one day. The selected indicators, doubling rule, sample size, and cadence are not forced by the requirement.</p>      </div>
+    </article>
+    <h2 class="sec">Requirements not addressed</h2>
+    <p>Every requirement is addressed by an ADR.</p>
+  </section>
+
+  <section class="panel" data-panel="trajectory" hidden>
+    <p class="hint">How the agent explained the solution: 8 points or regions evaluated of a budget of 8. The story follows the agent's thinking step by step; the questions, options and criteria then show which of the solution's choices the requirements force. Select a point anywhere to see it in the graph.</p>
+
+
+
+    <h2 class="sec">The explanation, step by step</h2>
+    <article class="story-step mv-solution" data-step="1">
+      <div class="story-head"><b>#1</b> The solution as one design point <span class="vd-chip vb-partial">partial</span> <span class="alt-chip">the solution</span></div>
+<p><span class="lbl">Thought</span> The complete combination implements the classification, delivery, feedback, throughput, cost, observability, loose-coupling, and EU/provider requirements.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Intake</span> → <span class="vref" data-node="z:1.1">EU object storage with Kafka upload events</span></li><li><span class="dref" data-node="z:2">Preprocessing</span> → <span class="vref" data-node="z:2.1">OCR, content-hash deduplication, and adjacent extracted text</span></li><li><span class="dref" data-node="z:3">Classifier runtime</span> → <span class="vref" data-node="z:3.1">Kubernetes workers autoscaled from 4 to 120 by Kafka backlog</span></li><li><span class="dref" data-node="z:4">LLM</span> → <span class="vref" data-node="z:4.1">approved provider in its EU region</span></li><li><span class="dref" data-node="z:5">Prompt</span> → <span class="vref" data-node="z:5.1">60 claim definitions and ten labelled examples</span></li><li><span class="dref" data-node="z:6">Inference batching</span> → <span class="vref" data-node="z:6.1">batches of 20 small documents</span></li><li><span class="dref" data-node="z:7">Result provenance</span> → <span class="vref" data-node="z:7.1">prompt version and model name stored with each result</span></li><li><span class="dref" data-node="z:8">Result delivery</span> → <span class="vref" data-node="z:8.1">second Kafka topic with one consumer group per team</span></li><li><span class="dref" data-node="z:9">Analytics delivery</span> → <span class="vref" data-node="z:9.1">hourly warehouse load</span></li><li><span class="dref" data-node="z:10">Human review</span> → <span class="vref" data-node="z:10.1">confidence below 0.7 enters labelling queue</span></li><li><span class="dref" data-node="z:11">Prompt learning</span> → <span class="vref" data-node="z:11.1">monthly replacement of examples with corrected documents</span></li><li><span class="dref" data-node="z:12">Prompt validation</span> → <span class="vref" data-node="z:12.1">check against 2,000 reviewed documents before switch</span></li><li><span class="dref" data-node="z:13">Quality monitoring</span> → <span class="vref" data-node="z:13.1">per-claim review share and mean confidence dashboard with doubling alert</span></li><li><span class="dref" data-node="z:14">Quality audit</span> → <span class="vref" data-node="z:14.1">weekly random sample of 300 classifications</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The design directly implements the functional workflows, team separation, and EU/provider constraints. Autoscaling and batching support the numeric throughput and cost goals, and monitoring supports quality visibility, but there are no measured completion times, average costs, or alert-latency results to show those numeric targets are achieved.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:R3">R3 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:6.1">batches of 20 small documents</span>, <span class="vref" data-node="z:11.1">monthly replacement of examples with corrected documents</span>, <span class="vref" data-node="z:10.1">confidence below 0.7 enters labelling queue</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q3">Q3</span>, <span class="vref" data-node="r:R3">R3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q1">Q1</span>: <span class="muted">Batching aims to reduce inference cost and review concentrates human effort, while waiting for batches and routing uncertain cases through people can add latency. The monthly prompt cycle also delays improvements.</span></li></ul><p class="muted">Documents land in EU object storage, with Kafka events triggering preprocessing, deduplication, OCR, and adjacent-text extraction. Autoscaled Kubernetes workers batch 20 small documents for an approved EU-region LLM using the versioned prompt, publish results with provenance to team consumer groups, and feed hourly analytics; low-confidence outputs enter review, while validated monthly example updates and monitoring/audits govern quality.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides scalable, region-constrained processing, traceability, and feedback-driven improvement. It gives up prompt freshness between monthly updates and incurs review, audit, and warehouse overhead, with low-confidence results potentially delayed.</p>    </article>
+    <article class="story-step mv-region" data-step="2">
+      <div class="story-head"><b>#2</b> A region of #1: part of the solution <span class="vd-chip vb-partial">partial</span></div>
+<p><span class="lbl">Thought</span> Q1 and Q3 explain event buffering, elastic worker scaling, and batching; C1 and C2 constrain where documents go and which provider is used.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Intake</span> → <span class="vref" data-node="z:1.1">EU object storage with Kafka upload events</span></li><li><span class="dref" data-node="z:3">Classifier runtime</span> → <span class="vref" data-node="z:3.1">Kubernetes workers autoscaled from 4 to 120 by Kafka backlog</span></li><li><span class="dref" data-node="z:6">Inference batching</span> → <span class="vref" data-node="z:6.1">batches of 20 small documents</span></li><li><span class="dref" data-node="z:4">LLM</span> → <span class="vref" data-node="z:4.1">approved provider in its EU region</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The buffering and elastic scaling fit the seasonal peak, and batching is a cost-conscious choice. The configured limits do not prove two-hour completion, and no provider price or annual workload mix proves the average cost target. Both numeric outcomes remain unverified.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:3.1">Kubernetes workers autoscaled from 4 to 120 by Kafka backlog</span>, <span class="vref" data-node="z:6.1">batches of 20 small documents</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q1">Q1</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">More workers support peak throughput but can raise compute expense; batching reduces request overhead, yet the cost target remains at risk without price and workload measurements.</span></li></ul><p class="muted">EU object storage emits Kafka upload events, which drive Kubernetes workers that scale from 4 to 120 according to backlog. Each worker groups 20 small documents for inference through the approved LLM provider’s EU region.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides EU-oriented data handling, elastic throughput, and batching efficiency, but batching can add latency while groups fill, and large autoscaling ranges plus Kafka and Kubernetes introduce operational complexity and potentially high peak resource costs.</p>    </article>
+    <article class="story-step mv-contrast" data-step="3">
+      <div class="story-head"><b>#3</b> A contrast on #2: one option changed <span class="vd-chip vb-partial">partial</span></div>
+<p><span class="lbl">Thought</span> Changing only autoscaling to a fixed worker count may weaken Q1; this tests whether the requirement forces backlog-based scaling.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:3">Classifier runtime</span>: <span class="vref" data-node="z:3.1">Kubernetes workers autoscaled from 4 to 120 by Kafka backlog</span> → <span class="vref" data-node="z:3.2">fixed worker count</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The fixed pool loses elasticity and makes the two-hour peak target less supported, while it could restrain peak compute expense. With no worker benchmark or workload distribution, this contrast does not establish that the chosen autoscaling range is strictly required; its degree is unproven.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:3.2">fixed worker count</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q3">Q3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q1">Q1</span>: <span class="muted">A fixed pool can make capacity and spending more predictable, but gives up adding workers as backlog rises during storm season.</span></li></ul><p class="muted">1. Kafka upload events trigger a fixed number of workers to retrieve documents from EU object storage. Each worker groups 20 small documents into an inference batch and sends them to the approved LLM provider’s EU region. 2. **</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> ** This provides EU-localized processing, predictable worker capacity, and batching efficiency, but gives up elastic scaling and may leave capacity underused or create delays when batches are not full. It also assumes documents fit the “small” batching profile.</p>    </article>
+    <article class="story-step mv-region" data-step="4">
+      <div class="story-head"><b>#4</b> A region of #1: part of the solution <span class="vd-chip vb-grounded">grounded</span></div>
+<p><span class="lbl">Thought</span> Q4 and R2 explain publishing results once and letting each team consume independently.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:8">Result delivery</span> → <span class="vref" data-node="z:8.1">second Kafka topic with one consumer group per team</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Separate consumer groups let each team change its own consumer and proceed at its own pace without changing the classifier or other teams. The requirements call for isolation; Kafka is one supported way to provide it, so this specific technology is a free implementation choice.</p><div class="judged"><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span></div><p class="muted">A classification pipeline publishes processed document results to a second Kafka topic. Each team consumes that topic using its own consumer group, allowing teams to receive the results independently while sharing work among their own consumers.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides team-level isolation, independent consumption rates, and replay through Kafka offsets. It adds topic and consumer-group management overhead, and each team must maintain its own consumer and handle the resulting operational and storage costs.</p>    </article>
+    <article class="story-step mv-region" data-step="5">
+      <div class="story-head"><b>#5</b> A region of #1: part of the solution <span class="vd-chip vb-grounded">grounded</span></div>
+<p><span class="lbl">Thought</span> R3 explains routing uncertain cases to staff and using corrections to improve the prompt; validation protects the update process.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:10">Human review</span> → <span class="vref" data-node="z:10.1">confidence below 0.7 enters labelling queue</span></li><li><span class="dref" data-node="z:11">Prompt learning</span> → <span class="vref" data-node="z:11.1">monthly replacement of examples with corrected documents</span></li><li><span class="dref" data-node="z:12">Prompt validation</span> → <span class="vref" data-node="z:12.1">check against 2,000 reviewed documents before switch</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> This closes the correction loop by reusing reviewed examples, and the 2,000-document check provides a release gate. The requirement forces human review and use of corrections, but it does not specify the 0.7 threshold, monthly cadence, example replacement, or validation sample size; those choices are free in the available evidence.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R3">R3 meets</span></div><p class="muted">Documents with confidence below 0.7 enter a labelling queue, and their corrected versions can become prompt examples. Each month, the examples are replaced, and the updated prompt is deployed only after checking it against 2,000 reviewed documents.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides targeted human correction and a substantial quality gate, but low-confidence cases require labelling and improvements may be delayed by the monthly replacement and validation cycle.</p>    </article>
+    <article class="story-step mv-region" data-step="6">
+      <div class="story-head"><b>#6</b> A region of #1: part of the solution <span class="vd-chip vb-partial">partial</span></div>
+<p><span class="lbl">Thought</span> Q2 explains measuring quality signals per claim type and alerting on change; sampling gives a check beyond confidence scores.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:13">Quality monitoring</span> → <span class="vref" data-node="z:13.1">per-claim review share and mean confidence dashboard with doubling alert</span></li><li><span class="dref" data-node="z:14">Quality audit</span> → <span class="vref" data-node="z:14.1">weekly random sample of 300 classifications</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Per-type signals can reveal changes associated with a layout shift, and the weekly sample can expose errors that confidence misses. The alert uses a week-over-week doubling rule, but no timing is stated for metric refresh or notification, so seeing a drop within one day is not established. No threshold or accuracy target is given for the sample; that outcome is unproven rather than a requirement cost.</p><div class="judged"><span class="j j-partly" data-node="r:Q2">Q2 partly</span></div><p class="muted">The system displays each claim’s review share and mean confidence, triggering an alert when the relevant measure doubles. Separately, it audits a random sample of 300 classifications every week to estimate classification quality.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This combines continuous visibility and rapid anomaly detection with a recurring, broader quality check. It adds dashboard and review overhead, while the sample may miss rare errors and mean confidence can diverge from actual correctness.</p>    </article>
+    <article class="story-step mv-region" data-step="7">
+      <div class="story-head"><b>#7</b> A region of #1: part of the solution <span class="vd-chip vb-grounded">grounded</span></div>
+<p><span class="lbl">Thought</span> C1 requires EU data locality, and C2 requires the approved LLM provider in its EU region.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Intake</span> → <span class="vref" data-node="z:1.1">EU object storage with Kafka upload events</span></li><li><span class="dref" data-node="z:4">LLM</span> → <span class="vref" data-node="z:4.1">approved provider in its EU region</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The input bucket and inference endpoint are explicitly in the EU, matching both constraints. The EU locations and provider are forced by the problem; the storage and event technology is not.</p><div class="judged"><span class="j j-meets" data-node="r:C1">C1 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><p class="muted">Documents are uploaded to EU object storage, which publishes upload events to Kafka. A classifier consumes those events, retrieves the documents, and submits them to the approved LLM deployment in its EU region for classification.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This supports decoupled, scalable ingestion and EU-region processing. It adds Kafka and storage integration and operational complexity, while limiting model choice to the approved provider and its EU-region offering.</p>    </article>
+    <article class="story-step mv-region" data-step="8">
+      <div class="story-head"><b>#8</b> A region of #1: part of the solution <span class="vd-chip vb-partial">partial</span></div>
+<p><span class="lbl">Thought</span> R3 and Q2 explain the combined feedback and monitoring practices: corrected uncertain cases improve future prompts, while per-type signals and review help reveal degradation.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:10">Human review</span> → <span class="vref" data-node="z:10.1">confidence below 0.7 enters labelling queue</span></li><li><span class="dref" data-node="z:11">Prompt learning</span> → <span class="vref" data-node="z:11.1">monthly replacement of examples with corrected documents</span></li><li><span class="dref" data-node="z:12">Prompt validation</span> → <span class="vref" data-node="z:12.1">check against 2,000 reviewed documents before switch</span></li><li><span class="dref" data-node="z:13">Quality monitoring</span> → <span class="vref" data-node="z:13.1">per-claim review share and mean confidence dashboard with doubling alert</span></li><li><span class="dref" data-node="z:14">Quality audit</span> → <span class="vref" data-node="z:14.1">weekly random sample of 300 classifications</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Human corrections feed prompt updates and per-type signals can expose localized changes. The one-day visibility target remains unproven because refresh and notification timing are unspecified; weekly sampling alone can be too slow.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R3">R3 meets</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:14.1">weekly random sample of 300 classifications</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R3">R3</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q2">Q2</span>: <span class="muted">The review and correction loop supports learning, while relying on a weekly sample can delay discovery of a quality drop within a day.</span></li></ul><p class="muted">The system sends classifications below 0.7 to a labelling queue, uses corrected documents to replace prompt examples monthly, and validates each revision against 2,000 reviewed documents before deployment. A dashboard tracks per-claim review share and mean confidence, triggers an alert when these double, and complements a weekly random audit of 300 classifications.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This combines targeted human review, controlled prompt updates, and ongoing oversight, but high-confidence errors may escape review, monthly updates can lag, and the validation and weekly audit require substantial effort.</p>    </article>
+
+    <h2 class="sec">Questions, options and criteria</h2>
+    <p class="hint">Each question is a dimension the solution settles; its options are the solution's value and the values contrasts tried; each option links to the requirements (criteria), as judged by the most specific point that evaluated it. Links of an option judged only within the whole solution are faint; hover an option to trace its links.</p>
+    <div class="qoc-wrap">
+      <svg class="qoc-links" aria-hidden="true"></svg>
+      <div class="qoc">
+        <div class="qoc-left">
+          <div class="qoc-hdr"><span>Question</span><span>Options</span></div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:1">Intake</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="0:0" data-step="7"><span class="vref" data-node="z:1.1">EU object storage with Kafka upload events</span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:2">Preprocessing</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="1:0" data-step="1"><span class="vref" data-node="z:2.1">OCR, content-hash deduplication, and adjacent extracted text</span> <span class="muted">the solution · judged only within the whole solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:3">Classifier runtime</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="2:0" data-step="2"><span class="vref" data-node="z:3.1">Kubernetes workers autoscaled from 4 to 120 by Kafka backlog</span> <span class="muted">the solution</span></div><div class="opt opt-contrast" data-qoc="2:1" data-step="3"><span class="vref" data-node="z:3.2">fixed worker count</span> <span class="muted">contrast #3</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:4">LLM</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="3:0" data-step="7"><span class="vref" data-node="z:4.1">approved provider in its EU region</span> <span class="muted">the solution · forced</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:5">Prompt</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="4:0" data-step="1"><span class="vref" data-node="z:5.1">60 claim definitions and ten labelled examples</span> <span class="muted">the solution · judged only within the whole solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:6">Inference batching</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="5:0" data-step="2"><span class="vref" data-node="z:6.1">batches of 20 small documents</span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:7">Result provenance</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="6:0" data-step="1"><span class="vref" data-node="z:7.1">prompt version and model name stored with each result</span> <span class="muted">the solution · judged only within the whole solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:8">Result delivery</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="7:0" data-step="4"><span class="vref" data-node="z:8.1">second Kafka topic with one consumer group per team</span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:9">Analytics delivery</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="8:0" data-step="1"><span class="vref" data-node="z:9.1">hourly warehouse load</span> <span class="muted">the solution · judged only within the whole solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:10">Human review</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="9:0" data-step="5"><span class="vref" data-node="z:10.1">confidence below 0.7 enters labelling queue</span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:11">Prompt learning</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="10:0" data-step="5"><span class="vref" data-node="z:11.1">monthly replacement of examples with corrected documents</span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:12">Prompt validation</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="11:0" data-step="5"><span class="vref" data-node="z:12.1">check against 2,000 reviewed documents before switch</span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:13">Quality monitoring</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="12:0" data-step="6"><span class="vref" data-node="z:13.1">per-claim review share and mean confidence dashboard with doubling alert</span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:14">Quality audit</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="13:0" data-step="6"><span class="vref" data-node="z:14.1">weekly random sample of 300 classifications</span> <span class="muted">the solution</span></div></div>
+          </div>
+        </div>
+        <div class="qoc-crit">
+          <div class="qoc-hdr"><span>Criteria</span></div>
+<div class="crit" data-crit="R1" data-node="r:R1"><b>R1</b> Classify every incoming document into a claim type, with a confidence.</div><div class="crit" data-crit="R2" data-node="r:R2"><b>R2</b> Deliver the results to the three consuming teams.</div><div class="crit" data-crit="R3" data-node="r:R3"><b>R3</b> Send the documents the classifier is unsure about to human review, and use the reviewers&#39; corrections to improve the classifier.</div><div class="crit" data-crit="Q1" data-node="r:Q1"><b>Q1</b> During storm season, at eight million documents a day, every document is classified within two hours of arrival.</div><div class="crit" data-crit="Q2" data-node="r:Q2"><b>Q2</b> When classification quality drops for one claim type (for example, after a form changes its layout), operators see it within one day.</div><div class="crit" data-crit="Q3" data-node="r:Q3"><b>Q3</b> The classification costs less than 0.2 cents per document on average over the year.</div><div class="crit" data-crit="Q4" data-node="r:Q4"><b>Q4</b> A consuming team can change how it processes the results without the other teams or the classifier having to change.</div><div class="crit" data-crit="C1" data-node="r:C1"><b>C1</b> The documents contain personal data and may not leave the EU.</div><div class="crit" data-crit="C2" data-node="r:C2"><b>C2</b> The classifier uses an LLM from the insurer&#39;s approved provider, in its EU region.</div>        </div>
+      </div>
+    </div>
+    <div class="legend"><span><b style="color:var(--accepted)">——</b> meets</span><span><b style="color:var(--mixed)">——</b> partly</span><span><b style="color:var(--rejected)">- - -</b> misses</span></div>
+
+    <h2 class="sec">Regions that justify the solution</h2>
+    <div class="region" data-step="2"><strong>G1 · Peak processing and EU inference</strong> <span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:C1">C1</span><span class="chip small" data-node="r:C2">C2</span> <span class="muted">investigated at step 2</span>
+      <p><span class="dref" data-node="z:1">Intake</span> → <span class="vref" data-node="z:1.1">EU object storage with Kafka upload events</span> · <span class="dref" data-node="z:3">Classifier runtime</span> → <span class="vref" data-node="z:3.1">Kubernetes workers autoscaled from 4 to 120 by Kafka backlog</span> · <span class="dref" data-node="z:6">Inference batching</span> → <span class="vref" data-node="z:6.1">batches of 20 small documents</span> · <span class="dref" data-node="z:4">LLM</span> → <span class="vref" data-node="z:4.1">approved provider in its EU region</span></p>
+<p>Backlog-driven workers and batching support the seasonal throughput and cost aims while EU storage and the approved EU endpoint satisfy the constraints. The numeric targets need measurement; the implementation pattern is supported but not quantitatively validated.</p>    </div>
+    <div class="region" data-step="4"><strong>G2 · Independent team consumption</strong> <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q4">Q4</span> <span class="muted">investigated at step 4</span>
+      <p><span class="dref" data-node="z:8">Result delivery</span> → <span class="vref" data-node="z:8.1">second Kafka topic with one consumer group per team</span></p>
+<p>A shared results stream with separate consumer groups gives all three teams independent pace and change boundaries.</p>    </div>
+    <div class="region" data-step="8"><strong>G3 · Correction loop and quality oversight</strong> <span class="chip small" data-node="r:R3">R3</span><span class="chip small" data-node="r:Q2">Q2</span> <span class="muted">investigated at step 8</span>
+      <p><span class="dref" data-node="z:10">Human review</span> → <span class="vref" data-node="z:10.1">confidence below 0.7 enters labelling queue</span> · <span class="dref" data-node="z:11">Prompt learning</span> → <span class="vref" data-node="z:11.1">monthly replacement of examples with corrected documents</span> · <span class="dref" data-node="z:12">Prompt validation</span> → <span class="vref" data-node="z:12.1">check against 2,000 reviewed documents before switch</span> · <span class="dref" data-node="z:13">Quality monitoring</span> → <span class="vref" data-node="z:13.1">per-claim review share and mean confidence dashboard with doubling alert</span> · <span class="dref" data-node="z:14">Quality audit</span> → <span class="vref" data-node="z:14.1">weekly random sample of 300 classifications</span></p>
+<p>Human corrections inform prompt updates, and per-type monitoring plus sampling provide quality signals. This supports the feedback requirement, while one-day detection is not demonstrated.</p>    </div>
+    <details class="grid-details"><summary>Dimension grid: every point, dimension by dimension</summary>
+    <div class="legend">
+<span><b style="color:var(--dimension)">solution</b> the solution as a point</span><span><b style="color:var(--accent)">region</b> a part of it</span><span><b style="color:var(--novel)">contrast</b> an option changed (outlined)</span>    </div>
+    <div class="scroll traj-wrap">
+      <svg class="lineage" aria-hidden="true"></svg>
+      <table class="traj">
+        <thead><tr><th class="row-h">Dimension</th>
+<th class="band-h" title="Peak processing and EU inference">G1</th><th class="band-h" title="Independent team consumption">G2</th><th class="band-h" title="Correction loop and quality oversight">G3</th><th class="step-h mv-solution" data-step="1" title="The complete combination implements the classification, delivery, feedback, throughput, cost, observability, loose-coupling, and EU/provider requirements."><b>1</b><span class="mv">solution</span><span class="vd vd-partial">partial</span><span class="alt">→ S</span></th><th class="step-h mv-region" data-step="2" title="Q1 and Q3 explain event buffering, elastic worker scaling, and batching; C1 and C2 constrain where documents go and which provider is used."><b>2</b><span class="mv">region</span><span class="vd vd-partial">partial</span></th><th class="step-h mv-contrast" data-step="3" title="Changing only autoscaling to a fixed worker count may weaken Q1; this tests whether the requirement forces backlog-based scaling."><b>3</b><span class="mv">contrast</span><span class="vd vd-partial">partial</span></th><th class="step-h mv-region" data-step="4" title="Q4 and R2 explain publishing results once and letting each team consume independently."><b>4</b><span class="mv">region</span><span class="vd vd-grounded">grounded</span></th><th class="step-h mv-region" data-step="5" title="R3 explains routing uncertain cases to staff and using corrections to improve the prompt; validation protects the update process."><b>5</b><span class="mv">region</span><span class="vd vd-grounded">grounded</span></th><th class="step-h mv-region" data-step="6" title="Q2 explains measuring quality signals per claim type and alerting on change; sampling gives a check beyond confidence scores."><b>6</b><span class="mv">region</span><span class="vd vd-partial">partial</span></th><th class="step-h mv-region" data-step="7" title="C1 requires EU data locality, and C2 requires the approved LLM provider in its EU region."><b>7</b><span class="mv">region</span><span class="vd vd-grounded">grounded</span></th><th class="step-h mv-region" data-step="8" title="R3 and Q2 explain the combined feedback and monitoring practices: corrected uncertain cases improve future prompts, while per-type signals and review help reveal degradation."><b>8</b><span class="mv">region</span><span class="vd vd-partial">partial</span></th>        </tr></thead>
+        <tbody>
+          <tr><th class="row-h"><span class="dref" data-node="z:1">Intake</span></th>
+<td class="band" title="Peak processing and EU inference"><span></span></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:1.1" title="EU object storage with Kafka upload events">EU object storage with Ka…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:1.1" title="EU object storage with Kafka upload events">EU object storage with Ka…</span></td>
+            <td class="c" data-step="3"><span class="vref cell-v " data-node="z:1.1" title="EU object storage with Kafka upload events">EU object storage with Ka…</span></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"><span class="vref cell-v " data-node="z:1.1" title="EU object storage with Kafka upload events">EU object storage with Ka…</span></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:2">Preprocessing</span></th>
+<td class="band" title="Peak processing and EU inference"></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:2.1" title="OCR, content-hash deduplication, and adjacent extracted text">OCR, content-hash dedupli…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:3">Classifier runtime</span></th>
+<td class="band" title="Peak processing and EU inference"><span></span></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:3.1" title="Kubernetes workers autoscaled from 4 to 120 by Kafka backlog">Kubernetes workers autosc…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:3.1" title="Kubernetes workers autoscaled from 4 to 120 by Kafka backlog">Kubernetes workers autosc…</span></td>
+            <td class="c contrast" data-step="3"><span class="vref cell-v " data-node="z:3.2" title="fixed worker count">fixed worker count</span></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:4">LLM</span></th>
+<td class="band" title="Peak processing and EU inference"><span></span></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:4.1" title="approved provider in its EU region">approved provider in its …</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:4.1" title="approved provider in its EU region">approved provider in its …</span></td>
+            <td class="c" data-step="3"><span class="vref cell-v " data-node="z:4.1" title="approved provider in its EU region">approved provider in its …</span></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"><span class="vref cell-v " data-node="z:4.1" title="approved provider in its EU region">approved provider in its …</span></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:5">Prompt</span></th>
+<td class="band" title="Peak processing and EU inference"></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:5.1" title="60 claim definitions and ten labelled examples">60 claim definitions and …</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:6">Inference batching</span></th>
+<td class="band" title="Peak processing and EU inference"><span></span></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:6.1" title="batches of 20 small documents">batches of 20 small documents</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:6.1" title="batches of 20 small documents">batches of 20 small documents</span></td>
+            <td class="c" data-step="3"><span class="vref cell-v " data-node="z:6.1" title="batches of 20 small documents">batches of 20 small documents</span></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:7">Result provenance</span></th>
+<td class="band" title="Peak processing and EU inference"></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:7.1" title="prompt version and model name stored with each result">prompt version and model …</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:8">Result delivery</span></th>
+<td class="band" title="Peak processing and EU inference"></td><td class="band" title="Independent team consumption"><span></span></td><td class="band" title="Correction loop and quality oversight"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:8.1" title="second Kafka topic with one consumer group per team">second Kafka topic with o…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"><span class="vref cell-v " data-node="z:8.1" title="second Kafka topic with one consumer group per team">second Kafka topic with o…</span></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:9">Analytics delivery</span></th>
+<td class="band" title="Peak processing and EU inference"></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:9.1" title="hourly warehouse load">hourly warehouse load</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:10">Human review</span></th>
+<td class="band" title="Peak processing and EU inference"></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"><span></span></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:10.1" title="confidence below 0.7 enters labelling queue">confidence below 0.7 ente…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"><span class="vref cell-v " data-node="z:10.1" title="confidence below 0.7 enters labelling queue">confidence below 0.7 ente…</span></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"><span class="vref cell-v " data-node="z:10.1" title="confidence below 0.7 enters labelling queue">confidence below 0.7 ente…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:11">Prompt learning</span></th>
+<td class="band" title="Peak processing and EU inference"></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"><span></span></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:11.1" title="monthly replacement of examples with corrected documents">monthly replacement of ex…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"><span class="vref cell-v " data-node="z:11.1" title="monthly replacement of examples with corrected documents">monthly replacement of ex…</span></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"><span class="vref cell-v " data-node="z:11.1" title="monthly replacement of examples with corrected documents">monthly replacement of ex…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:12">Prompt validation</span></th>
+<td class="band" title="Peak processing and EU inference"></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"><span></span></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:12.1" title="check against 2,000 reviewed documents before switch">check against 2,000 revie…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"><span class="vref cell-v " data-node="z:12.1" title="check against 2,000 reviewed documents before switch">check against 2,000 revie…</span></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"><span class="vref cell-v " data-node="z:12.1" title="check against 2,000 reviewed documents before switch">check against 2,000 revie…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:13">Quality monitoring</span></th>
+<td class="band" title="Peak processing and EU inference"></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"><span></span></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:13.1" title="per-claim review share and mean confidence dashboard with doubling alert">per-claim review share an…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"><span class="vref cell-v " data-node="z:13.1" title="per-claim review share and mean confidence dashboard with doubling alert">per-claim review share an…</span></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"><span class="vref cell-v " data-node="z:13.1" title="per-claim review share and mean confidence dashboard with doubling alert">per-claim review share an…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:14">Quality audit</span></th>
+<td class="band" title="Peak processing and EU inference"></td><td class="band" title="Independent team consumption"></td><td class="band" title="Correction loop and quality oversight"><span></span></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:14.1" title="weekly random sample of 300 classifications">weekly random sample of 3…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"><span class="vref cell-v " data-node="z:14.1" title="weekly random sample of 300 classifications">weekly random sample of 3…</span></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"><span class="vref cell-v " data-node="z:14.1" title="weekly random sample of 300 classifications">weekly random sample of 3…</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </details>
+  </section>
+
+  <section class="gaps" id="gaps">
+  <h2 class="sec">Gaps in the space</h2>
+  <p>No space was provided: the agent worked zero-shot, naming dimensions and values from its own knowledge, so nothing can fall short of a space.</p>
+  </section>
+</main>
+<div class="splitter-v" role="separator" aria-orientation="vertical" aria-label="Resize the text and the graph" tabindex="0" title="Drag to resize (double-click to reset)"></div>
+<aside class="ex-side">
+  <div id="canvas"><svg id="svg" role="img" aria-label="The dimensions this rationale involves"></svg>
+    <label class="graph-toggle"><input type="checkbox" id="show-all"> Show every value the agent named</label>
+    <div class="zoom-ctl"><button type="button" data-zoom="in" title="Zoom in" aria-label="Zoom in">+</button><button type="button" data-zoom="out" title="Zoom out" aria-label="Zoom out">−</button><button type="button" data-zoom="fit" title="Fit the graph" aria-label="Fit the graph">⤢</button></div></div>
+  <div class="splitter-h" role="separator" aria-orientation="horizontal" aria-label="Resize the graph and its details" tabindex="0" title="Drag to resize (double-click to reset)"></div>
+  <div class="graph-key"><span>from the centre: dimensions, values, <b>design points</b> (▲, one per step, coloured by its rating), requirements (■, linked by how each point meets them)</span><span><b>blue</b>: explored paths</span><span><b>outlined</b>: the design point shown</span><span>select a node: its path to the centre and the paths from it to design points and requirements</span></div>
+  <div id="info"><p class="hint">Select a dimension, value or requirement (in the graph or the text) to see its details.</p></div>
+</aside>
+</div>
+<script type="application/json" id="explainer-data">{"adrs": [{"consequences": "", "context": "The system must classify every input with confidence, handle the seasonal peak, control average inference cost, and keep personal data within the EU while using the approved EU-region LLM.", "drivers": ["R1", "Q1", "Q3", "C1", "C2"], "id": "ADR1", "options": [{"cons": ["Batch filling may add latency.", "The worker range and batch size are not backed by throughput or cost measurements."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR1:O1", "name": "EU event intake, elastic Kubernetes workers, and batched approved EU inference", "point": {"z:1": "z:1.1", "z:2": "z:2.1", "z:3": "z:3.1", "z:4": "z:4.1", "z:5": "z:5.1", "z:6": "z:6.1"}, "pros": ["Processes scans and extracts usable text.", "Backlog-based scaling responds to changing volume.", "Batching is intended to reduce cost.", "EU storage and approved EU inference meet the location and provider constraints."], "quotes": ["Incoming documents land in an object storage bucket in the EU region, and each upload puts a message on a Kafka topic.", "A preprocessing service reads the topic, extracts the text (with OCR for scanned forms), removes duplicates by content hash and writes the text next to the document.", "The number of classifier workers scales with the length of the Kafka topic's backlog, from 4 to 120.", "A classifier service, running on Kubernetes, sends the text to the approved provider's LLM in its EU region.", "The prompt lists the 60 claim types with a short definition and ten labelled examples, and asks for a claim type and a confidence between 0 and 1.", "Small documents are sent in batches of 20 to reduce cost."], "reason": "The approved EU provider is forced by C2 and EU handling by C1. Event buffering, Kubernetes, the scaling range, prompt format, and batch size are implementation choices; throughput and cost targets remain unverified.", "status": "chosen", "step": 1}, {"cons": ["Does not add capacity as backlog grows during storm season."], "fit": "exact", "fit_note": "", "id": "O2", "in": [], "key": "ADR1:O2", "name": "Fixed worker pool", "point": {"z:1": "z:1.1", "z:3": "z:3.2", "z:4": "z:4.1", "z:6": "z:6.1"}, "pros": ["Predictable worker capacity and potentially steadier peak compute spending."], "quotes": [], "reason": "It weakens support for the peak-throughput requirement. The available information does not establish that a correctly sized fixed pool would miss the two-hour target, so the contrast does not prove autoscaling is strictly forced.", "status": "discarded", "step": 3}], "title": "Scale document inference while keeping data in the EU"}, {"consequences": "", "context": "Claims handling, fraud investigation, and analytics all need results, and each team must be able to change its processing independently.", "drivers": ["R2", "Q4"], "id": "ADR2", "options": [{"cons": ["Kafka topic and consumer operations add infrastructure and maintenance."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR2:O1", "name": "Shared Kafka results topic with team consumer groups", "point": {"z:7": "z:7.1", "z:8": "z:8.1", "z:9": "z:9.1"}, "pros": ["Each team can consume at its own pace.", "Consumer changes are isolated from the classifier and other teams.", "Analytics receives a regular warehouse feed."], "quotes": ["Every result is stored with the prompt version and the model name that produced it.", "Results go to a second Kafka topic. Each consuming team has its own consumer group and reads at its own pace;", "analytics also loads the topic into the data warehouse every hour."], "reason": "Independent consumption is required by Q4; Kafka consumer groups and the hourly warehouse schedule are free choices. Stored provenance supports later diagnosis.", "status": "chosen", "step": 1}], "title": "Publish results for independent team consumption"}, {"consequences": "", "context": "The classifier must return a claim type and confidence, send uncertain results to staff, and use corrections to improve future classifications.", "drivers": ["R1", "R3"], "id": "ADR3", "options": [{"cons": ["The threshold and monthly cadence may not match changing uncertainty or drift.", "Review and validation create delay and staff effort."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR3:O1", "name": "Confidence threshold, staff labelling, monthly prompt examples, and pre-release check", "point": {"z:10": "z:10.1", "z:11": "z:11.1", "z:12": "z:12.1"}, "pros": ["Staff corrections feed future prompt examples.", "A fixed review threshold gives an explicit routing rule.", "The prompt is checked before a new version is used."], "quotes": ["Documents with a confidence below 0.7 go to a review queue in a labelling tool, where claims staff correct the claim type.", "Every month the team replaces the prompt's examples with recent corrected documents,", "and checks the new prompt against 2,000 reviewed documents before switching to it."], "reason": "Reviewing uncertain items and using corrections are required by R3. The 0.7 cutoff, monthly cadence, replacement strategy, and sample size are freely selected parameters.", "status": "chosen", "step": 5}], "title": "Route uncertain classifications into a correction loop"}, {"consequences": "", "context": "Operators need to notice when classification quality degrades for a particular claim type within one day.", "drivers": ["Q2"], "id": "ADR4", "options": [{"cons": ["Review share and mean confidence are indirect quality measures.", "Weekly comparison and sampling do not establish one-day detection."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR4:O1", "name": "Per-type dashboard, review-share alert, and weekly sample", "point": {"z:13": "z:13.1", "z:14": "z:14.1"}, "pros": ["Per-claim measures can reveal localized changes.", "The weekly human sample checks a signal beyond model confidence."], "quotes": ["A dashboard shows, per claim type, the share of documents sent to review and the mean confidence; an alert fires when the share sent to review for a claim type doubles from one week to the next.", "Each week, analysts review a random sample of 300 classified documents."], "reason": "Per-type visibility supports Q2, but the solution does not demonstrate that the alert fires within one day. The selected indicators, doubling rule, sample size, and cadence are not forced by the requirement.", "status": "chosen", "step": 6}], "title": "Watch quality by claim type"}], "alternatives": [{"approach": null, "choices": [{"dimension": "z:1", "drivers": ["C1", "Q1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "Incoming documents land in an object storage bucket in the EU region, and each upload puts a message on a Kafka topic.", "reason": "The EU location is forced by C1; object storage and Kafka are implementation choices that support durable, event-driven intake.", "value": "z:1.1"}, {"dimension": "z:2", "drivers": ["R1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "A preprocessing service reads the topic, extracts the text (with OCR for scanned forms), removes duplicates by content hash and writes the text next to the document.", "reason": "Text extraction enables classification of scans and documents; deduplication and adjacent text are implementation choices, not explicitly required.", "value": "z:2.1"}, {"dimension": "z:3", "drivers": ["Q1", "Q3"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "The number of classifier workers scales with the length of the Kafka topic's backlog, from 4 to 120.", "reason": "Elastic workers support storm-season throughput, but the contrast cannot prove this range is required or sufficient, and peak cost is not measured.", "value": "z:3.1"}, {"dimension": "z:4", "drivers": ["C1", "C2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": true, "quote": "A classifier service, running on Kubernetes, sends the text to the approved provider's LLM in its EU region.", "reason": "C2 explicitly requires the approved provider in its EU region; the EU endpoint also supports C1.", "value": "z:4.1"}, {"dimension": "z:5", "drivers": ["R1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "The prompt lists the 60 claim types with a short definition and ten labelled examples, and asks for a claim type and a confidence between 0 and 1.", "reason": "The prompt represents all claim types and examples to guide classification, but the number and format of examples are not required by the problem.", "value": "z:5.1"}, {"dimension": "z:6", "drivers": ["Q3", "Q1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "Small documents are sent in batches of 20 to reduce cost.", "reason": "Batching is intended to lower cost, with a possible latency cost; neither the batch size nor its cost and latency effects are measured.", "value": "z:6.1"}, {"dimension": "z:7", "drivers": ["Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "Every result is stored with the prompt version and the model name that produced it.", "reason": "Version and model provenance help diagnose quality shifts, though the problem does not prescribe this metadata.", "value": "z:7.1"}, {"dimension": "z:8", "drivers": ["R2", "Q4"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "Results go to a second Kafka topic. Each consuming team has its own consumer group and reads at its own pace;", "reason": "Independent consumption serves loose coupling; Kafka is a free choice among ways to provide that separation.", "value": "z:8.1"}, {"dimension": "z:9", "drivers": ["R2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "analytics also loads the topic into the data warehouse every hour.", "reason": "This delivers results to analytics, but the hourly schedule and warehouse mechanism are not specified by the requirements.", "value": "z:9.1"}, {"dimension": "z:10", "drivers": ["R3"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "Documents with a confidence below 0.7 go to a review queue in a labelling tool, where claims staff correct the claim type.", "reason": "Human review of uncertain cases is required, while 0.7 and the labelling tool are chosen details.", "value": "z:10.1"}, {"dimension": "z:11", "drivers": ["R3"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "Every month the team replaces the prompt's examples with recent corrected documents,", "reason": "Using reviewer corrections is required; monthly full example replacement is a chosen update strategy.", "value": "z:11.1"}, {"dimension": "z:12", "drivers": ["R3", "Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "and checks the new prompt against 2,000 reviewed documents before switching to it.", "reason": "Validation can reduce regression risk, but the requirement does not set the check size or require this specific gate.", "value": "z:12.1"}, {"dimension": "z:13", "drivers": ["Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "A dashboard shows, per claim type, the share of documents sent to review and the mean confidence; an alert fires when the share sent to review for a claim type doubles from one week to the next.", "reason": "Per-claim signals support finding localized changes, but no stated timing or evidence shows the alert meets the one-day target.", "value": "z:13.1"}, {"dimension": "z:14", "drivers": ["Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "Each week, analysts review a random sample of 300 classified documents.", "reason": "The sample supplies a human quality check, but its frequency and size are not specified and it does not alone ensure one-day visibility.", "value": "z:14.1"}], "considered": [], "id": "S", "name": "Document classification as built", "open": [], "parts": [{"adr": "ADR1", "drivers": ["R1", "Q1", "Q3", "C1", "C2"], "name": "EU event intake, elastic Kubernetes workers, and batched approved EU inference", "option": "O1", "point": {"z:1": "z:1.1", "z:2": "z:2.1", "z:3": "z:3.1", "z:4": "z:4.1", "z:5": "z:5.1", "z:6": "z:6.1"}, "title": "Scale document inference while keeping data in the EU"}, {"adr": "ADR2", "drivers": ["R2", "Q4"], "name": "Shared Kafka results topic with team consumer groups", "option": "O1", "point": {"z:7": "z:7.1", "z:8": "z:8.1", "z:9": "z:9.1"}, "title": "Publish results for independent team consumption"}, {"adr": "ADR3", "drivers": ["R1", "R3"], "name": "Confidence threshold, staff labelling, monthly prompt examples, and pre-release check", "option": "O1", "point": {"z:10": "z:10.1", "z:11": "z:11.1", "z:12": "z:12.1"}, "title": "Route uncertain classifications into a correction loop"}, {"adr": "ADR4", "drivers": ["Q2"], "name": "Per-type dashboard, review-share alert, and weekly sample", "option": "O1", "point": {"z:13": "z:13.1", "z:14": "z:14.1"}, "title": "Watch quality by claim type"}], "point": "Documents land in EU object storage, with Kafka events triggering preprocessing, deduplication, OCR, and adjacent-text extraction. Autoscaled Kubernetes workers batch 20 small documents for an approved EU-region LLM using the versioned prompt, publish results with provenance to team consumer groups, and feed hourly analytics; low-confidence outputs enter review, while validated monthly example updates and monitoring/audits govern quality.", "relations": [], "step": 1, "summary": "An EU hosted, event-driven LLM pipeline classifies documents, routes uncertain results to staff, and publishes results for independent team consumption. Prompt changes are based on corrections and quality is monitored per claim type."}], "approaches": [], "budget": {"max_points": 8, "used": 8}, "context": "An insurer receives between two and eight million documents a day (scanned forms, e-mails, PDFs) and classifies each one into one of 60 claim types with an LLM-based classifier. Volume varies strongly over the year: storm season brings four times the usual load. Three teams use the results: claims handling, fraud investigation and analytics. The documents contain personal data.", "dimensions": {"z:1": {"core": false, "href": null, "id": "z:1", "label": "Intake", "question": "", "values": ["z:1.1"]}, "z:10": {"core": false, "href": null, "id": "z:10", "label": "Human review", "question": "", "values": ["z:10.1"]}, "z:11": {"core": false, "href": null, "id": "z:11", "label": "Prompt learning", "question": "", "values": ["z:11.1"]}, "z:12": {"core": false, "href": null, "id": "z:12", "label": "Prompt validation", "question": "", "values": ["z:12.1"]}, "z:13": {"core": false, "href": null, "id": "z:13", "label": "Quality monitoring", "question": "", "values": ["z:13.1"]}, "z:14": {"core": false, "href": null, "id": "z:14", "label": "Quality audit", "question": "", "values": ["z:14.1"]}, "z:2": {"core": false, "href": null, "id": "z:2", "label": "Preprocessing", "question": "", "values": ["z:2.1"]}, "z:3": {"core": false, "href": null, "id": "z:3", "label": "Classifier runtime", "question": "", "values": ["z:3.1", "z:3.2"]}, "z:4": {"core": false, "href": null, "id": "z:4", "label": "LLM", "question": "", "values": ["z:4.1"]}, "z:5": {"core": false, "href": null, "id": "z:5", "label": "Prompt", "question": "", "values": ["z:5.1"]}, "z:6": {"core": false, "href": null, "id": "z:6", "label": "Inference batching", "question": "", "values": ["z:6.1"]}, "z:7": {"core": false, "href": null, "id": "z:7", "label": "Result provenance", "question": "", "values": ["z:7.1"]}, "z:8": {"core": false, "href": null, "id": "z:8", "label": "Result delivery", "question": "", "values": ["z:8.1"]}, "z:9": {"core": false, "href": null, "id": "z:9", "label": "Analytics delivery", "question": "", "values": ["z:9.1"]}}, "fits": [], "graph_changed": false, "id": "documents-explain-N-r1", "lanes": null, "links": {"graph": null, "index": null}, "mode": "explain", "qoc": [{"dimension": "z:1", "options": [{"assessment": {"C1": "meets", "C2": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 7, "value": "z:1.1"}]}, {"dimension": "z:2", "options": [{"assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "partly", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "forced": null, "kind": "solution", "specific": false, "step": 1, "value": "z:2.1"}]}, {"dimension": "z:3", "options": [{"assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q3": "partly", "R1": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 2, "value": "z:3.1"}, {"assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q3": "partly", "R1": "meets"}, "forced": null, "kind": "contrast", "specific": true, "step": 3, "value": "z:3.2"}]}, {"dimension": "z:4", "options": [{"assessment": {"C1": "meets", "C2": "meets"}, "forced": true, "kind": "solution", "specific": true, "step": 7, "value": "z:4.1"}]}, {"dimension": "z:5", "options": [{"assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "partly", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "forced": null, "kind": "solution", "specific": false, "step": 1, "value": "z:5.1"}]}, {"dimension": "z:6", "options": [{"assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q3": "partly", "R1": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 2, "value": "z:6.1"}]}, {"dimension": "z:7", "options": [{"assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "partly", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "forced": null, "kind": "solution", "specific": false, "step": 1, "value": "z:7.1"}]}, {"dimension": "z:8", "options": [{"assessment": {"Q4": "meets", "R2": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 4, "value": "z:8.1"}]}, {"dimension": "z:9", "options": [{"assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "partly", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "forced": null, "kind": "solution", "specific": false, "step": 1, "value": "z:9.1"}]}, {"dimension": "z:10", "options": [{"assessment": {"R1": "meets", "R3": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 5, "value": "z:10.1"}]}, {"dimension": "z:11", "options": [{"assessment": {"R1": "meets", "R3": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 5, "value": "z:11.1"}]}, {"dimension": "z:12", "options": [{"assessment": {"R1": "meets", "R3": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 5, "value": "z:12.1"}]}, {"dimension": "z:13", "options": [{"assessment": {"Q2": "partly"}, "forced": null, "kind": "solution", "specific": true, "step": 6, "value": "z:13.1"}]}, {"dimension": "z:14", "options": [{"assessment": {"Q2": "partly"}, "forced": null, "kind": "solution", "specific": true, "step": 6, "value": "z:14.1"}]}], "regions": [{"drivers": ["Q1", "Q3", "C1", "C2"], "id": "G1", "name": "Peak processing and EU inference", "point": {"z:1": "z:1.1", "z:3": "z:3.1", "z:4": "z:4.1", "z:6": "z:6.1"}, "reason": "Backlog-driven workers and batching support the seasonal throughput and cost aims while EU storage and the approved EU endpoint satisfy the constraints. The numeric targets need measurement; the implementation pattern is supported but not quantitatively validated.", "step": 2}, {"drivers": ["R2", "Q4"], "id": "G2", "name": "Independent team consumption", "point": {"z:8": "z:8.1"}, "reason": "A shared results stream with separate consumer groups gives all three teams independent pace and change boundaries.", "step": 4}, {"drivers": ["R3", "Q2"], "id": "G3", "name": "Correction loop and quality oversight", "point": {"z:10": "z:10.1", "z:11": "z:11.1", "z:12": "z:12.1", "z:13": "z:13.1", "z:14": "z:14.1"}, "reason": "Human corrections inform prompt updates, and per-type monitoring plus sampling provide quality signals. This supports the feedback requirement, while one-day detection is not demonstrated.", "step": 8}], "relations": [], "requirements": [{"attribute": "", "id": "R1", "kind": "functional", "text": "Classify every incoming document into a claim type, with a confidence."}, {"attribute": "", "id": "R2", "kind": "functional", "text": "Deliver the results to the three consuming teams."}, {"attribute": "", "id": "R3", "kind": "functional", "text": "Send the documents the classifier is unsure about to human review, and use the reviewers' corrections to improve the classifier."}, {"attribute": "throughput and scalability", "id": "Q1", "kind": "quality", "text": "During storm season, at eight million documents a day, every document is classified within two hours of arrival."}, {"attribute": "observability", "id": "Q2", "kind": "quality", "text": "When classification quality drops for one claim type (for example, after a form changes its layout), operators see it within one day."}, {"attribute": "cost", "id": "Q3", "kind": "quality", "text": "The classification costs less than 0.2 cents per document on average over the year."}, {"attribute": "loose coupling", "id": "Q4", "kind": "quality", "text": "A consuming team can change how it processes the results without the other teams or the classifier having to change."}, {"attribute": "", "id": "C1", "kind": "constraint", "text": "The documents contain personal data and may not leave the EU."}, {"attribute": "", "id": "C2", "kind": "constraint", "text": "The classifier uses an LLM from the insurer's approved provider, in its EU region."}], "rows": [{"cells": [{"kind": "choice", "reason": "The EU location is forced by C1; object storage and Kafka are implementation choices that support durable, event-driven intake.", "value": "z:1.1"}], "differs": false, "dimension": "z:1", "note": ""}, {"cells": [{"kind": "choice", "reason": "Text extraction enables classification of scans and documents; deduplication and adjacent text are implementation choices, not explicitly required.", "value": "z:2.1"}], "differs": false, "dimension": "z:2", "note": ""}, {"cells": [{"kind": "choice", "reason": "Elastic workers support storm-season throughput, but the contrast cannot prove this range is required or sufficient, and peak cost is not measured.", "value": "z:3.1"}], "differs": false, "dimension": "z:3", "note": ""}, {"cells": [{"kind": "choice", "reason": "C2 explicitly requires the approved provider in its EU region; the EU endpoint also supports C1.", "value": "z:4.1"}], "differs": false, "dimension": "z:4", "note": ""}, {"cells": [{"kind": "choice", "reason": "The prompt represents all claim types and examples to guide classification, but the number and format of examples are not required by the problem.", "value": "z:5.1"}], "differs": false, "dimension": "z:5", "note": ""}, {"cells": [{"kind": "choice", "reason": "Batching is intended to lower cost, with a possible latency cost; neither the batch size nor its cost and latency effects are measured.", "value": "z:6.1"}], "differs": false, "dimension": "z:6", "note": ""}, {"cells": [{"kind": "choice", "reason": "Version and model provenance help diagnose quality shifts, though the problem does not prescribe this metadata.", "value": "z:7.1"}], "differs": false, "dimension": "z:7", "note": ""}, {"cells": [{"kind": "choice", "reason": "Independent consumption serves loose coupling; Kafka is a free choice among ways to provide that separation.", "value": "z:8.1"}], "differs": false, "dimension": "z:8", "note": ""}, {"cells": [{"kind": "choice", "reason": "This delivers results to analytics, but the hourly schedule and warehouse mechanism are not specified by the requirements.", "value": "z:9.1"}], "differs": false, "dimension": "z:9", "note": ""}, {"cells": [{"kind": "choice", "reason": "Human review of uncertain cases is required, while 0.7 and the labelling tool are chosen details.", "value": "z:10.1"}], "differs": false, "dimension": "z:10", "note": ""}, {"cells": [{"kind": "choice", "reason": "Using reviewer corrections is required; monthly full example replacement is a chosen update strategy.", "value": "z:11.1"}], "differs": false, "dimension": "z:11", "note": ""}, {"cells": [{"kind": "choice", "reason": "Validation can reduce regression risk, but the requirement does not set the check size or require this specific gate.", "value": "z:12.1"}], "differs": false, "dimension": "z:12", "note": ""}, {"cells": [{"kind": "choice", "reason": "Per-claim signals support finding localized changes, but no stated timing or evidence shows the alert meets the one-day target.", "value": "z:13.1"}], "differs": false, "dimension": "z:13", "note": ""}, {"cells": [{"kind": "choice", "reason": "The sample supplies a human quality check, but its frequency and size are not specified and it does not alone ensure one-day visibility.", "value": "z:14.1"}], "differs": false, "dimension": "z:14", "note": ""}], "space": null, "title": "Large-scale document classification", "trajectory": [{"alternative": "S", "approach": null, "assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q2": "partly", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "meets", "R3": "meets"}, "attested_by": [], "changed": [], "description": "Documents land in EU object storage, with Kafka events triggering preprocessing, deduplication, OCR, and adjacent-text extraction. Autoscaled Kubernetes workers batch 20 small documents for an approved EU-region LLM using the versioned prompt, publish results with provenance to team consumer groups, and feed hourly analytics; low-confidence outputs enter review, while validated monthly example updates and monitoring/audits govern quality.", "diff": [{"after": "z:1.1", "before": null, "dimension": "z:1"}, {"after": "z:2.1", "before": null, "dimension": "z:2"}, {"after": "z:3.1", "before": null, "dimension": "z:3"}, {"after": "z:4.1", "before": null, "dimension": "z:4"}, {"after": "z:5.1", "before": null, "dimension": "z:5"}, {"after": "z:6.1", "before": null, "dimension": "z:6"}, {"after": "z:7.1", "before": null, "dimension": "z:7"}, {"after": "z:8.1", "before": null, "dimension": "z:8"}, {"after": "z:9.1", "before": null, "dimension": "z:9"}, {"after": "z:10.1", "before": null, "dimension": "z:10"}, {"after": "z:11.1", "before": null, "dimension": "z:11"}, {"after": "z:12.1", "before": null, "dimension": "z:12"}, {"after": "z:13.1", "before": null, "dimension": "z:13"}, {"after": "z:14.1", "before": null, "dimension": "z:14"}], "drivers": ["R1", "R2", "R3", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "solution", "novel": ["z:1", "z:2", "z:3", "z:4", "z:5", "z:6", "z:7", "z:8", "z:9", "z:10", "z:11", "z:12", "z:13", "z:14"], "observation": "The design directly implements the functional workflows, team separation, and EU/provider constraints. Autoscaling and batching support the numeric throughput and cost goals, and monitoring supports quality visibility, but there are no measured completion times, average costs, or alert-latency results to show those numeric targets are achieved.", "own_tradeoff": "This provides scalable, region-constrained processing, traceability, and feedback-driven improvement. It gives up prompt freshness between monthly updates and incurs review, audit, and warehouse overhead, with low-confidence results potentially delayed.", "parent": null, "point": {"z:1": "z:1.1", "z:10": "z:10.1", "z:11": "z:11.1", "z:12": "z:12.1", "z:13": "z:13.1", "z:14": "z:14.1", "z:2": "z:2.1", "z:3": "z:3.1", "z:4": "z:4.1", "z:5": "z:5.1", "z:6": "z:6.1", "z:7": "z:7.1", "z:8": "z:8.1", "z:9": "z:9.1"}, "point_id": "P1", "reuses": null, "round": null, "step": 1, "tradeoffs": [{"causes": ["z:6.1", "z:11.1", "z:10.1"], "costs": ["Q1"], "gains": ["Q3", "R3"], "note": "Batching aims to reduce inference cost and review concentrates human effort, while waiting for batches and routing uncertain cases through people can add latency. The monthly prompt cycle also delays improvements."}], "verdict": "partial", "why": "The complete combination implements the classification, delivery, feedback, throughput, cost, observability, loose-coupling, and EU/provider requirements."}, {"alternative": null, "approach": null, "assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q3": "partly", "R1": "meets"}, "attested_by": [], "changed": ["z:10", "z:11", "z:12", "z:13", "z:14", "z:2", "z:5", "z:7", "z:8", "z:9"], "description": "EU object storage emits Kafka upload events, which drive Kubernetes workers that scale from 4 to 120 according to backlog. Each worker groups 20 small documents for inference through the approved LLM provider’s EU region.", "diff": [{"after": null, "before": "z:2.1", "dimension": "z:2"}, {"after": null, "before": "z:5.1", "dimension": "z:5"}, {"after": null, "before": "z:7.1", "dimension": "z:7"}, {"after": null, "before": "z:8.1", "dimension": "z:8"}, {"after": null, "before": "z:9.1", "dimension": "z:9"}, {"after": null, "before": "z:10.1", "dimension": "z:10"}, {"after": null, "before": "z:11.1", "dimension": "z:11"}, {"after": null, "before": "z:12.1", "dimension": "z:12"}, {"after": null, "before": "z:13.1", "dimension": "z:13"}, {"after": null, "before": "z:14.1", "dimension": "z:14"}], "drivers": ["R1", "Q1", "Q3", "C1", "C2"], "move": "region", "novel": [], "observation": "The buffering and elastic scaling fit the seasonal peak, and batching is a cost-conscious choice. The configured limits do not prove two-hour completion, and no provider price or annual workload mix proves the average cost target. Both numeric outcomes remain unverified.", "own_tradeoff": "This provides EU-oriented data handling, elastic throughput, and batching efficiency, but batching can add latency while groups fill, and large autoscaling ranges plus Kafka and Kubernetes introduce operational complexity and potentially high peak resource costs.", "parent": 1, "point": {"z:1": "z:1.1", "z:3": "z:3.1", "z:4": "z:4.1", "z:6": "z:6.1"}, "point_id": "P2", "reuses": null, "round": null, "step": 2, "tradeoffs": [{"causes": ["z:3.1", "z:6.1"], "costs": ["Q3"], "gains": ["Q1"], "note": "More workers support peak throughput but can raise compute expense; batching reduces request overhead, yet the cost target remains at risk without price and workload measurements."}], "verdict": "partial", "why": "Q1 and Q3 explain event buffering, elastic worker scaling, and batching; C1 and C2 constrain where documents go and which provider is used."}, {"alternative": null, "approach": null, "assessment": {"C1": "meets", "C2": "meets", "Q1": "partly", "Q3": "partly", "R1": "meets"}, "attested_by": [], "changed": ["z:3"], "description": "1. Kafka upload events trigger a fixed number of workers to retrieve documents from EU object storage. Each worker groups 20 small documents into an inference batch and sends them to the approved LLM provider’s EU region. 2. **", "diff": [{"after": "z:3.2", "before": "z:3.1", "dimension": "z:3"}], "drivers": ["R1", "Q1", "Q3", "C1", "C2"], "move": "contrast", "novel": ["z:3"], "observation": "The fixed pool loses elasticity and makes the two-hour peak target less supported, while it could restrain peak compute expense. With no worker benchmark or workload distribution, this contrast does not establish that the chosen autoscaling range is strictly required; its degree is unproven.", "own_tradeoff": "** This provides EU-localized processing, predictable worker capacity, and batching efficiency, but gives up elastic scaling and may leave capacity underused or create delays when batches are not full. It also assumes documents fit the “small” batching profile.", "parent": 2, "point": {"z:1": "z:1.1", "z:3": "z:3.2", "z:4": "z:4.1", "z:6": "z:6.1"}, "point_id": "P3", "reuses": null, "round": null, "step": 3, "tradeoffs": [{"causes": ["z:3.2"], "costs": ["Q1"], "gains": ["Q3"], "note": "A fixed pool can make capacity and spending more predictable, but gives up adding workers as backlog rises during storm season."}], "verdict": "partial", "why": "Changing only autoscaling to a fixed worker count may weaken Q1; this tests whether the requirement forces backlog-based scaling."}, {"alternative": null, "approach": null, "assessment": {"Q4": "meets", "R2": "meets"}, "attested_by": [], "changed": ["z:1", "z:10", "z:11", "z:12", "z:13", "z:14", "z:2", "z:3", "z:4", "z:5", "z:6", "z:7", "z:9"], "description": "A classification pipeline publishes processed document results to a second Kafka topic. Each team consumes that topic using its own consumer group, allowing teams to receive the results independently while sharing work among their own consumers.", "diff": [{"after": null, "before": "z:1.1", "dimension": "z:1"}, {"after": null, "before": "z:2.1", "dimension": "z:2"}, {"after": null, "before": "z:3.1", "dimension": "z:3"}, {"after": null, "before": "z:4.1", "dimension": "z:4"}, {"after": null, "before": "z:5.1", "dimension": "z:5"}, {"after": null, "before": "z:6.1", "dimension": "z:6"}, {"after": null, "before": "z:7.1", "dimension": "z:7"}, {"after": null, "before": "z:9.1", "dimension": "z:9"}, {"after": null, "before": "z:10.1", "dimension": "z:10"}, {"after": null, "before": "z:11.1", "dimension": "z:11"}, {"after": null, "before": "z:12.1", "dimension": "z:12"}, {"after": null, "before": "z:13.1", "dimension": "z:13"}, {"after": null, "before": "z:14.1", "dimension": "z:14"}], "drivers": ["R2", "Q4"], "move": "region", "novel": [], "observation": "Separate consumer groups let each team change its own consumer and proceed at its own pace without changing the classifier or other teams. The requirements call for isolation; Kafka is one supported way to provide it, so this specific technology is a free implementation choice.", "own_tradeoff": "This provides team-level isolation, independent consumption rates, and replay through Kafka offsets. It adds topic and consumer-group management overhead, and each team must maintain its own consumer and handle the resulting operational and storage costs.", "parent": 1, "point": {"z:8": "z:8.1"}, "point_id": "P4", "reuses": null, "round": null, "step": 4, "tradeoffs": [], "verdict": "grounded", "why": "Q4 and R2 explain publishing results once and letting each team consume independently."}, {"alternative": null, "approach": null, "assessment": {"R1": "meets", "R3": "meets"}, "attested_by": [], "changed": ["z:1", "z:13", "z:14", "z:2", "z:3", "z:4", "z:5", "z:6", "z:7", "z:8", "z:9"], "description": "Documents with confidence below 0.7 enter a labelling queue, and their corrected versions can become prompt examples. Each month, the examples are replaced, and the updated prompt is deployed only after checking it against 2,000 reviewed documents.", "diff": [{"after": null, "before": "z:1.1", "dimension": "z:1"}, {"after": null, "before": "z:2.1", "dimension": "z:2"}, {"after": null, "before": "z:3.1", "dimension": "z:3"}, {"after": null, "before": "z:4.1", "dimension": "z:4"}, {"after": null, "before": "z:5.1", "dimension": "z:5"}, {"after": null, "before": "z:6.1", "dimension": "z:6"}, {"after": null, "before": "z:7.1", "dimension": "z:7"}, {"after": null, "before": "z:8.1", "dimension": "z:8"}, {"after": null, "before": "z:9.1", "dimension": "z:9"}, {"after": null, "before": "z:13.1", "dimension": "z:13"}, {"after": null, "before": "z:14.1", "dimension": "z:14"}], "drivers": ["R1", "R3"], "move": "region", "novel": [], "observation": "This closes the correction loop by reusing reviewed examples, and the 2,000-document check provides a release gate. The requirement forces human review and use of corrections, but it does not specify the 0.7 threshold, monthly cadence, example replacement, or validation sample size; those choices are free in the available evidence.", "own_tradeoff": "This provides targeted human correction and a substantial quality gate, but low-confidence cases require labelling and improvements may be delayed by the monthly replacement and validation cycle.", "parent": 1, "point": {"z:10": "z:10.1", "z:11": "z:11.1", "z:12": "z:12.1"}, "point_id": "P5", "reuses": null, "round": null, "step": 5, "tradeoffs": [], "verdict": "grounded", "why": "R3 explains routing uncertain cases to staff and using corrections to improve the prompt; validation protects the update process."}, {"alternative": null, "approach": null, "assessment": {"Q2": "partly"}, "attested_by": [], "changed": ["z:1", "z:10", "z:11", "z:12", "z:2", "z:3", "z:4", "z:5", "z:6", "z:7", "z:8", "z:9"], "description": "The system displays each claim’s review share and mean confidence, triggering an alert when the relevant measure doubles. Separately, it audits a random sample of 300 classifications every week to estimate classification quality.", "diff": [{"after": null, "before": "z:1.1", "dimension": "z:1"}, {"after": null, "before": "z:2.1", "dimension": "z:2"}, {"after": null, "before": "z:3.1", "dimension": "z:3"}, {"after": null, "before": "z:4.1", "dimension": "z:4"}, {"after": null, "before": "z:5.1", "dimension": "z:5"}, {"after": null, "before": "z:6.1", "dimension": "z:6"}, {"after": null, "before": "z:7.1", "dimension": "z:7"}, {"after": null, "before": "z:8.1", "dimension": "z:8"}, {"after": null, "before": "z:9.1", "dimension": "z:9"}, {"after": null, "before": "z:10.1", "dimension": "z:10"}, {"after": null, "before": "z:11.1", "dimension": "z:11"}, {"after": null, "before": "z:12.1", "dimension": "z:12"}], "drivers": ["Q2"], "move": "region", "novel": [], "observation": "Per-type signals can reveal changes associated with a layout shift, and the weekly sample can expose errors that confidence misses. The alert uses a week-over-week doubling rule, but no timing is stated for metric refresh or notification, so seeing a drop within one day is not established. No threshold or accuracy target is given for the sample; that outcome is unproven rather than a requirement cost.", "own_tradeoff": "This combines continuous visibility and rapid anomaly detection with a recurring, broader quality check. It adds dashboard and review overhead, while the sample may miss rare errors and mean confidence can diverge from actual correctness.", "parent": 1, "point": {"z:13": "z:13.1", "z:14": "z:14.1"}, "point_id": "P6", "reuses": null, "round": null, "step": 6, "tradeoffs": [], "verdict": "partial", "why": "Q2 explains measuring quality signals per claim type and alerting on change; sampling gives a check beyond confidence scores."}, {"alternative": null, "approach": null, "assessment": {"C1": "meets", "C2": "meets"}, "attested_by": [], "changed": ["z:10", "z:11", "z:12", "z:13", "z:14", "z:2", "z:3", "z:5", "z:6", "z:7", "z:8", "z:9"], "description": "Documents are uploaded to EU object storage, which publishes upload events to Kafka. A classifier consumes those events, retrieves the documents, and submits them to the approved LLM deployment in its EU region for classification.", "diff": [{"after": null, "before": "z:2.1", "dimension": "z:2"}, {"after": null, "before": "z:3.1", "dimension": "z:3"}, {"after": null, "before": "z:5.1", "dimension": "z:5"}, {"after": null, "before": "z:6.1", "dimension": "z:6"}, {"after": null, "before": "z:7.1", "dimension": "z:7"}, {"after": null, "before": "z:8.1", "dimension": "z:8"}, {"after": null, "before": "z:9.1", "dimension": "z:9"}, {"after": null, "before": "z:10.1", "dimension": "z:10"}, {"after": null, "before": "z:11.1", "dimension": "z:11"}, {"after": null, "before": "z:12.1", "dimension": "z:12"}, {"after": null, "before": "z:13.1", "dimension": "z:13"}, {"after": null, "before": "z:14.1", "dimension": "z:14"}], "drivers": ["C1", "C2"], "move": "region", "novel": [], "observation": "The input bucket and inference endpoint are explicitly in the EU, matching both constraints. The EU locations and provider are forced by the problem; the storage and event technology is not.", "own_tradeoff": "This supports decoupled, scalable ingestion and EU-region processing. It adds Kafka and storage integration and operational complexity, while limiting model choice to the approved provider and its EU-region offering.", "parent": 1, "point": {"z:1": "z:1.1", "z:4": "z:4.1"}, "point_id": "P7", "reuses": null, "round": null, "step": 7, "tradeoffs": [], "verdict": "grounded", "why": "C1 requires EU data locality, and C2 requires the approved LLM provider in its EU region."}, {"alternative": null, "approach": null, "assessment": {"Q2": "partly", "R1": "meets", "R3": "meets"}, "attested_by": [], "changed": ["z:1", "z:2", "z:3", "z:4", "z:5", "z:6", "z:7", "z:8", "z:9"], "description": "The system sends classifications below 0.7 to a labelling queue, uses corrected documents to replace prompt examples monthly, and validates each revision against 2,000 reviewed documents before deployment. A dashboard tracks per-claim review share and mean confidence, triggers an alert when these double, and complements a weekly random audit of 300 classifications.", "diff": [{"after": null, "before": "z:1.1", "dimension": "z:1"}, {"after": null, "before": "z:2.1", "dimension": "z:2"}, {"after": null, "before": "z:3.1", "dimension": "z:3"}, {"after": null, "before": "z:4.1", "dimension": "z:4"}, {"after": null, "before": "z:5.1", "dimension": "z:5"}, {"after": null, "before": "z:6.1", "dimension": "z:6"}, {"after": null, "before": "z:7.1", "dimension": "z:7"}, {"after": null, "before": "z:8.1", "dimension": "z:8"}, {"after": null, "before": "z:9.1", "dimension": "z:9"}], "drivers": ["R1", "R3", "Q2"], "move": "region", "novel": [], "observation": "Human corrections feed prompt updates and per-type signals can expose localized changes. The one-day visibility target remains unproven because refresh and notification timing are unspecified; weekly sampling alone can be too slow.", "own_tradeoff": "This combines targeted human review, controlled prompt updates, and ongoing oversight, but high-confidence errors may escape review, monthly updates can lag, and the validation and weekly audit require substantial effort.", "parent": 1, "point": {"z:10": "z:10.1", "z:11": "z:11.1", "z:12": "z:12.1", "z:13": "z:13.1", "z:14": "z:14.1"}, "point_id": "P8", "reuses": null, "round": null, "step": 8, "tradeoffs": [{"causes": ["z:14.1"], "costs": ["Q2"], "gains": ["R3"], "note": "The review and correction loop supports learning, while relying on a weekly sample can delay discovery of a quality drop within a day."}], "verdict": "partial", "why": "R3 and Q2 explain the combined feedback and monitoring practices: corrected uncertain cases improve future prompts, while per-type signals and review help reveal degradation."}], "trajectory_dimensions": ["z:1", "z:2", "z:3", "z:4", "z:5", "z:6", "z:7", "z:8", "z:9", "z:10", "z:11", "z:12", "z:13", "z:14"], "unaddressed": [], "uncovered": [], "values": {"z:1.1": {"description": "", "dimension": "z:1", "href": null, "id": "z:1.1", "label": "EU object storage with Kafka upload events", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 2, 3, 7]}, "z:10.1": {"description": "", "dimension": "z:10", "href": null, "id": "z:10.1", "label": "confidence below 0.7 enters labelling queue", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 5, 8]}, "z:11.1": {"description": "", "dimension": "z:11", "href": null, "id": "z:11.1", "label": "monthly replacement of examples with corrected documents", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 5, 8]}, "z:12.1": {"description": "", "dimension": "z:12", "href": null, "id": "z:12.1", "label": "check against 2,000 reviewed documents before switch", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 5, 8]}, "z:13.1": {"description": "", "dimension": "z:13", "href": null, "id": "z:13.1", "label": "per-claim review share and mean confidence dashboard with doubling alert", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 6, 8]}, "z:14.1": {"description": "", "dimension": "z:14", "href": null, "id": "z:14.1", "label": "weekly random sample of 300 classifications", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 6, 8]}, "z:2.1": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.1", "label": "OCR, content-hash deduplication, and adjacent extracted text", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1]}, "z:3.1": {"description": "", "dimension": "z:3", "href": null, "id": "z:3.1", "label": "Kubernetes workers autoscaled from 4 to 120 by Kafka backlog", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 2]}, "z:3.2": {"description": "", "dimension": "z:3", "href": null, "id": "z:3.2", "label": "fixed worker count", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [3]}, "z:4.1": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.1", "label": "approved provider in its EU region", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 2, 3, 7]}, "z:5.1": {"description": "", "dimension": "z:5", "href": null, "id": "z:5.1", "label": "60 claim definitions and ten labelled examples", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1]}, "z:6.1": {"description": "", "dimension": "z:6", "href": null, "id": "z:6.1", "label": "batches of 20 small documents", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 2, 3]}, "z:7.1": {"description": "", "dimension": "z:7", "href": null, "id": "z:7.1", "label": "prompt version and model name stored with each result", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1]}, "z:8.1": {"description": "", "dimension": "z:8", "href": null, "id": "z:8.1", "label": "second Kafka topic with one consumer group per team", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 4]}, "z:9.1": {"description": "", "dimension": "z:9", "href": null, "id": "z:9.1", "label": "hourly warehouse load", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1]}}, "wiki": false, "with_space": true}</script>
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById("theme-toggle");
+    function current() {
+      return root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    }
+    function label() { btn.textContent = current() === "dark" ? "☀" : "☾"; }
+    btn.addEventListener("click", function () {
+      var next = current() === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      try { localStorage.setItem("ddspace-wiki-theme", next); } catch (e) {}
+      label();
+      document.dispatchEvent(new CustomEvent("themechange"));
+    });
+    label();
+  })();
+</script>
+<script src="../assets/d3.min.js"></script>
+<script src="../assets/graph-layout.js"></script>
+<script>
+(function () {
+  const data = JSON.parse(document.getElementById("explainer-data").textContent);
+  const COLOR = {};
+  function readColors() {
+    const cs = getComputedStyle(document.documentElement), get = (name) => cs.getPropertyValue(name).trim();
+    ["dimension", "source", "accepted", "mixed", "rejected", "outcome", "muted", "fg", "accent", "novel"]
+      .forEach((k) => { COLOR[k] = get("--" + k); });
+  }
+  readColors();
+  const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const alts = data.alternatives;
+  const altName = (a) => a.id + " · " + a.name;
+
+  // The subgraph, as a tree from the centre: the domain, the involved dimensions, their values, then the design
+  // points the agent evaluated (one per step), then the requirements on the outer ring, linked to the points
+  // whose assessment judges them.
+  const steps = data.trajectory || [];
+  const pointValues = new Set();  // explored: every value a design point of the page takes (a step's or a choice's)
+  steps.forEach((s) => Object.values(s.point).forEach((v) => pointValues.add(v)));
+  alts.forEach((a) => a.choices.forEach((c) => c.value && pointValues.add(c.value)));
+  const consideredValues = new Set();
+  alts.forEach((a) => a.considered.forEach((c) => c.value && consideredValues.add(c.value)));
+  const options = new Map();  // "ADR:option" -> option, from every ADR
+  (data.adrs || []).forEach((r) => r.options.forEach((o) => {
+    options.set(o.key, o); Object.values(o.point).forEach((v) => consideredValues.add(v)); }));
+  const exploredDims = new Set([...pointValues].map((v) => (data.values[v] || {}).dimension).filter(Boolean));
+  const nodes = [{ id: "domain", kind: "domain", label: data.space ? (data.space.domain || "") : data.title }];
+  const edges = [];
+  Object.values(data.dimensions).forEach((dm) => {
+    nodes.push({ ...dm, kind: "dimension" });
+    edges.push({ source: "domain", target: dm.id, type: "domain" });
+    dm.values.forEach((vid) => edges.push({ source: dm.id, target: vid, type: "has_value" }));
+  });
+  Object.values(data.values).forEach((v) => nodes.push({ ...v, kind: "value" }));
+  const pid = (n) => "p:" + n;
+  steps.forEach((s) => {
+    nodes.push({ id: pid(s.step), kind: "point", step: s.step, verdict: s.verdict, values: Object.values(s.point),
+      label: (s.alternative ? s.alternative + " · " : "") + "#" + s.step, description: s.description });
+    Object.values(s.point).forEach((v) => edges.push({ source: v, target: pid(s.step), type: "member" }));
+    Object.entries(s.assessment || {}).forEach(([r, judged]) =>
+      edges.push({ source: pid(s.step), target: "r:" + r, type: "assess", judged }));
+  });
+  data.relations.forEach((r) => edges.push({ source: r.source, target: r.target, type: "relation", relation: r.type,
+    directed: r.directed, reading: r.reading }));
+  data.requirements.forEach((r) => nodes.push({ ...r, id: "r:" + r.id, req: r.id, kind: "requirement", label: r.id }));
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const links = edges.filter((e) => byId.has(e.source) && byId.has(e.target));
+  const TREE = new Set(["domain", "has_value", "member"]);
+
+  const SYMBOL = { domain: d3.symbolCircle, dimension: d3.symbolCircle, value: d3.symbolDiamond, point: d3.symbolTriangle,
+    requirement: d3.symbolSquare };
+  const radius = (n) => n.kind === "domain" ? 14 : n.kind === "dimension" ? 10 : n.kind === "value" ? 6 : n.kind === "point" ? 8 : 7;
+  const shapePath = (n) => d3.symbol().type(SYMBOL[n.kind] || d3.symbolCircle)
+    .size(Math.PI * radius(n) * radius(n) * (n.kind === "value" ? 1.25 : 1))();
+  const JUDGED = { strong: "accepted", grounded: "accepted", mixed: "mixed", partial: "mixed", weak: "rejected",
+    ungrounded: "rejected", meets: "accepted", partly: "mixed", misses: "rejected" };
+  const nodeColor = (n) => n.kind === "value" ? (COLOR[n.status] || COLOR.accent) : n.kind === "domain" ? COLOR.fg
+    : n.kind === "requirement" ? COLOR.novel : n.kind === "point" ? (COLOR[JUDGED[n.verdict]] || COLOR.accent) : COLOR.dimension;
+
+  // The shared radial layout (graph-layout.js). Dimension labels point inwards, so each dimension sits just inside
+  // its values; the other rings start beyond the longest label of the ring inside them. Points (in step order,
+  // clockwise from the top) and requirements sit evenly around their rings.
+  const LABEL_MAX = 22;  // short labels keep the rings tight, so the graph (and its text) is drawn larger
+  const shortLabel = (s) => { s = String(s ?? ""); return s.length > LABEL_MAX ? s.slice(0, LABEL_MAX - 1).trimEnd() + "…" : s; };
+  const measure = (() => {
+    const ctx = document.createElement("canvas").getContext("2d");
+    ctx.font = "15px " + getComputedStyle(document.body).fontFamily;
+    return (s) => ctx ? ctx.measureText(s).width : s.length * 6.5;
+  })();
+  const labelReach = (ns) => d3.max(ns, (n) => radius(n) + 4 + measure(shortLabel(n.label)) + 3) || 0;
+  const radialTargets = (nodes, links, cx, cy) => DelveLayout.radialTargets(nodes, links, cx, cy, {
+    rings: ["domain", "dimension", "value", "point", "requirement"],
+    spacing: { dimension: 90, value: 30, point: 34, requirement: 40 }, ringGap: 70,
+    labelReach, restJitter: 0.04, inward: ["dimension"], inset: { dimension: 36 }, even: ["point", "requirement"] });
+
+  const svg = d3.select("#svg"), g = svg.append("g");
+  svg.append("defs").append("marker").attr("id", "arrow").attr("viewBox", "0 -5 10 10").attr("refX", 20).attr("refY", 0)
+    .attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto")
+    .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", COLOR.dimension);
+  const zoom = d3.zoom().scaleExtent([0.2, 6]).on("zoom", (ev) => g.attr("transform", ev.transform));
+  svg.call(zoom);
+  const linkLayer = g.append("g"), nodeLayer = g.append("g");
+  const REL_DASH = { requires: null, affects: "7,3", constrains: "2,3", co_occurs_with: "1,5", refines: "9,3,2,3" };
+  function edgeStyle(e) {
+    if (e.type === "relation") return { stroke: COLOR.dimension, width: 2, dash: REL_DASH[e.relation] || null, op: 0.85, arrow: e.directed !== false };
+    if (e.type === "assess") return { stroke: COLOR[JUDGED[e.judged]] || COLOR.muted, width: 1.2, dash: e.judged === "misses" ? "4,3" : null, op: 0.22 };
+    if (e.type === "member") return { stroke: COLOR.muted, width: 1, dash: null, op: 0.12 };
+    if (e.type === "domain") return { stroke: COLOR.muted, width: 0.8, dash: null, op: 0.3 };
+    return { stroke: COLOR.muted, width: 1, dash: null, op: 0.5 };
+  }
+  const width = () => document.getElementById("canvas").clientWidth;
+  const height = () => document.getElementById("canvas").clientHeight;
+  const cx = 0, cy = 0;  // the layout's own frame; fit() maps it onto the canvas
+  const pos = (id) => byId.get(id);
+  const linkSel = linkLayer.selectAll("line").data(links).enter().append("line")
+    .attr("class", (d) => "link" + (TREE.has(d.type) ? " tree" : ""));
+  function styleLinks() {
+    linkSel.each(function (d) { const st = edgeStyle(d); d3.select(this).attr("stroke", st.stroke).attr("stroke-width", st.width)
+      .attr("stroke-dasharray", st.dash).attr("stroke-opacity", st.op).attr("marker-end", st.arrow ? "url(#arrow)" : null); });
+  }
+  styleLinks();
+  linkSel.filter((d) => d.reading).append("title").text((d) => d.reading);
+  linkSel.filter((d) => d.type === "assess").append("title").text((d) => byId.get(d.source).label + " " + d.judged + " " + d.target.slice(2));
+  const nodeSel = nodeLayer.selectAll("g.node").data(nodes).enter().append("g").attr("class", "node")
+    .style("cursor", "pointer").on("click", (ev, d) => { ev.stopPropagation(); select(d.id); });
+  nodeSel.append("circle").attr("r", (d) => Math.max(radius(d), 10)).attr("fill", "transparent");
+  nodeSel.append("path").attr("class", "shape").attr("d", shapePath);
+  nodeSel.append("text").text((d) => d.kind === "domain" ? d.label : shortLabel(d.label));
+  // A selected path shows its nodes' full labels (the rest of the graph is faded); otherwise labels are short.
+  function labels(keep) {
+    nodeSel.select("text").text((d) => d.kind === "domain" || (keep && keep.has(d.id)) ? d.label : shortLabel(d.label));
+  }
+  nodeSel.append("title").text((d) => d.kind === "requirement" ? d.req + ": " + d.text
+    : d.kind === "point" ? "Step " + d.step + " · " + d.verdict + (d.description ? ": " + d.description : "")
+    : d.label + (d.status ? " (" + d.status + ")" : ""));
+  const orientLabels = () => DelveLayout.orientLabels(nodeSel.select("text"), cx, cy, { radius, centreDy: "-1.4em",
+    inward: (d) => d.kind === "dimension" });
+  function fit() {
+    const shown = nodes.filter(visible);
+    const xs = shown.map((d) => d.x), ys = shown.map((d) => d.y), pad = 70;
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const k = Math.min(2.5, 0.95 / Math.max((x1 - x0 + 2 * pad) / (width() || 1), (y1 - y0 + 2 * pad) / (height() || 1)));
+    svg.call(zoom.transform, d3.zoomIdentity.translate(width() / 2, height() / 2).scale(k).translate(-(x0 + x1) / 2, -(y0 + y1) / 2));
+  }
+  // Shown: every node but the values no design point takes and no alternative considered, unless the reader asks
+  // for every value the space offers. The layout is computed over the shown nodes only.
+  let showAll = false;
+  const visible = (d) => d.kind !== "value" || showAll || pointValues.has(d.id) || consideredValues.has(d.id);
+  function layout() {
+    const shown = nodes.filter(visible), ids = new Set(shown.map((n) => n.id));
+    const target = radialTargets(shown, links.filter((l) => ids.has(l.source) && ids.has(l.target)), cx, cy);
+    shown.forEach((n) => { const t = target.get(n.id); n.x = t.x; n.y = t.y; });
+    nodeSel.style("display", (d) => ids.has(d.id) ? null : "none").attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
+    linkSel.style("display", (d) => ids.has(d.source) && ids.has(d.target) ? null : "none")
+      .attr("x1", (d) => pos(d.source).x).attr("y1", (d) => pos(d.source).y)
+      .attr("x2", (d) => pos(d.target).x).attr("y2", (d) => pos(d.target).y);
+    orientLabels();
+    fit();
+  }
+  layout();
+  document.querySelectorAll("[data-zoom]").forEach((b) => b.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (b.dataset.zoom === "fit") fit(); else svg.transition().duration(200).call(zoom.scaleBy, b.dataset.zoom === "in" ? 1.4 : 1 / 1.4);
+  }));
+  // A requirement no design point is judged against: drawn hollow, with a dashed outline.
+  const judgedReqs = new Set(links.filter((e) => e.type === "assess").map((e) => e.target));
+  nodeSel.classed("unjudged", (d) => d.kind === "requirement" && !judgedReqs.has(d.id));
+  nodeSel.filter((d) => d.kind === "requirement" && !judgedReqs.has(d.id)).select("title")
+    .text((d) => d.req + ": " + d.text + " (no design point is judged against it)");
+  const toggle = document.getElementById("show-all");
+  if (toggle) toggle.addEventListener("change", () => { showAll = toggle.checked; layout(); });
+
+  // The active view: the trajectory (every step's point, or the selected step's), one alternative, or the compare
+  // view (every alternative). Explored dimensions and values stay coloured in every view; the point shown is outlined.
+  let view = "adrs", selected = null, selectedStep = null, selectedAlt = null, selectedOption = null;
+  const explored = (d) => d.kind === "value" ? pointValues.has(d.id) : d.kind === "dimension" ? exploredDims.has(d.id) : true;
+  linkSel.classed("explored", (d) => (d.type === "has_value" && pointValues.has(d.target))
+    || (d.type === "domain" && exploredDims.has(d.target)));
+  const stepOf = (n) => steps.find((s) => s.step === n);
+  function shownPoint() {
+    const lit = new Set();
+    const add = (s) => { if (!s) return; lit.add(pid(s.step)); Object.values(s.point).forEach((v) => lit.add(v)); };
+    if (view === "trajectory") { if (selectedStep !== null) add(stepOf(selectedStep)); return lit; }
+    if (view === "adrs" && selectedOption) {
+      const o = options.get(selectedOption); Object.values(o.point).forEach((v) => lit.add(v)); if (o.step) lit.add(pid(o.step));
+      return lit;
+    }
+    alts.filter((a) => view === "compare" || (view === "adrs" && a.id === selectedAlt)).forEach((a) => {
+      add(stepOf(a.step)); a.choices.forEach((c) => c.value && lit.add(c.value)); });
+    return lit;
+  }
+  function applyView() {
+    const lit = shownPoint();
+    nodeSel.classed("greyed", (d) => !explored(d)).classed("in-point", (d) => lit.has(d.id))
+      .select("path.shape").attr("fill", (d) => explored(d) ? nodeColor(d) : COLOR.muted)
+      .attr("stroke", (d) => d.id === selected || lit.has(d.id) ? COLOR.fg : d.kind === "dimension" ? "#fff" : "none")
+      .attr("stroke-width", (d) => d.id === selected ? 3 : lit.has(d.id) ? 2.2 : 1.5)
+      .attr("transform", (d) => lit.has(d.id) ? "scale(1.45)" : null);
+    // The point shown: its links to its values and to the requirements stand out.
+    linkSel.classed("shown", (d) => (d.type === "member" && lit.has(d.target)) || (d.type === "assess" && lit.has(d.source)));
+    document.querySelectorAll("[data-step]").forEach((el) =>
+      el.classList.toggle("sel", view === "trajectory" && selectedStep !== null && Number(el.dataset.step) === selectedStep));
+    document.querySelectorAll(".solution").forEach((el) => el.classList.toggle("sel", el.dataset.alt === selectedAlt));
+    document.querySelectorAll(".option").forEach((el) => el.classList.toggle("sel", el.dataset.option === selectedOption));
+  }
+  // A selected node's lineage in the tree (domain -> dimension -> value -> design point -> requirement): its
+  // ancestors up to the centre, and the paths down from it through design points to the requirements they are
+  // judged against. A requirement lights the points judged against it and their ancestors.
+  function lineage(id) {
+    const keep = new Set([id, "domain"]);
+    const up = (vid) => { keep.add(vid); const v = data.values[vid]; if (v) keep.add(v.dimension); };
+    const pointUp = (p) => { keep.add(p); (byId.get(p).values || []).forEach(up); };
+    const pointsWith = (vid) => links.filter((e) => e.type === "member" && e.source === vid).forEach((e) => keep.add(e.target));
+    const n = byId.get(id);
+    if (!n) return keep;
+    if (n.kind === "domain") { pointValues.forEach(up); steps.forEach((s) => keep.add(pid(s.step))); }
+    else if (n.kind === "dimension") (data.dimensions[id].values || []).filter((v) => pointValues.has(v))
+      .forEach((v) => { up(v); pointsWith(v); });
+    else if (n.kind === "value") { up(id); pointsWith(id); }
+    else if (n.kind === "point") pointUp(id);
+    else if (n.kind === "requirement") links.filter((e) => e.type === "assess" && e.target === id).forEach((e) => pointUp(e.source));
+    if (n.kind !== "requirement")  // down to the requirements the kept points are judged against
+      links.filter((e) => e.type === "assess" && keep.has(e.source)).forEach((e) => keep.add(e.target));
+    return keep;
+  }
+  function highlight(id) {
+    const keep = lineage(id);
+    labels(keep);
+    nodeSel.classed("dim-out", (d) => !keep.has(d.id));
+    linkSel.classed("dim-out", (d) => !(keep.has(d.source) && keep.has(d.target)))
+      .classed("on-path", (d) => d.type !== "relation" && keep.has(d.source) && keep.has(d.target));
+  }
+  const HINT = '<p class="hint">Select anything in the graph or the text (a dimension, a value, a design point, a requirement, an alternative or an option) to see what it is and the part it plays in this rationale.</p>';
+  function clearSelection() {
+    selected = null; selectedStep = null; selectedAlt = null; selectedOption = null;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    document.querySelectorAll(".chip.sel").forEach((c) => c.classList.remove("sel"));
+    document.getElementById("info").innerHTML = HINT;
+    applyView();
+  }
+  // The details panel: every kind of element reads the same way: what it is (kind, name, one sentence), then
+  // sections named as on the page (in the decisions, in the alternatives, in the trajectory, requirements, sources).
+  const EXPLAIN = data.mode === "explain";
+  const link = (n) => n.href ? '<p class="info-link"><a class="open-page" href="' + esc(n.href) + '">Open its page in the wiki →</a></p>' : "";
+  const vlabel = (vid) => { const v = data.values[vid]; return v ? '<span data-id="' + esc(v.id) + '" class="vref">' + esc(v.label) + "</span>" : "—"; };
+  const dlabel = (did) => { const x = data.dimensions[did]; return x ? '<span data-id="' + esc(x.id) + '" class="dref">' + esc(x.label) + "</span>" : "—"; };
+  const rlabel = (rid) => '<span data-id="r:' + esc(rid) + '" class="vref">' + esc(rid) + "</span>";
+  const pair = (did, vid) => dlabel(did) + " → " + vlabel(vid);
+  const head = (kind, title, sub) => '<div class="kind">' + kind + "</div><h2>" + title + "</h2>" + (sub ? '<p class="info-sub">' + sub + "</p>" : "");
+  const sec = (title, body) => body ? '<h3 class="info-h">' + esc(title) + "</h3>" + body : "";
+  const list = (items) => items.length ? "<ul>" + items.map((i) => "<li>" + i + "</li>").join("") + "</ul>" : "";
+  const para = (text) => text ? "<p>" + text + "</p>" : "";
+  // A step's trade-off against the requirements, and the one the point's description names.
+  const tradeoffLine = (t) => (t.causes && t.causes.length ? t.causes.map(vlabel).join(", ") + ": " : "") + '<span class="t-gain">gains</span> ' + t.gains.map(rlabel).join(", ")
+    + ' <span class="t-cost">gives up</span> ' + t.costs.map(rlabel).join(", ") + (t.note ? '<br><span class="muted">' + esc(t.note) + "</span>" : "");
+  const tradeoffSecs = (s) => sec("Trade-offs against the requirements", list((s.tradeoffs || []).map(tradeoffLine)))
+    + sec("The point's own trade-off", para(esc(s.own_tradeoff || "")));
+  const judgedChip = (rid, j) => '<span class="j j-' + esc(j) + '" data-id="r:' + esc(rid) + '">' + esc(rid) + " " + esc(j) + "</span>";
+  const judgedWord = (j) => '<span class="j j-' + esc(j) + '">' + esc(j) + "</span>";  // inside a requirement's own panel
+  const chips = (assessment) => { const e = Object.entries(assessment || {}); return e.length ? '<div class="judged">' + e.map(([r, j]) => judgedChip(r, j)).join("") + "</div>" : ""; };
+  const stepChip = (s) => '<span class="node-chip vb-' + esc(s.verdict) + '" data-step-ref="' + s.step + '" title="' + esc(s.verdict) + '">#' + s.step + "</span>";
+  const MEANS = {
+    strong: "it meets every constraint and serves every requirement at least partly",
+    mixed: "good on some requirements, but it misses one or carries a conflict",
+    weak: "it breaks a constraint or misses a key requirement",
+    grounded: "the requirements call for these values and what is known supports them",
+    partial: "only part of that holds: the requirements or what is known support it, not both",
+    ungrounded: "neither the requirements nor what is known support it" };
+  const STATUS = { accepted: "The sources accept this value.", mixed: "The sources are divided on this value.",
+    rejected: "The sources reject this value.", outcome: "The sources report this as an outcome." };
+  const STANCE = { accepts: "accepts it", rejects: "rejects it", supports: "supports it", both: "both accepts and rejects it" };
+  function phrase(s) {
+    const p = s.parent ? "#" + s.parent : "";
+    return { seed: "Seed of approach " + s.approach, exploit: "Refined " + p + (s.approach ? " (approach " + s.approach + ")" : ""),
+      explore: "New approach " + s.approach + (s.parent ? ", started from " + p : ""), ablate: "Ablation of " + p + ": which value made it work?",
+      solution: "The solution as one design point", region: "A region of " + p + ": part of the solution",
+      contrast: "A contrast on " + p + ": one option changed" }[s.move] || s.move;
+  }
+  function moveItems(s) {
+    if (["seed", "solution", "region"].includes(s.move) || !s.parent || !(s.diff || []).length)
+      return Object.entries(s.point).map(([d, v]) => pair(d, v));
+    return s.diff.map((c) => c.before == null ? "add " + pair(c.dimension, c.after)
+      : c.after == null ? "drop " + dlabel(c.dimension) + ' <span class="muted">(was ' + vlabel(c.before) + ")</span>"
+      : "change " + dlabel(c.dimension) + ": " + vlabel(c.before) + " → " + vlabel(c.after));
+  }
+  const adrOptions = [];  // [{r, o}] over every ADR option
+  (data.adrs || []).forEach((r) => r.options.forEach((o) => adrOptions.push({ r, o })));
+  const statusBadge = (o) => o.status === "chosen"
+    ? '<span class="badge accepted">chosen' + (EXPLAIN ? "" : " in " + esc(o.in.join(", "))) + "</span>"
+    : '<span class="badge rejected">discarded</span>';
+  const adrRef = (id, title) => '<a href="#adr-' + esc(id) + '" class="adr-link">' + esc(id) + "</a> · " + esc(title);
+  const optLine = ({ r, o }) => adrRef(r.id, r.title) + ": <b>" + esc(o.name) + "</b> " + statusBadge(o);
+  const altsTitle = EXPLAIN ? "In the solution" : "In the alternatives";
+  const ev = (list) => list.map((e) => esc(e.doc) + (e.stance ? " (" + esc(e.stance) + ")" : "")).join(", ");
+  const taking = (vid) => steps.filter((s) => Object.values(s.point).includes(vid));
+
+  function details(n) {
+    if (n.kind === "dimension") {
+      const dm = data.dimensions[n.id];
+      const explored = (dm.values || []).filter((v) => pointValues.has(v));
+      return head("Dimension · a design concern", esc(n.label), esc(n.question || ""))
+        + sec("In the decisions", list(adrOptions.filter(({ o }) => o.point[n.id]).map((x) => optLine(x) + "<br>" + pair(n.id, x.o.point[n.id]))))
+        + sec(altsTitle, list(alts.map((a) => {
+            const c = a.choices.find((x) => x.dimension === n.id), o = a.open.find((x) => x.dimension === n.id);
+            return "<b>" + esc(a.id) + "</b> " + (c ? vlabel(c.value) + (c.reason ? '<br><span class="muted">' + esc(c.reason) + "</span>" : "")
+              : o ? "leaves it open" + (o.reason ? ': <span class="muted">' + esc(o.reason) + "</span>" : "") : '<span class="muted">does not settle it</span>');
+          })))
+        + sec("In the trajectory", explored.length
+            ? para(explored.length + " of the " + dm.values.length + " values " + (data.wiki ? "the space offers" : "the agent named") + " were taken by some design point:")
+              + list(explored.map((v) => vlabel(v) + " " + taking(v).map(stepChip).join("")))
+            : para('<span class="muted">No design point settled this dimension.</span>'))
+        + sec("Relations", list(data.relations.filter((r) => r.source === n.id || r.target === n.id)
+            .map((r) => dlabel(r.source) + " <em>" + esc(r.type) + "</em> " + dlabel(r.target) + ' <span class="muted">(in the space)</span>')
+            .concat(alts.flatMap((a) => a.relations.filter((r) => r.source === n.id || r.target === n.id).map((r) =>
+              (r.source ? dlabel(r.source) : esc(r.source_label)) + " <em>" + esc(r.type) + "</em> " + (r.target ? dlabel(r.target) : esc(r.target_label))
+              + ' <span class="muted">(' + esc(a.id) + (r.holds ? ": holds" : ": does not hold") + (r.note ? ", " + esc(r.note) : "") + ")</span>")))))
+        + link(n);
+    }
+    if (n.kind === "value") {
+      const points = taking(n.id);
+      const roles = [];
+      alts.forEach((a) => {
+        const c = a.choices.find((x) => x.value === n.id), k = a.considered.find((x) => x.value === n.id);
+        if (c) roles.push("<b>Chosen in " + esc(a.id) + "</b>" + (c.drivers.length ? " for " + c.drivers.map(rlabel).join(", ") : "")
+          + (c.reason ? "<br>" + esc(c.reason) : "") + (c.quote ? '<div class="quote">“' + esc(c.quote) + "”</div>" : "")
+          + (c.evidence.length ? '<br><span class="ev">Cited evidence: ' + ev(c.evidence) + "</span>" : ""));
+        else if (k) roles.push("<b>Weighed and set aside in " + esc(a.id) + "</b>" + (k.reason ? "<br>" + esc(k.reason) : ""));
+      });
+      return head("Value · an option for " + dlabel(n.dimension), esc(n.label), esc(n.description || ""))
+        + (n.status && STATUS[n.status] ? para('<span class="badge ' + esc(n.status) + '">' + esc(n.status) + "</span> " + STATUS[n.status]) : "")
+        + sec("In the decisions", list(adrOptions.filter(({ o }) => Object.values(o.point).includes(n.id)).map(optLine)))
+        + sec(altsTitle, list(roles))
+        + sec("In the trajectory", points.length
+            ? para("Taken by " + points.length + " design point" + (points.length > 1 ? "s" : "") + ": " + points.map(stepChip).join("")
+              + "<br>First tried in #" + points[0].step + ": " + esc(phrase(points[0])) + ".")
+            : para('<span class="muted">No design point took it: ' + (data.wiki ? "the space offers it, but the agent did not try it." : "the agent named it as an option, but did not try it.") + "</span>"))
+        + sec("What the sources say", list(n.sources.map((s) => (s.href ? '<a href="' + esc(s.href) + '">' + esc(s.label) + "</a>" : esc(s.label))
+            + (s.stance ? " " + esc(STANCE[s.stance] || s.stance) : "")))
+            + (n.passages.length ? '<p class="ev">Passages: ' + ev(n.passages) + "</p>" : ""))
+        + link(n);
+    }
+    if (n.kind === "requirement") {
+      const rq = data.requirements.find((r) => r.id === n.req) || {};
+      const adrsFor = (data.adrs || []).filter((r) => r.drivers.includes(n.req));
+      const judged = steps.filter((s) => s.assessment && s.assessment[n.req]);
+      const drives = [];
+      alts.forEach((a) => a.choices.filter((c) => c.drivers.includes(n.req)).forEach((c) =>
+        drives.push("<b>" + esc(a.id) + "</b> " + pair(c.dimension, c.value))));
+      return head("Requirement · " + esc(rq.kind || "requirement") + (rq.attribute ? ": " + esc(rq.attribute) : ""), esc(n.req), esc(n.text))
+        + sec("In the decisions", adrsFor.length
+            ? list(adrsFor.map((r) => adrRef(r.id, r.title) + ": "
+                + r.options.filter((o) => o.status === "chosen").map((o) => "<b>" + esc(o.name) + "</b>" + (EXPLAIN ? "" : " (" + esc(o.in.join(", ")) + ")")).join("; ")))
+            : para('<span class="muted">No ADR addresses it.</span>'))
+        + sec(altsTitle, list(alts.map((a) => { const s = stepOf(a.step), j = s && s.assessment ? s.assessment[n.req] : null;
+            return "<b>" + esc(a.id) + "</b> " + (j ? judgedWord(j) : '<span class="muted">not judged</span>'); })))
+        + sec("In the trajectory", judged.length
+            ? para(judged.length + " design point" + (judged.length > 1 ? "s were" : " was") + " judged against it:")
+              + '<div class="judged">' + judged.map((s) => '<span class="pair-chip">' + stepChip(s) + judgedWord(s.assessment[n.req]) + "</span>").join(" ") + "</div>"
+            : para('<span class="muted">No design point was judged against it.</span>'))
+        + sec("Choices that name it as a driver", list(drives));
+    }
+    return head("Design space", esc(n.label || data.title),
+        data.space ? "The centre of the graph. Around it: the dimensions this rationale involves, their values, the design points the agent evaluated and the requirements."
+          : "The problem. Around it: the dimensions the agent named, their values, the design points it evaluated and the requirements.")
+      + sec("At a glance", list([exploredDims.size + " of " + Object.keys(data.dimensions).length + " dimensions settled by some design point",
+          pointValues.size + " values taken by some design point", steps.length + " design points evaluated"
+          + (data.budget && data.budget.max_points ? " (budget " + data.budget.max_points + ")" : ""),
+          alts.length + (EXPLAIN ? " solution explained" : " alternative" + (alts.length > 1 ? "s" : "") + " proposed"),
+          (data.adrs || []).length + " ADRs"]))
+      + link(n);
+  }
+  function select(id) {
+    const n = byId.get(id); if (!n) return;
+    if (n.kind === "point") { selectStep(n.step); return; }
+    selected = id; applyView(); highlight(id);
+    document.querySelectorAll(".chip.sel").forEach((c) => c.classList.remove("sel"));
+    if (n.kind === "requirement") document.querySelectorAll('[data-requirement="' + n.req + '"]').forEach((c) => c.classList.add("sel"));
+    showInfo(details(n));
+  }
+  svg.on("click", () => clearSelection());
+
+  // The trajectory: selecting a step (its column, its entry or its point in the graph) lights its point and its lineage.
+  function stepInfo(s) {
+    const sub = (s.approach ? "Approach " + esc(s.approach) + (s.round ? ", round " + esc(s.round) : "") + ". " : "") + esc(s.description || "");
+    const inAdrs = adrOptions.filter(({ o }) => o.step === s.step);
+    return head("Design point" + (s.point_id ? " · " + esc(s.point_id) : ""), "#" + s.step + " · " + esc(phrase(s)),
+        sub + (s.reuses ? " The same point as #" + s.reuses + ": reused, not evaluated again." : ""))
+      + para('<span class="vd-chip vb-' + esc(s.verdict) + '">' + esc(s.verdict) + "</span> " + esc(MEANS[s.verdict] || "")
+        + (s.alternative ? '<br><span class="alt-chip">' + (EXPLAIN ? "This is the solution." : "It became alternative " + esc(s.alternative) + ".") + "</span>" : ""))
+      + sec("Thought", para(esc(s.why)))
+      + sec("Move", list(moveItems(s)))
+      + sec("Observed", para(esc(s.observation)))
+      + sec("Requirements", chips(s.assessment))
+      + tradeoffSecs(s)
+      + (["seed", "solution", "region"].includes(s.move) ? "" : sec("The whole point", list(Object.entries(s.point).map(([d, v]) => pair(d, v)))))
+      + sec("In the decisions", list(inAdrs.map(optLine)))
+      + (data.wiki ? sec("What the sources say", s.attested_by.length
+          ? para("Attested by " + s.attested_by.map((a) => a.href ? '<a href="' + esc(a.href) + '">' + esc(a.label) + "</a>" : esc(a.label)).join("; ") + ".")
+          : para('<span class="muted">No source attests this combination.</span>')) : "");
+  }
+  function selectStep(n) {
+    const s = stepOf(n); if (!s) return;
+    selected = null; selectedStep = n;
+    if (view !== "trajectory") document.querySelector('.tab[data-tab="trajectory"]')?.click();
+    selectedStep = n; applyView(); highlight(pid(n));
+    showInfo(stepInfo(s));
+  }
+  document.querySelectorAll(".step-h, .region, .node-chip, .heat-h, td.h, .story-step, .opt").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    selectStep(Number(el.dataset.step));
+  }));
+  // The ADRs tab: an alternative or an option lights its point in the graph.
+  function altInfo(a) {
+    const s = stepOf(a.step);
+    return head(EXPLAIN ? "The solution" : "Alternative" + (a.approach ? " · from approach " + esc(a.approach) : ""), esc(altName(a)), esc(a.summary || ""))
+      + sec("Composed of", list((a.parts || []).map((p) => adrRef(p.adr, p.name)
+          + "<br>" + Object.entries(p.point).map(([d, v]) => pair(d, v)).join("<br>"))))
+      + sec("Requirements", s ? chips(s.assessment) : "")
+      + (s ? tradeoffSecs(s) : "")
+      + sec("Left open", list(a.open.map((o) => dlabel(o.dimension) + (o.reason ? ': <span class="muted">' + esc(o.reason) + "</span>" : ""))))
+      + sec("Each choice", list(a.choices.map((c) => pair(c.dimension, c.value) + (c.drivers.length ? " · for " + c.drivers.map(rlabel).join(", ") : "")
+          + (c.reason ? '<br><span class="muted">' + esc(c.reason) + "</span>" : "")
+          + (c.fit === "approximate" ? '<br><span class="badge mixed approx">approximate fit</span> ' + esc(c.fit_note || "") : "") + (c.quote ? '<div class="quote">“' + esc(c.quote) + "”</div>" : "")
+          + (c.evidence.length ? '<br><span class="ev">Cited evidence: ' + ev(c.evidence) + "</span>" : ""))));
+  }
+  function optionInfo(o) {
+    const { r } = adrOptions.find((x) => x.o === o) || {};
+    return head("Option · " + (r ? esc(r.id) + " " + esc(r.title) : "ADR"), esc(o.name), statusBadge(o) + " " + esc(o.reason || ""))
+      + sec("Values", list(Object.entries(o.point).map(([d, v]) => pair(d, v))))
+      + (o.fit === "approximate" ? sec("Approximate fit", para(esc(o.fit_note || "The values only roughly match this option."))) : "")
+      + sec("Pros", list(o.pros.map(esc))) + sec("Cons", list(o.cons.map(esc)))
+      + (o.quotes && o.quotes.length ? sec("In the solution's words", o.quotes.map((q) => '<div class="quote">“' + esc(q) + "”</div>").join("")) : "")
+      + (r ? sec("The decision it answers", para(esc(r.context)) + '<div class="judged">' + r.drivers.map((d) => '<span class="chip-sm">' + rlabel(d) + "</span>").join(" ") + "</div>") : "");
+  }
+  function showInfo(html) {
+    const info = document.getElementById("info"); info.innerHTML = html; info.scrollTop = 0;
+    info.querySelectorAll("[data-id]").forEach((el) => el.addEventListener("click", () => select(el.dataset.id)));
+    info.querySelectorAll("[data-step-ref]").forEach((el) => el.addEventListener("click", () => selectStep(Number(el.dataset.stepRef))));
+    info.querySelectorAll("a.adr-link").forEach((el) => el.addEventListener("click", () => {
+      if (view !== "adrs") document.querySelector('.tab[data-tab="adrs"]')?.click(); }));
+  }
+  document.querySelectorAll(".solution").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    const a = alts.find((x) => x.id === el.dataset.alt); if (!a) return;
+    selected = null; selectedOption = null; selectedAlt = a.id;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    applyView(); showInfo(altInfo(a));
+  }));
+  document.querySelectorAll(".option").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    const o = options.get(el.dataset.option); if (!o) return;
+    selected = null; selectedAlt = null; selectedOption = o.key;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    applyView(); showInfo(optionInfo(o));
+  }));
+  // A gap's approximate fit selects its ADR option (or its alternative) in the ADRs tab.
+  document.querySelectorAll("[data-gap-option], [data-gap-alt]").forEach((el) => {
+    const go = () => {
+      if (view !== "adrs") document.querySelector('.tab[data-tab="adrs"]')?.click();
+      const target = el.dataset.gapOption ? document.querySelector('.option[data-option="' + CSS.escape(el.dataset.gapOption) + '"]')
+        : document.querySelector('.solution[data-alt="' + CSS.escape(el.dataset.gapAlt) + '"]');
+      if (target) { target.click(); target.scrollIntoView({ block: "center", behavior: "smooth" }); }
+    };
+    el.addEventListener("click", (e) => { if (!e.target.closest("a") && !e.target.closest("[data-node]")) go(); });
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+  });
+  // The lanes: an arrow from each point's parent to it (refine along a lane, a new approach across lanes,
+  // an ablation dotted).
+  function overlay(wrapSel, svgSel) {
+    const wrap = document.querySelector(wrapSel), svgEl = wrap && wrap.querySelector(svgSel);
+    if (!wrap || !svgEl || !wrap.offsetParent) return null;
+    svgEl.setAttribute("width", wrap.scrollWidth); svgEl.setAttribute("height", wrap.scrollHeight);
+    const box = wrap.getBoundingClientRect();
+    const at = (el, side) => { const r = el.getBoundingClientRect();
+      return [(side === "left" ? r.left : side === "right" ? r.right : r.left + r.width / 2) - box.left + wrap.scrollLeft,
+        r.top + r.height / 2 - box.top]; };
+    return { svgEl, at };
+  }
+  const MOVE_COLOR = (m) => m === "explore" || m === "contrast" ? COLOR.novel : m === "seed" || m === "solution" ? COLOR.dimension : COLOR.accent;
+  function drawLanes() {
+    const o = overlay(".lanes-wrap", "svg.lane-arrows"); if (!o) return;
+    let html = "";
+    steps.forEach((s) => {
+      if (!s.parent) return;
+      const a = document.querySelector('.node-chip[data-step="' + s.parent + '"]'), b = document.querySelector('.node-chip[data-step="' + s.step + '"]');
+      if (!a || !b) return;
+      const [x0, y0] = o.at(a, "right"), [x1, y1] = o.at(b, "left");
+      const mx = (x0 + x1) / 2, dash = s.move === "ablate" ? "2,3" : s.move === "explore" ? "6,4" : null;
+      html += '<path d="M' + x0 + "," + y0 + " C" + mx + "," + y0 + " " + mx + "," + y1 + " " + x1 + "," + y1 + '" fill="none" stroke="'
+        + MOVE_COLOR(s.move) + '" stroke-width="1.8"' + (dash ? ' stroke-dasharray="' + dash + '"' : "") + ' marker-end="url(#lane-arrow)"></path>';
+    });
+    o.svgEl.innerHTML = '<defs><marker id="lane-arrow" viewBox="0 -5 10 10" refX="9" refY="0" markerWidth="6" markerHeight="6" orient="auto">'
+      + '<path d="M0,-5L10,0L0,5" fill="' + COLOR.muted + '"></path></marker></defs>' + html;
+  }
+  // The questions, options and criteria: a link from each option to each requirement its point was judged against.
+  const JUDGE_STYLE = { meets: [() => COLOR.accepted, null], partly: [() => COLOR.mixed, null], misses: [() => COLOR.rejected, "5,4"] };
+  function drawQoc() {
+    const o = overlay(".qoc-wrap", "svg.qoc-links"); if (!o) return;
+    let html = "";
+    document.querySelectorAll(".opt[data-qoc]").forEach((el) => {
+      const [qi, oi] = el.dataset.qoc.split(":").map(Number), opt = (data.qoc[qi] || { options: [] }).options[oi];
+      if (!opt) return;
+      const [x0, y0] = o.at(el, "right");
+      Object.entries(opt.assessment || {}).forEach(([rid, judged]) => {
+        const c = document.querySelector('.crit[data-crit="' + rid + '"]'); if (!c) return;
+        const [x1, y1] = o.at(c, "left"), st = JUDGE_STYLE[judged] || [() => COLOR.muted, null], mx = (x0 + x1) / 2;
+        html += '<path data-from="' + el.dataset.qoc + '" d="M' + x0 + "," + y0 + " C" + mx + "," + y0 + " " + mx + "," + y1 + " " + x1 + "," + y1
+          + '" fill="none" stroke="' + st[0]() + '" stroke-width="1.5" stroke-opacity="' + (opt.specific ? 0.8 : 0.14) + '"'
+          + (st[1] ? ' stroke-dasharray="' + st[1] + '"' : "") + "></path>";
+      });
+    });
+    o.svgEl.innerHTML = html;
+  }
+  document.querySelectorAll(".opt[data-qoc]").forEach((el) => {
+    const mark = (on) => document.querySelectorAll('svg.qoc-links path[data-from="' + el.dataset.qoc + '"]')
+      .forEach((p) => p.classList.toggle("traced", on));
+    el.addEventListener("mouseenter", () => mark(true)); el.addEventListener("mouseleave", () => mark(false));
+  });
+  function drawTrajectory() { drawLanes(); drawQoc(); drawLineage(); }
+  document.querySelector("details.grid-details")?.addEventListener("toggle", drawLineage);
+  // The lineage: an arc from each step's parent column to its own, above the grid.
+  function drawLineage() {
+    const svgL = document.querySelector("svg.lineage"); if (!svgL) return;
+    const box = svgL.getBoundingClientRect(), table = document.querySelector("table.traj");
+    svgL.style.width = table.scrollWidth + "px";
+    const x = (n) => { const th = document.querySelector('.step-h[data-step="' + n + '"]'); if (!th) return null;
+      const r = th.getBoundingClientRect(); return r.left - box.left + r.width / 2; };
+    const colorOf = (m) => m === "explore" || m === "contrast" ? COLOR.novel : m === "exploit" || m === "region" ? COLOR.accent : COLOR.dimension;
+    let html = "";
+    steps.forEach((s) => {
+      const x1 = x(s.step); if (x1 === null) return;
+      html += '<circle cx="' + x1 + '" cy="40" r="3" fill="' + colorOf(s.move) + '"></circle>';
+      const x0 = s.parent ? x(s.parent) : null; if (x0 === null) return;
+      const h = Math.min(36, 10 + Math.abs(x1 - x0) / 8);
+      html += '<path d="M' + x0 + ",40 C" + x0 + "," + (40 - h) + " " + x1 + "," + (40 - h) + " " + x1 + ',40" fill="none" stroke="'
+        + colorOf(s.move) + '" stroke-width="1.6"></path>';
+    });
+    svgL.innerHTML = html;
+  }
+  document.querySelectorAll("main [data-node]").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a")) return;  // a wiki link opens its page
+    e.preventDefault(); select(el.dataset.node);
+  }));
+
+  // Tabs: switching shows the tab's panel, re-lights the graph and drops the selection fade.
+  document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => {
+    view = t.dataset.tab;
+    document.querySelectorAll(".tab").forEach((x) => x.setAttribute("aria-selected", x === t ? "true" : "false"));
+    document.querySelectorAll(".panel").forEach((p) => { p.hidden = p.dataset.panel !== view; });
+    clearSelection();
+    if (view === "trajectory") drawTrajectory();
+  }));
+  applyView();
+  drawTrajectory();
+  // The dividers: drag (or use the arrow keys on) the vertical one to share the width between the text and the
+  // graph, the horizontal one to share the height between the graph and its details. Double-click resets. The
+  // split is kept in this browser only (a convenience; the page works without storage).
+  (function splitters() {
+    const KEY = "delve-explainer-split", root = document.documentElement, wrap = document.querySelector(".ex-wrap");
+    const side = document.querySelector(".ex-side");
+    const LIMITS = { left: [20, 80], canvas: [20, 85] }, DEFAULT = { left: 50, canvas: 60 };
+    let split = { ...DEFAULT };
+    try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) split = { ...split, ...s }; } catch (e) { /* no storage */ }
+    const clamp = (k, v) => Math.min(LIMITS[k][1], Math.max(LIMITS[k][0], v));
+    let pending = null;
+    function apply(save) {
+      root.style.setProperty("--split-left", clamp("left", split.left) + "%");
+      root.style.setProperty("--split-canvas", clamp("canvas", split.canvas) + "%");
+      if (!pending) pending = requestAnimationFrame(() => { pending = null; fit(); drawTrajectory(); });
+      if (save) { try { localStorage.setItem(KEY, JSON.stringify(split)); } catch (e) { /* no storage */ } }
+    }
+    function drag(handle, key, axis) {
+      if (!handle) return;
+      handle.addEventListener("pointerdown", (e) => {
+        e.preventDefault(); handle.setPointerCapture(e.pointerId); handle.classList.add("dragging");
+        document.body.classList.add("resizing", axis === "x" ? "col" : "row");
+        const move = (ev) => {
+          if (axis === "x") { const r = wrap.getBoundingClientRect(); split.left = clamp("left", (ev.clientX - r.left) / r.width * 100); }
+          else { const r = side.getBoundingClientRect(); split.canvas = clamp("canvas", (ev.clientY - r.top) / r.height * 100); }
+          apply(false);
+        };
+        const up = () => { handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up);
+          handle.classList.remove("dragging"); document.body.classList.remove("resizing", "col", "row"); apply(true); };
+        handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up);
+      });
+      handle.addEventListener("keydown", (e) => {
+        const step = e.shiftKey ? 10 : 2;
+        const delta = { ArrowLeft: -step, ArrowUp: -step, ArrowRight: step, ArrowDown: step }[e.key];
+        if (delta === undefined) return;
+        e.preventDefault(); split[key] = clamp(key, split[key] + delta); apply(true);
+      });
+      handle.addEventListener("dblclick", () => { split[key] = DEFAULT[key]; apply(true); });
+    }
+    drag(document.querySelector(".splitter-v"), "left", "x");
+    drag(document.querySelector(".splitter-h"), "canvas", "y");
+    apply(false);
+  })();
+
+  let lastSize = width() + "x" + height(), timer = null;
+  window.addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(() => {
+    const size = width() + "x" + height(); if (size !== lastSize) { lastSize = size; fit(); drawTrajectory(); } }, 200); });
+  document.addEventListener("themechange", () => { readColors(); styleLinks(); applyView(); drawTrajectory(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,975 @@
+{
+  "run": "20261108_202031",
+  "built_at": "2026-11-11T13:55:28-03:00",
+  "pages": 161,
+  "nodes": 161,
+  "treedex": "0.1.5",
+  "map": {
+    "0001": {
+      "title": "Overview",
+      "path": "wiki/overview.md",
+      "kind": "overview",
+      "graph_id": ""
+    },
+    "0002": {
+      "title": "Approach",
+      "path": "wiki/approach.md",
+      "kind": "reference",
+      "graph_id": ""
+    },
+    "0003": {
+      "title": "Relations between dimensions",
+      "path": "wiki/relations.md",
+      "kind": "reference",
+      "graph_id": ""
+    },
+    "0004": {
+      "title": "Change log",
+      "path": "wiki/log.md",
+      "kind": "reference",
+      "graph_id": ""
+    },
+    "0005": {
+      "title": "Design decisions (dimensions)",
+      "path": "wiki/concepts/index.md",
+      "kind": "folder",
+      "graph_id": ""
+    },
+    "0006": {
+      "title": "Dimension: How to integrate a machine learning model in an application?",
+      "path": "wiki/concepts/how-to-integrate-a-machine-learning-model-in-an-application.md",
+      "kind": "dimension",
+      "graph_id": "d:1"
+    },
+    "0007": {
+      "title": "Value: Model as a service (accepted)",
+      "path": "wiki/entities/model-as-a-service.md",
+      "kind": "value",
+      "graph_id": "v:1.1"
+    },
+    "0008": {
+      "title": "Value: Model in monolith (accepted)",
+      "path": "wiki/entities/model-in-monolith.md",
+      "kind": "value",
+      "graph_id": "v:1.2"
+    },
+    "0009": {
+      "title": "Value: Model as module in modular monolith (accepted)",
+      "path": "wiki/entities/model-as-module-in-modular-monolith.md",
+      "kind": "value",
+      "graph_id": "v:1.3"
+    },
+    "0010": {
+      "title": "Value: Model in batch prediction system (accepted)",
+      "path": "wiki/entities/model-in-batch-prediction-system.md",
+      "kind": "value",
+      "graph_id": "v:1.4"
+    },
+    "0011": {
+      "title": "Value: Event-driven model as a service (accepted)",
+      "path": "wiki/entities/event-driven-model-as-a-service.md",
+      "kind": "value",
+      "graph_id": "v:1.5"
+    },
+    "0012": {
+      "title": "Value: Serverless model as a service (accepted)",
+      "path": "wiki/entities/serverless-model-as-a-service.md",
+      "kind": "value",
+      "graph_id": "v:1.6"
+    },
+    "0013": {
+      "title": "Value: No integration of the model (accepted)",
+      "path": "wiki/entities/no-integration-of-the-model.md",
+      "kind": "value",
+      "graph_id": "v:1.7"
+    },
+    "0014": {
+      "title": "Dimension: How to store data used in machine learning applications?",
+      "path": "wiki/concepts/how-to-store-data-used-in-machine-learning-applications.md",
+      "kind": "dimension",
+      "graph_id": "d:2"
+    },
+    "0015": {
+      "title": "Value: Shared data store (accepted)",
+      "path": "wiki/entities/shared-data-store.md",
+      "kind": "value",
+      "graph_id": "v:2.1"
+    },
+    "0016": {
+      "title": "Value: Data service (accepted)",
+      "path": "wiki/entities/data-service.md",
+      "kind": "value",
+      "graph_id": "v:2.2"
+    },
+    "0017": {
+      "title": "Value: Event store (accepted)",
+      "path": "wiki/entities/event-store.md",
+      "kind": "value",
+      "graph_id": "v:2.3"
+    },
+    "0018": {
+      "title": "Value: No data store (accepted)",
+      "path": "wiki/entities/no-data-store.md",
+      "kind": "value",
+      "graph_id": "v:2.4"
+    },
+    "0019": {
+      "title": "Dimension: How to design the interface for data access?",
+      "path": "wiki/concepts/how-to-design-the-interface-for-data-access.md",
+      "kind": "dimension",
+      "graph_id": "d:3"
+    },
+    "0020": {
+      "title": "Value: Local data access API (accepted)",
+      "path": "wiki/entities/local-data-access-api.md",
+      "kind": "value",
+      "graph_id": "v:3.1"
+    },
+    "0021": {
+      "title": "Value: Service-based data access API (accepted)",
+      "path": "wiki/entities/service-based-data-access-api.md",
+      "kind": "value",
+      "graph_id": "v:3.2"
+    },
+    "0022": {
+      "title": "Value: Pub/sub data access API (accepted)",
+      "path": "wiki/entities/pub-sub-data-access-api.md",
+      "kind": "value",
+      "graph_id": "v:3.3"
+    },
+    "0023": {
+      "title": "Value: Message/event queueing-based data access API (accepted)",
+      "path": "wiki/entities/message-event-queueing-based-data-access-api.md",
+      "kind": "value",
+      "graph_id": "v:3.4"
+    },
+    "0024": {
+      "title": "Value: Data provider is accessed directly (accepted)",
+      "path": "wiki/entities/data-provider-is-accessed-directly.md",
+      "kind": "value",
+      "graph_id": "v:3.5"
+    },
+    "0025": {
+      "title": "Dimension: How to persist and provide access to features?",
+      "path": "wiki/concepts/how-to-persist-and-provide-access-to-features.md",
+      "kind": "dimension",
+      "graph_id": "d:4"
+    },
+    "0026": {
+      "title": "Value: Feature store (accepted)",
+      "path": "wiki/entities/feature-store.md",
+      "kind": "value",
+      "graph_id": "v:4.1"
+    },
+    "0027": {
+      "title": "Value: Store features in data stores without specific support (accepted)",
+      "path": "wiki/entities/store-features-in-data-stores-without-specific-support.md",
+      "kind": "value",
+      "graph_id": "v:4.2"
+    },
+    "0028": {
+      "title": "Dimension: How to serve model predictions or scores?",
+      "path": "wiki/concepts/how-to-serve-model-predictions-or-scores.md",
+      "kind": "dimension",
+      "graph_id": "d:5"
+    },
+    "0029": {
+      "title": "Value: Microservice based model serving (accepted)",
+      "path": "wiki/entities/microservice-based-model-serving.md",
+      "kind": "value",
+      "graph_id": "v:5.1"
+    },
+    "0030": {
+      "title": "Value: Local service/API based model serving (accepted)",
+      "path": "wiki/entities/local-service-api-based-model-serving.md",
+      "kind": "value",
+      "graph_id": "v:5.2"
+    },
+    "0031": {
+      "title": "Value: Data batch based model serving (accepted)",
+      "path": "wiki/entities/data-batch-based-model-serving.md",
+      "kind": "value",
+      "graph_id": "v:5.3"
+    },
+    "0032": {
+      "title": "Value: Precompute serving (accepted)",
+      "path": "wiki/entities/precompute-serving.md",
+      "kind": "value",
+      "graph_id": "v:5.4"
+    },
+    "0033": {
+      "title": "Value: Hybrid online/offline model serving (accepted)",
+      "path": "wiki/entities/hybrid-online-offline-model-serving.md",
+      "kind": "value",
+      "graph_id": "v:5.5"
+    },
+    "0034": {
+      "title": "Dimension: How to inform clients about prediction result availability?",
+      "path": "wiki/concepts/how-to-inform-clients-about-prediction-result-availability.md",
+      "kind": "dimension",
+      "graph_id": "d:6"
+    },
+    "0035": {
+      "title": "Value: Push notification (accepted)",
+      "path": "wiki/entities/push-notification.md",
+      "kind": "value",
+      "graph_id": "v:6.1"
+    },
+    "0036": {
+      "title": "Value: Polling (accepted)",
+      "path": "wiki/entities/polling.md",
+      "kind": "value",
+      "graph_id": "v:6.2"
+    },
+    "0037": {
+      "title": "Value: Block on result (accepted)",
+      "path": "wiki/entities/block-on-result.md",
+      "kind": "value",
+      "graph_id": "v:6.3"
+    },
+    "0038": {
+      "title": "Dimension: How to ingest data into ML projects or applications?",
+      "path": "wiki/concepts/how-to-ingest-data-into-ml-projects-or-applications.md",
+      "kind": "dimension",
+      "graph_id": "d:7"
+    },
+    "0039": {
+      "title": "Value: Streamed data ingestion (accepted)",
+      "path": "wiki/entities/streamed-data-ingestion.md",
+      "kind": "value",
+      "graph_id": "v:7.1"
+    },
+    "0040": {
+      "title": "Value: Data ingestion by request (accepted)",
+      "path": "wiki/entities/data-ingestion-by-request.md",
+      "kind": "value",
+      "graph_id": "v:7.2"
+    },
+    "0041": {
+      "title": "Value: Data ingestion in batches (accepted)",
+      "path": "wiki/entities/data-ingestion-in-batches.md",
+      "kind": "value",
+      "graph_id": "v:7.3"
+    },
+    "0042": {
+      "title": "Value: Manual data ingestion (accepted)",
+      "path": "wiki/entities/manual-data-ingestion.md",
+      "kind": "value",
+      "graph_id": "v:7.4"
+    },
+    "0043": {
+      "title": "Dimension: How to perform automatic integration and delivery in a machine learning context?",
+      "path": "wiki/concepts/how-to-perform-automatic-integration-and-delivery-in-a-machine-learning-context.md",
+      "kind": "dimension",
+      "graph_id": "d:8"
+    },
+    "0044": {
+      "title": "Value: CI/CD pipeline (accepted)",
+      "path": "wiki/entities/ci-cd-pipeline.md",
+      "kind": "value",
+      "graph_id": "v:8.1"
+    },
+    "0045": {
+      "title": "Value: Build and Deployment scripts (accepted)",
+      "path": "wiki/entities/build-and-deployment-scripts.md",
+      "kind": "value",
+      "graph_id": "v:8.2"
+    },
+    "0046": {
+      "title": "Value: Machine learning orchestrator (accepted)",
+      "path": "wiki/entities/machine-learning-orchestrator.md",
+      "kind": "value",
+      "graph_id": "v:8.3"
+    },
+    "0047": {
+      "title": "Value: No integration or delivery automation (accepted)",
+      "path": "wiki/entities/no-integration-or-delivery-automation.md",
+      "kind": "value",
+      "graph_id": "v:8.4"
+    },
+    "0048": {
+      "title": "Dimension: Which tasks can be performed by a delivery pipeline or component?",
+      "path": "wiki/concepts/which-tasks-can-be-performed-by-a-delivery-pipeline-or-component.md",
+      "kind": "dimension",
+      "graph_id": "d:9"
+    },
+    "0049": {
+      "title": "Value: Packaging (accepted)",
+      "path": "wiki/entities/packaging.md",
+      "kind": "value",
+      "graph_id": "v:9.1"
+    },
+    "0050": {
+      "title": "Value: Testing (accepted)",
+      "path": "wiki/entities/testing.md",
+      "kind": "value",
+      "graph_id": "v:9.2"
+    },
+    "0051": {
+      "title": "Value: Building (accepted)",
+      "path": "wiki/entities/building.md",
+      "kind": "value",
+      "graph_id": "v:9.3"
+    },
+    "0052": {
+      "title": "Value: Deployment (accepted)",
+      "path": "wiki/entities/deployment.md",
+      "kind": "value",
+      "graph_id": "v:9.4"
+    },
+    "0053": {
+      "title": "Value: Containerization (accepted)",
+      "path": "wiki/entities/containerization.md",
+      "kind": "value",
+      "graph_id": "v:9.5"
+    },
+    "0054": {
+      "title": "Value: Canary testing (accepted)",
+      "path": "wiki/entities/canary-testing-2.md",
+      "kind": "value",
+      "graph_id": "v:9.6"
+    },
+    "0055": {
+      "title": "Value: A/B testing (accepted)",
+      "path": "wiki/entities/a-b-testing-2.md",
+      "kind": "value",
+      "graph_id": "v:9.7"
+    },
+    "0056": {
+      "title": "Value: Evidence based hypothesis testing (accepted)",
+      "path": "wiki/entities/evidence-based-hypothesis-testing-2.md",
+      "kind": "value",
+      "graph_id": "v:9.8"
+    },
+    "0057": {
+      "title": "Value: Version control repository (accepted)",
+      "path": "wiki/entities/version-control-repository.md",
+      "kind": "value",
+      "graph_id": "v:9.9"
+    },
+    "0058": {
+      "title": "Dimension: Which model versions should be deployed to production and how?",
+      "path": "wiki/concepts/which-model-versions-should-be-deployed-to-production-and-how.md",
+      "kind": "dimension",
+      "graph_id": "d:10"
+    },
+    "0059": {
+      "title": "Value: N versions in production (accepted)",
+      "path": "wiki/entities/n-versions-in-production.md",
+      "kind": "value",
+      "graph_id": "v:10.1"
+    },
+    "0060": {
+      "title": "Value: Rollback to previous model version (accepted)",
+      "path": "wiki/entities/rollback-to-previous-model-version.md",
+      "kind": "value",
+      "graph_id": "v:10.2"
+    },
+    "0061": {
+      "title": "Value: Single model in production (accepted)",
+      "path": "wiki/entities/single-model-in-production.md",
+      "kind": "value",
+      "graph_id": "v:10.3"
+    },
+    "0062": {
+      "title": "Dimension: How to version data decision?",
+      "path": "wiki/concepts/how-to-version-data-decision.md",
+      "kind": "dimension",
+      "graph_id": "d:11"
+    },
+    "0063": {
+      "title": "Value: Data version repository (accepted)",
+      "path": "wiki/entities/data-version-repository.md",
+      "kind": "value",
+      "graph_id": "v:11.1"
+    },
+    "0064": {
+      "title": "Value: Data versioning in code repository (accepted)",
+      "path": "wiki/entities/data-versioning-in-code-repository.md",
+      "kind": "value",
+      "graph_id": "v:11.2"
+    },
+    "0065": {
+      "title": "Value: No data versioning (accepted)",
+      "path": "wiki/entities/no-data-versioning.md",
+      "kind": "value",
+      "graph_id": "v:11.3"
+    },
+    "0066": {
+      "title": "Dimension: How to trigger a machine learning pipeline or orchestrator?",
+      "path": "wiki/concepts/how-to-trigger-a-machine-learning-pipeline-or-orchestrator.md",
+      "kind": "dimension",
+      "graph_id": "d:12"
+    },
+    "0067": {
+      "title": "Value: On-demand trigger (accepted)",
+      "path": "wiki/entities/on-demand-trigger.md",
+      "kind": "value",
+      "graph_id": "v:12.1"
+    },
+    "0068": {
+      "title": "Value: On-commit trigger (accepted)",
+      "path": "wiki/entities/on-commit-trigger.md",
+      "kind": "value",
+      "graph_id": "v:12.2"
+    },
+    "0069": {
+      "title": "Value: On-schedule trigger (accepted)",
+      "path": "wiki/entities/on-schedule-trigger.md",
+      "kind": "value",
+      "graph_id": "v:12.3"
+    },
+    "0070": {
+      "title": "Value: On availability of new training data trigger (accepted)",
+      "path": "wiki/entities/on-availability-of-new-training-data-trigger.md",
+      "kind": "value",
+      "graph_id": "v:12.4"
+    },
+    "0071": {
+      "title": "Value: On model performance degradation trigger (accepted)",
+      "path": "wiki/entities/on-model-performance-degradation-trigger.md",
+      "kind": "value",
+      "graph_id": "v:12.5"
+    },
+    "0072": {
+      "title": "Value: On changes in the data distribution trigger (accepted)",
+      "path": "wiki/entities/on-changes-in-the-data-distribution-trigger.md",
+      "kind": "value",
+      "graph_id": "v:12.6"
+    },
+    "0073": {
+      "title": "Dimension: How to automatically provision environments?",
+      "path": "wiki/concepts/how-to-automatically-provision-environments.md",
+      "kind": "dimension",
+      "graph_id": "d:13"
+    },
+    "0074": {
+      "title": "Value: Automated provisioning (accepted)",
+      "path": "wiki/entities/automated-provisioning.md",
+      "kind": "value",
+      "graph_id": "v:13.1"
+    },
+    "0075": {
+      "title": "Value: No automated provisioning (accepted)",
+      "path": "wiki/entities/no-automated-provisioning.md",
+      "kind": "value",
+      "graph_id": "v:13.2"
+    },
+    "0076": {
+      "title": "Dimension: How to automatically process the data used for model building?",
+      "path": "wiki/concepts/how-to-automatically-process-the-data-used-for-model-building.md",
+      "kind": "dimension",
+      "graph_id": "d:14"
+    },
+    "0077": {
+      "title": "Value: Data pipeline (accepted)",
+      "path": "wiki/entities/data-pipeline.md",
+      "kind": "value",
+      "graph_id": "v:14.1"
+    },
+    "0078": {
+      "title": "Value: ETL pipeline (accepted)",
+      "path": "wiki/entities/etl-pipeline.md",
+      "kind": "value",
+      "graph_id": "v:14.2"
+    },
+    "0079": {
+      "title": "Value: Data processing component (accepted)",
+      "path": "wiki/entities/data-processing-component.md",
+      "kind": "value",
+      "graph_id": "v:14.3"
+    },
+    "0080": {
+      "title": "Value: No data processing automation (accepted)",
+      "path": "wiki/entities/no-data-processing-automation.md",
+      "kind": "value",
+      "graph_id": "v:14.4"
+    },
+    "0081": {
+      "title": "Dimension: Should data be processed in batches or in realtime?",
+      "path": "wiki/concepts/should-data-be-processed-in-batches-or-in-realtime.md",
+      "kind": "dimension",
+      "graph_id": "d:15"
+    },
+    "0082": {
+      "title": "Value: Batch-based data processing (accepted)",
+      "path": "wiki/entities/batch-based-data-processing.md",
+      "kind": "value",
+      "graph_id": "v:15.1"
+    },
+    "0083": {
+      "title": "Value: Real-time, stream-based data processing (accepted)",
+      "path": "wiki/entities/real-time-stream-based-data-processing.md",
+      "kind": "value",
+      "graph_id": "v:15.2"
+    },
+    "0084": {
+      "title": "Dimension: Which data processing tasks can be performed by a data processing pipeline or component?",
+      "path": "wiki/concepts/which-data-processing-tasks-can-be-performed-by-a-data-processing-pipeline-or-co.md",
+      "kind": "dimension",
+      "graph_id": "d:16"
+    },
+    "0085": {
+      "title": "Value: Data extraction (accepted)",
+      "path": "wiki/entities/data-extraction.md",
+      "kind": "value",
+      "graph_id": "v:16.1"
+    },
+    "0086": {
+      "title": "Value: Data preparation (accepted)",
+      "path": "wiki/entities/data-preparation.md",
+      "kind": "value",
+      "graph_id": "v:16.2"
+    },
+    "0087": {
+      "title": "Value: Data validation (accepted)",
+      "path": "wiki/entities/data-validation.md",
+      "kind": "value",
+      "graph_id": "v:16.3"
+    },
+    "0088": {
+      "title": "Value: Data transformation (accepted)",
+      "path": "wiki/entities/data-transformation.md",
+      "kind": "value",
+      "graph_id": "v:16.4"
+    },
+    "0089": {
+      "title": "Value: Data selection (accepted)",
+      "path": "wiki/entities/data-selection.md",
+      "kind": "value",
+      "graph_id": "v:16.5"
+    },
+    "0090": {
+      "title": "Value: Feature engineering (accepted)",
+      "path": "wiki/entities/feature-engineering.md",
+      "kind": "value",
+      "graph_id": "v:16.6"
+    },
+    "0091": {
+      "title": "Value: Data processing hyperparameter tuning (accepted)",
+      "path": "wiki/entities/data-processing-hyperparameter-tuning.md",
+      "kind": "value",
+      "graph_id": "v:16.7"
+    },
+    "0092": {
+      "title": "Dimension: How to parallelize data processing?",
+      "path": "wiki/concepts/how-to-parallelize-data-processing.md",
+      "kind": "dimension",
+      "graph_id": "d:17"
+    },
+    "0093": {
+      "title": "Value: Data pipeline per data set (accepted)",
+      "path": "wiki/entities/data-pipeline-per-data-set.md",
+      "kind": "value",
+      "graph_id": "v:17.1"
+    },
+    "0094": {
+      "title": "Value: Data partitioning in data pipeline (accepted)",
+      "path": "wiki/entities/data-partitioning-in-data-pipeline.md",
+      "kind": "value",
+      "graph_id": "v:17.2"
+    },
+    "0095": {
+      "title": "Value: Hybrid data processing parallelization (accepted)",
+      "path": "wiki/entities/hybrid-data-processing-parallelization.md",
+      "kind": "value",
+      "graph_id": "v:17.3"
+    },
+    "0096": {
+      "title": "Value: No parallel data processing (accepted)",
+      "path": "wiki/entities/no-parallel-data-processing.md",
+      "kind": "value",
+      "graph_id": "v:17.4"
+    },
+    "0097": {
+      "title": "Dimension: How to perform model building in an ML project?",
+      "path": "wiki/concepts/how-to-perform-model-building-in-an-ml-project.md",
+      "kind": "dimension",
+      "graph_id": "d:18"
+    },
+    "0098": {
+      "title": "Value: Model building pipeline (accepted)",
+      "path": "wiki/entities/model-building-pipeline.md",
+      "kind": "value",
+      "graph_id": "v:18.1"
+    },
+    "0099": {
+      "title": "Value: Model builder component (accepted)",
+      "path": "wiki/entities/model-builder-component.md",
+      "kind": "value",
+      "graph_id": "v:18.2"
+    },
+    "0100": {
+      "title": "Value: Model building in development tool (accepted)",
+      "path": "wiki/entities/model-building-in-development-tool.md",
+      "kind": "value",
+      "graph_id": "v:18.3"
+    },
+    "0101": {
+      "title": "Dimension: When and how to train the model?",
+      "path": "wiki/concepts/when-and-how-to-train-the-model.md",
+      "kind": "dimension",
+      "graph_id": "d:19"
+    },
+    "0102": {
+      "title": "Value: Batch-based learning (accepted)",
+      "path": "wiki/entities/batch-based-learning.md",
+      "kind": "value",
+      "graph_id": "v:19.1"
+    },
+    "0103": {
+      "title": "Value: Incremental learning (accepted)",
+      "path": "wiki/entities/incremental-learning.md",
+      "kind": "value",
+      "graph_id": "v:19.2"
+    },
+    "0104": {
+      "title": "Value: Hybrid batch-based and incremental learning (accepted)",
+      "path": "wiki/entities/hybrid-batch-based-and-incremental-learning.md",
+      "kind": "value",
+      "graph_id": "v:19.3"
+    },
+    "0105": {
+      "title": "Dimension: Which tasks can be performed by a model building pipeline or component?",
+      "path": "wiki/concepts/which-tasks-can-be-performed-by-a-model-building-pipeline-or-component.md",
+      "kind": "dimension",
+      "graph_id": "d:20"
+    },
+    "0106": {
+      "title": "Value: Model training (accepted)",
+      "path": "wiki/entities/model-training.md",
+      "kind": "value",
+      "graph_id": "v:20.1"
+    },
+    "0107": {
+      "title": "Value: Data splitting (accepted)",
+      "path": "wiki/entities/data-splitting.md",
+      "kind": "value",
+      "graph_id": "v:20.2"
+    },
+    "0108": {
+      "title": "Value: Data checkpoints (accepted)",
+      "path": "wiki/entities/data-checkpoints.md",
+      "kind": "value",
+      "graph_id": "v:20.3"
+    },
+    "0109": {
+      "title": "Value: Model validation (accepted)",
+      "path": "wiki/entities/model-validation.md",
+      "kind": "value",
+      "graph_id": "v:20.4"
+    },
+    "0110": {
+      "title": "Value: Model selection (accepted)",
+      "path": "wiki/entities/model-selection.md",
+      "kind": "value",
+      "graph_id": "v:20.5"
+    },
+    "0111": {
+      "title": "Value: Model packaging (accepted)",
+      "path": "wiki/entities/model-packaging.md",
+      "kind": "value",
+      "graph_id": "v:20.6"
+    },
+    "0112": {
+      "title": "Value: Development tool facade (accepted)",
+      "path": "wiki/entities/development-tool-facade.md",
+      "kind": "value",
+      "graph_id": "v:20.7"
+    },
+    "0113": {
+      "title": "Value: Development tool export (accepted)",
+      "path": "wiki/entities/development-tool-export.md",
+      "kind": "value",
+      "graph_id": "v:20.8"
+    },
+    "0114": {
+      "title": "Value: Train multiple model versions with different parameters and/or algorithms (accepted)",
+      "path": "wiki/entities/train-multiple-model-versions-with-different-parameters-and-or-algorithms.md",
+      "kind": "value",
+      "graph_id": "v:20.9"
+    },
+    "0115": {
+      "title": "Value: Model hyperparameter tuning (accepted)",
+      "path": "wiki/entities/model-hyperparameter-tuning.md",
+      "kind": "value",
+      "graph_id": "v:20.10"
+    },
+    "0116": {
+      "title": "Dimension: How to parallelize model building?",
+      "path": "wiki/concepts/how-to-parallelize-model-building.md",
+      "kind": "dimension",
+      "graph_id": "d:21"
+    },
+    "0117": {
+      "title": "Value: Model building pipeline per model (accepted)",
+      "path": "wiki/entities/model-building-pipeline-per-model.md",
+      "kind": "value",
+      "graph_id": "v:21.1"
+    },
+    "0118": {
+      "title": "Value: Training data partitioning (accepted)",
+      "path": "wiki/entities/training-data-partitioning.md",
+      "kind": "value",
+      "graph_id": "v:21.2"
+    },
+    "0119": {
+      "title": "Value: Model partitioning (accepted)",
+      "path": "wiki/entities/model-partitioning.md",
+      "kind": "value",
+      "graph_id": "v:21.3"
+    },
+    "0120": {
+      "title": "Value: Hybrid model building parallelization (accepted)",
+      "path": "wiki/entities/hybrid-model-building-parallelization.md",
+      "kind": "value",
+      "graph_id": "v:21.4"
+    },
+    "0121": {
+      "title": "Value: No parallel model building (accepted)",
+      "path": "wiki/entities/no-parallel-model-building.md",
+      "kind": "value",
+      "graph_id": "v:21.5"
+    },
+    "0122": {
+      "title": "Dimension: How to monitor and track the model in production?",
+      "path": "wiki/concepts/how-to-monitor-and-track-the-model-in-production.md",
+      "kind": "dimension",
+      "graph_id": "d:22"
+    },
+    "0123": {
+      "title": "Value: Model performance monitoring (accepted)",
+      "path": "wiki/entities/model-performance-monitoring.md",
+      "kind": "value",
+      "graph_id": "v:22.1"
+    },
+    "0124": {
+      "title": "Value: Monitoring or logging data and predictions (accepted)",
+      "path": "wiki/entities/monitoring-or-logging-data-and-predictions.md",
+      "kind": "value",
+      "graph_id": "v:22.2"
+    },
+    "0125": {
+      "title": "Value: No in-production monitoring (accepted)",
+      "path": "wiki/entities/no-in-production-monitoring.md",
+      "kind": "value",
+      "graph_id": "v:22.3"
+    },
+    "0126": {
+      "title": "Value: Model in-production tracking (accepted)",
+      "path": "wiki/entities/model-in-production-tracking.md",
+      "kind": "value",
+      "graph_id": "v:22.4"
+    },
+    "0127": {
+      "title": "Dimension: Should AutoML be used and if so where?",
+      "path": "wiki/concepts/should-automl-be-used-and-if-so-where.md",
+      "kind": "dimension",
+      "graph_id": "d:23"
+    },
+    "0128": {
+      "title": "Value: AutoML (accepted)",
+      "path": "wiki/entities/automl.md",
+      "kind": "value",
+      "graph_id": "v:23.1"
+    },
+    "0129": {
+      "title": "Value: No AutoML (accepted)",
+      "path": "wiki/entities/no-automl.md",
+      "kind": "value",
+      "graph_id": "v:23.2"
+    },
+    "0130": {
+      "title": "Dimension: How to adjust models based on monitoring results?",
+      "path": "wiki/concepts/how-to-adjust-models-based-on-monitoring-results.md",
+      "kind": "dimension",
+      "graph_id": "d:24"
+    },
+    "0131": {
+      "title": "Value: Manual model adjustment (accepted)",
+      "path": "wiki/entities/manual-model-adjustment.md",
+      "kind": "value",
+      "graph_id": "v:24.1"
+    },
+    "0132": {
+      "title": "Value: Automated model adjustment (accepted)",
+      "path": "wiki/entities/automated-model-adjustment.md",
+      "kind": "value",
+      "graph_id": "v:24.2"
+    },
+    "0133": {
+      "title": "Dimension: What to build, test, and deploy automatically by CI/CD pipelines?",
+      "path": "wiki/concepts/what-to-build-test-and-deploy-automatically-by-ci-cd-pipelines.md",
+      "kind": "dimension",
+      "graph_id": "d:25"
+    },
+    "0134": {
+      "title": "Value: Build, test, and deploy models to be served and other system components (accepted)",
+      "path": "wiki/entities/build-test-and-deploy-models-to-be-served-and-other-system-components.md",
+      "kind": "value",
+      "graph_id": "v:25.1"
+    },
+    "0135": {
+      "title": "Value: Build, test, and deploy machine learning pipelines and components needed during pipeline runs (accepted)",
+      "path": "wiki/entities/build-test-and-deploy-machine-learning-pipelines-and-components-needed-during-pi.md",
+      "kind": "value",
+      "graph_id": "v:25.2"
+    },
+    "0136": {
+      "title": "Value: No automated deployment (accepted)",
+      "path": "wiki/entities/no-automated-deployment.md",
+      "kind": "value",
+      "graph_id": "v:25.3"
+    },
+    "0137": {
+      "title": "Dimension: What to test in a machine learning/data science pipeline?",
+      "path": "wiki/concepts/what-to-test-in-a-machine-learning-data-science-pipeline.md",
+      "kind": "dimension",
+      "graph_id": "d:26"
+    },
+    "0138": {
+      "title": "Value: Canary testing (accepted)",
+      "path": "wiki/entities/canary-testing.md",
+      "kind": "value",
+      "graph_id": "v:26.1"
+    },
+    "0139": {
+      "title": "Value: A/B testing (accepted)",
+      "path": "wiki/entities/a-b-testing.md",
+      "kind": "value",
+      "graph_id": "v:26.2"
+    },
+    "0140": {
+      "title": "Value: Evidence based hypothesis testing (accepted)",
+      "path": "wiki/entities/evidence-based-hypothesis-testing.md",
+      "kind": "value",
+      "graph_id": "v:26.3"
+    },
+    "0141": {
+      "title": "Value: Unit testing system components (accepted)",
+      "path": "wiki/entities/unit-testing-system-components.md",
+      "kind": "value",
+      "graph_id": "v:26.4"
+    },
+    "0142": {
+      "title": "Value: System integration testing (accepted)",
+      "path": "wiki/entities/system-integration-testing.md",
+      "kind": "value",
+      "graph_id": "v:26.5"
+    },
+    "0143": {
+      "title": "Value: Unit testing feature engineering logic (accepted)",
+      "path": "wiki/entities/unit-testing-feature-engineering-logic.md",
+      "kind": "value",
+      "graph_id": "v:26.6"
+    },
+    "0144": {
+      "title": "Value: Unit testing different methods implemented in a model (accepted)",
+      "path": "wiki/entities/unit-testing-different-methods-implemented-in-a-model.md",
+      "kind": "value",
+      "graph_id": "v:26.7"
+    },
+    "0145": {
+      "title": "Value: Testing model training converges (accepted)",
+      "path": "wiki/entities/testing-model-training-converges.md",
+      "kind": "value",
+      "graph_id": "v:26.8"
+    },
+    "0146": {
+      "title": "Value: Testing trained model quality (accepted)",
+      "path": "wiki/entities/testing-trained-model-quality.md",
+      "kind": "value",
+      "graph_id": "v:26.9"
+    },
+    "0147": {
+      "title": "Value: Unit testing pipeline components (accepted)",
+      "path": "wiki/entities/unit-testing-pipeline-components.md",
+      "kind": "value",
+      "graph_id": "v:26.10"
+    },
+    "0148": {
+      "title": "Value: Integration testing pipeline components (accepted)",
+      "path": "wiki/entities/integration-testing-pipeline-components.md",
+      "kind": "value",
+      "graph_id": "v:26.11"
+    },
+    "0149": {
+      "title": "Value: Prediction service API testing (accepted)",
+      "path": "wiki/entities/prediction-service-api-testing.md",
+      "kind": "value",
+      "graph_id": "v:26.12"
+    },
+    "0150": {
+      "title": "Value: Prediction service performance testing (accepted)",
+      "path": "wiki/entities/prediction-service-performance-testing.md",
+      "kind": "value",
+      "graph_id": "v:26.13"
+    },
+    "0151": {
+      "title": "Value: No testing (accepted)",
+      "path": "wiki/entities/no-testing.md",
+      "kind": "value",
+      "graph_id": "v:26.14"
+    },
+    "0152": {
+      "title": "Dimension: Should MLOps be used and if so when?",
+      "path": "wiki/concepts/should-mlops-be-used-and-if-so-when.md",
+      "kind": "dimension",
+      "graph_id": "d:27"
+    },
+    "0153": {
+      "title": "Value: MLOps (accepted)",
+      "path": "wiki/entities/mlops.md",
+      "kind": "value",
+      "graph_id": "v:27.1"
+    },
+    "0154": {
+      "title": "Value: No MLOps (accepted)",
+      "path": "wiki/entities/no-mlops.md",
+      "kind": "value",
+      "graph_id": "v:27.2"
+    },
+    "0155": {
+      "title": "Dimension: What development environment should be used?",
+      "path": "wiki/concepts/what-development-environment-should-be-used.md",
+      "kind": "dimension",
+      "graph_id": "d:28"
+    },
+    "0156": {
+      "title": "Value: Use computational notebooks (accepted)",
+      "path": "wiki/entities/use-computational-notebooks.md",
+      "kind": "value",
+      "graph_id": "v:28.1"
+    },
+    "0157": {
+      "title": "Value: Use an IDE (accepted)",
+      "path": "wiki/entities/use-an-ide.md",
+      "kind": "value",
+      "graph_id": "v:28.2"
+    },
+    "0158": {
+      "title": "Synthesis",
+      "path": "wiki/synthesis/index.md",
+      "kind": "folder",
+      "graph_id": ""
+    },
+    "0159": {
+      "title": "Run overview",
+      "path": "wiki/synthesis/overview.md",
+      "kind": "synthesis",
+      "graph_id": ""
+    },
+    "0160": {
+      "title": "Contested decisions",
+      "path": "wiki/synthesis/contested.md",
+      "kind": "synthesis",
+      "graph_id": ""
+    },
+    "0161": {
+      "title": "Dropped and unsupported",
+      "path": "wiki/synthesis/dropped.md",
+      "kind": "synthesis",
+      "graph_id": ""
+    }
+  }
+}
