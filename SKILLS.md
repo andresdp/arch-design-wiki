@@ -12,7 +12,7 @@ Both write their result as one rationale file, `rationale/<id>.json`. They work 
 skills (Claude Code, Codex, ...), with or without a design space.
 
 - [1. Install the skills](#1-install-the-skills)
-- [2. Give the problem](#2-give-the-problem-a-file-or-text)
+- [2. Give the problem](#2-give-the-problem)
 - [3. Two ways to run them](#3-two-ways-to-run-them)
 - [4. Define your own design space](#4-define-your-own-design-space)
 - [5. An example from start to end](#5-an-example-from-start-to-end)
@@ -31,33 +31,35 @@ To install them for one project only, copy them into its `.claude/skills/` or `.
 skill is a `SKILL.md` and a `references/design-space.md`, which the skill reads only when it works on a design
 space.
 
-## 2. Give the problem: a file or text
+## 2. Give the problem
 
-Name the skill and give the problem, either as a file:
-
-```text
-Use the ddspace-search skill. The problem is in PROBLEM.md.
-```
-
-or as text, in the request itself:
+Call the skill with its slash command and write the problem right after it, as plain text:
 
 ```text
-Use the ddspace-search skill on this problem: an online shop with 2 million visits a day wants product
-recommendations on every page. Recommendations must appear within 100 ms, a new product must be recommended
-within a day, and the team of four has no ML platform; everything runs on the company's AWS account.
+/ddspace-search I need alternatives for the following problem: an online shop with 2 million visits a day wants
+product recommendations on every page. Recommendations must appear within 100 ms, a new product must be
+recommended within a day, and a team of four with no ML platform runs everything on the company's AWS account.
 ```
 
-To explain a solution, give the solution the same way (a file such as `SOLUTION.md`, or text):
+To explain a solution, give the problem and then the solution:
 
 ```text
-Use the ddspace-explain skill. The problem is in PROBLEM.md and the solution in SOLUTION.md.
+/ddspace-explain Explain this solution. Problem: an online shop with 2 million visits a day wants product
+recommendations on every page, within 100 ms, with new products recommended within a day; a team of four runs it
+on AWS. Solution: a nightly batch job trains a matrix-factorization model on SageMaker and writes the top 20
+products per user to DynamoDB; the web servers read them with each page; new products are shown by popularity
+until the next night's run.
 ```
 
-When the request names no file and gives no text, the skill looks for `PROBLEM.md` (and `SOLUTION.md`) in the
-working folder, and asks when there is none. A problem works best with its requirements labelled: functional
-(R1, R2, ...), quality attributes as scenarios (Q1, ...: a stimulus and a measurable response) and constraints
-(C1, ...). The templates are in [`examples/your-own/`](examples/your-own/); without labels, the skill takes the
-requirements from the text and says how it read them.
+The more the text says about the requirements, the better: what the system must do, the quality attributes it
+must reach (best as scenarios with a measurable response, e.g. "within 100 ms"), and the constraints (a team, a
+provider, a budget). Labels are not needed: the skill takes the requirements from the text, gives them ids (R1,
+Q1, C1, ...) and says how it read them.
+
+In an agent without slash commands for skills, name the skill instead: "Use the ddspace-search skill: I need
+alternatives for ...". For a long problem, a file works too: "/ddspace-search The problem is in PROBLEM.md." (the
+templates are in [`examples/your-own/`](examples/your-own/)); with no text and no file named, the skill looks for
+`PROBLEM.md` (and `SOLUTION.md`) in the working folder.
 
 ## 3. Two ways to run them
 
@@ -143,33 +145,49 @@ To change the space, edit the file and import it again.
 
 ## 5. An example from start to end
 
-The Git-hosting problem asks for a self-hosted Git service for 3,000 engineers: durability, one-minute failover,
-30-second CI fetches, read-after-push consistency, standard Git clients, and a team of five.
+A self-hosted Git service, first with a design space and then zero-shot.
 
 ```bash
 cp -R arch-design-wiki/skills/* ~/.claude/skills/
 pip install -e arch-design-wiki && export OPENAI_API_KEY=sk-...
 
-# with a design space: the sample space, defined from its YAML file
+# the sample space, defined from its YAML file
 ddspace init ~/git-hosting --yes && cd ~/git-hosting
 ddspace import ~/arch-design-wiki/examples/your-own/design-space.yaml --kind space --yes
 ddspace wiki build --yes
-cp ~/arch-design-wiki/examples/toy-git-hosting/cases/1-hosting-search/problem.md PROBLEM.md
-claude "Use the ddspace-search skill. The problem is in PROBLEM.md."
-ddspace rationale list                                  # the file's id
-ddspace rationale build rationale/<id>.json && open site/explainers/<id>.html
-
-# zero-shot, for comparison (in a folder without a space; with ddspace installed, the skill warns first)
-mkdir ~/git-hosting-zero && cd ~/git-hosting-zero
-cp ~/git-hosting/PROBLEM.md .
-claude "Use the ddspace-search skill. The problem is in PROBLEM.md."
+claude
 ```
 
-With the space, expect two or three alternatives that differ where the requirements conflict (replicated Git
-repositories, or an object-storage log as the source of truth), each step's trade-offs, and the requirements the
-space has no dimension for (failover, the team's workload). Without it, the agent names similar decisions in its own
-words, and nothing is left unaddressed: there is no space for a requirement to fall outside of. The
+In the agent, in `~/git-hosting`:
+
+```text
+/ddspace-search I need alternatives for this problem: a software company hosts its own Git service for 3,000
+engineers in four regions. CI starts 40,000 jobs a day, each fetching the repository it builds; the largest
+repository is 200 GB and most engineers touch only a small part of it. No pushed commit may be lost when a machine
+or disk fails; when a server fails, pushes and fetches must continue within one minute without an operator; a CI
+job in any region must fetch the latest state within 30 seconds, even right after a push, and see every push that
+succeeded before it started. Five engineers build and run the service, and engineers keep using standard Git
+clients.
+```
+
+Then render the result in the space's wiki:
+
+```bash
+ddspace rationale list                                  # the file's id
+ddspace rationale build rationale/<id>.json && open site/explainers/<id>.html     # xdg-open on Linux
+```
+
+Expect two or three alternatives that differ where the requirements conflict (replicated Git repositories, or an
+object-storage log as the source of truth), each step's trade-offs, and the requirements the space has no
+dimension for (operator-free failover, the team's workload).
+
+For the zero-shot version, run the same command in an empty folder (with `ddspace` installed, the skill first warns
+that there is no space there). The agent names similar decisions in its own words, and nothing is left unaddressed:
+there is no space for a requirement to fall outside of. The
 [recorded runs](https://andresdp.github.io/arch-design-wiki/#explainers) of this example show both.
 
-To explain a solution instead, copy `examples/toy-git-hosting/cases/2-spokes-explain/solution.md` as `SOLUTION.md`
-and use the explain skill.
+To explain a solution, follow the problem with it: "/ddspace-explain Explain this solution. Problem: ... Solution:
+every repository is stored as plain Git on the local disks of three file servers; a push updates references through
+a three-phase commit and succeeds once a majority agrees; reads go to the closest up-to-date replica; engineers use
+full clones." The full text of both is in
+[`examples/toy-git-hosting/cases/`](examples/toy-git-hosting/cases/).

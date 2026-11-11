@@ -54,11 +54,11 @@ the expert ML-workflow space (**E**) and without a space (**N**), two repetition
 ## Use the skills with your own coding agent
 
 The search and explain skills are not tied to the study: they are ordinary agent skills, in [`skills/`](skills/).
-Copy them into your agent's skills folder (Claude Code, Codex, ...) and give them your own problem, as a file or as
-text in the request:
+Copy them into your agent's skills folder (Claude Code, Codex, ...) and call them with your own problem:
 
 ```text
-Use the ddspace-search skill. The problem is in PROBLEM.md.
+/ddspace-search I need alternatives for the following problem: an online shop with 2 million visits a day wants
+product recommendations on every page, within 100 ms; a team of four runs everything on AWS.
 ```
 
 They work zero-shot with nothing else installed, or, with `ddspace` and a design space, on the space's decisions
