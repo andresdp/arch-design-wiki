@@ -13,7 +13,7 @@ skills (Claude Code, Codex, ...), with or without a design space.
 
 - [1. Install the skills](#1-install-the-skills)
 - [2. Give the problem](#2-give-the-problem-a-file-or-text)
-- [3. Three ways to run them](#3-three-ways-to-run-them)
+- [3. Two ways to run them](#3-two-ways-to-run-them)
 - [4. Define your own design space](#4-define-your-own-design-space)
 - [5. An example from start to end](#5-an-example-from-start-to-end)
 
@@ -59,43 +59,37 @@ working folder, and asks when there is none. A problem works best with its requi
 (C1, ...). The templates are in [`examples/your-own/`](examples/your-own/); without labels, the skill takes the
 requirements from the text and says how it read them.
 
-## 3. Three ways to run them
+## 3. Two ways to run them
 
 | | What you install | What the agent works with | What you get |
 |---|---|---|---|
-| **A. Zero-shot** | the skills only | its own knowledge: it names the decisions and options itself | the rationale file |
-| **B. With `ddspace`, no space** | the skills and `ddspace` | its own knowledge, as in A | the rationale file, checked; each design point described; an explainer page |
-| **C. With `ddspace` and a design space** | the skills, `ddspace` and a space (a wiki) | the space: every decision is a dimension of the space, every option one of its values | the rationale file, checked against the space; an explainer page inside the space's wiki |
+| **Zero-shot** | the skills only | its own knowledge: it names the decisions and options itself | the rationale file |
+| **With a design space** | the skills, `ddspace` and a space (a wiki) | the space: every decision is a dimension of the space, every option one of its values | the rationale file, checked against the space, and an explainer page inside the space's wiki |
 
-**A. Zero-shot.** Nothing else is needed. The agent checks the file against the shape the skill gives, and says that
+**Zero-shot.** Nothing else is needed. The agent checks the file against the shape the skill gives, and says that
 `ddspace` did not check it.
 
-**B. With `ddspace`, no space.** Install `ddspace` from this repository (Python 3.10 or later):
+**With a design space.** Install `ddspace` from this repository (Python 3.10 or later) and run the agent inside the
+space's folder: one of this repository's [`spaces/`](spaces/) (copy it first), a space you define (section 4), or
+one you import.
 
 ```bash
 pip install -e arch-design-wiki
-export OPENAI_API_KEY=sk-...                      # for the descriptions of design points (one LLM call each)
-export DDSPACE_POINT_MODEL=openai/gpt-4.1-mini    # the model that writes them
+export OPENAI_API_KEY=sk-...                      # ddspace describes each design point with one LLM call
 ```
 
-The skill finds no space in the folder, **says so** ("`ddspace` is installed, but this folder has no design space:
-I continue without one"), and continues zero-shot. `ddspace` then describes each design point, checks the file, and
-renders it:
-
-```bash
-ddspace rationale build rationale/<id>.json --out .     # explainers/<id>.html
-```
-
-**C. With a design space.** Run the agent inside the space's folder: one of this repository's
-[`spaces/`](spaces/) (copy it first), a space you define (section 4), or one you import. The skill finds the space
-there and works on it. The explainer goes into the space's wiki:
+The skill finds the space in the folder and works on it. The point descriptions use the space's
+`models.generation_llm` in `ddspace.yaml`; set a model your key can use. With Codex, allow the sandbox network
+access for them: `codex -c sandbox_workspace_write.network_access=true`. To see the result in the space's wiki:
 
 ```bash
 ddspace rationale build rationale/<id>.json             # site/explainers/<id>.html
 ```
 
-The point descriptions use the space's `models.generation_llm` in `ddspace.yaml`; set a model your key can use.
-With Codex, allow the sandbox network access for them: `codex -c sandbox_workspace_write.network_access=true`.
+**A missing space is an error.** `ddspace` always goes with a design space. If `ddspace` is installed but the agent
+runs in a folder without a space, the skill warns ("Warning: `ddspace` is installed, but no design space was found
+in this folder; I continue zero-shot. To use a space, run me in its folder.") and falls back to zero-shot, so the
+work is not lost. To use the space, run the agent again in the space's folder.
 
 ## 4. Define your own design space
 
@@ -132,7 +126,7 @@ open site/index.html                                    # xdg-open on Linux
 ```
 
 The wiki has a page per dimension and value, the relations, and a graph view; it says the space was written by
-hand. Run the agent in `my-space/` (case C). The import reports what is wrong with a file (a dimension without
+hand. Run the agent in `my-space/`. The import reports what is wrong with a file (a dimension without
 values, a relation to an unknown dimension, an unknown relation type), and `ddspace import --help` shows the format.
 To change the space, edit the file and import it again.
 
@@ -145,7 +139,7 @@ The Git-hosting problem asks for a self-hosted Git service for 3,000 engineers: 
 cp -R arch-design-wiki/skills/* ~/.claude/skills/
 pip install -e arch-design-wiki && export OPENAI_API_KEY=sk-...
 
-# with a design space (case C): the sample space, defined from its YAML file
+# with a design space: the sample space, defined from its YAML file
 ddspace init ~/git-hosting --yes && cd ~/git-hosting
 ddspace import ~/arch-design-wiki/examples/your-own/design-space.yaml --kind space --yes
 ddspace wiki build --yes
@@ -154,7 +148,7 @@ claude "Use the ddspace-search skill. The problem is in PROBLEM.md."
 ddspace rationale list                                  # the file's id
 ddspace rationale build rationale/<id>.json && open site/explainers/<id>.html
 
-# zero-shot (case A or B), for comparison
+# zero-shot, for comparison (in a folder without a space; with ddspace installed, the skill warns first)
 mkdir ~/git-hosting-zero && cd ~/git-hosting-zero
 cp ~/git-hosting/PROBLEM.md .
 claude "Use the ddspace-search skill. The problem is in PROBLEM.md."

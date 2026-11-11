@@ -61,11 +61,11 @@ text in the request:
 Use the ddspace-search skill. The problem is in PROBLEM.md.
 ```
 
-They work zero-shot with nothing else installed; with `ddspace` they also describe, check and render the result;
-and with a design space they work on the space's decisions and options. You can define a space of your own in a
+They work zero-shot with nothing else installed, or, with `ddspace` and a design space, on the space's decisions
+and options, with the result checked against the space and rendered in its wiki. You can define a space of your own in a
 short YAML file and turn it into a wiki.
 
-**[SKILLS.md](SKILLS.md)** covers installing the skills, giving the problem, the three ways to run them, defining a
+**[SKILLS.md](SKILLS.md)** covers installing the skills, giving the problem, the two ways to run them, defining a
 design space, and an example from start to end.
 
 ## Reproduce
