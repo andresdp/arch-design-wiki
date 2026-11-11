@@ -83,8 +83,8 @@
       <strong>explain</strong>, from an existing solution back to the space's decisions. Both produce a rationale
       file, rendered as a browsable <strong>explainer</strong> next to the space's wiki.</p>
     <nav class="jump" aria-label="Sections">
-      <a href="#spaces">The design spaces</a><a href="#explainers">Explainers</a><a href="#study">The study</a>
-      <a href="#reproduce">Reproduce</a><a href="#cite">Cite</a>
+      <a href="#spaces">The design spaces</a><a href="#explainers">Explainers</a>
+      <a href="https://github.com/andresdp/arch-design-wiki">Study, code and how to reproduce (GitHub)</a>
     </nav>
   </div>
 </header>
@@ -162,44 +162,6 @@
     </div>
   </section>
 
-  <section id="study">
-    <h2>The study</h2>
-    <p class="sub">Six cases for ML-enabled systems: four search problems and two solutions to explain. Each problem
-      has functional requirements, quality-attribute scenarios and constraints. A coding agent (Codex CLI,
-      <code>gpt-6-luna</code>, high reasoning effort) followed the search or explain skill in 24 sessions.</p>
-    <div class="cards">
-      <div class="card"><h3>Cases and prompt</h3><p>The problems, the solutions to explain, and the session prompt.</p>
-        <a href="https://github.com/andresdp/arch-design-wiki/tree/main/study/designing2027/cases">cases</a> ·
-        <a href="https://github.com/andresdp/arch-design-wiki/blob/main/study/designing2027/prompt.md">prompt</a></div>
-      <div class="card"><h3>Rationale files</h3><p>The 24 rationale files the agent wrote, and a summary of each
-        session (commands, design points, checks, tokens, time).</p>
-        <a href="https://github.com/andresdp/arch-design-wiki/tree/main/study/designing2027/results-v2">results</a></div>
-      <div class="card"><h3>Skills and tool</h3><p>The search and explain skills and the <code>ddspace</code> command
-        that serves a space to them (query, check and describe design points).</p>
-        <a href="https://github.com/andresdp/arch-design-wiki/tree/main/src/delvedspace/templates/skills">skills</a> ·
-        <a href="https://github.com/andresdp/arch-design-wiki/blob/main/USAGE.md">commands</a></div>
-    </div>
-  </section>
-
-  <section id="reproduce">
-    <h2>Reproduce</h2>
-    <ol class="steps">
-      <li><strong>Offline, in minutes, no API key:</strong> check every rationale file against its space, rebuild the
-        explainers, and recompute the paper's table with <code>study/designing2027/analyze.py</code>.</li>
-      <li><strong>Full rerun, about three hours, with an OpenAI key:</strong> build the expert workspace and run the
-        24 sessions with Codex CLI.</li>
-    </ol>
-<pre>pip install -e .
-python study/designing2027/analyze.py        # the paper's table, from the kept files</pre>
-    <p><a href="https://github.com/andresdp/arch-design-wiki/blob/main/REPRODUCE.md">REPRODUCE.md</a> has every step.</p>
-  </section>
-
-  <section id="cite">
-    <h2>Cite</h2>
-    <p class="sub">The paper is under review for the 4th International Workshop on Designing Software (Designing 2027,
-      co-located with ICSE 2027). Until it is published, please cite this repository
-      (<a href="https://github.com/andresdp/arch-design-wiki/blob/main/CITATION.cff">CITATION.cff</a>).</p>
-  </section>
 </main>
 
 <footer>

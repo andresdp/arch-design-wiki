@@ -17,8 +17,26 @@ trade-offs it makes) that is checked against the space and rendered as a browsab
 space's wiki. The initial implementation gives a coding agent two skills over `ddspace`, a command that serves a
 design space to agents (query its dimensions and values, check and describe design points).
 
-**Browse it online: <https://andresdp.github.io/arch-design-wiki/>**, with both spaces as wikis and all 28
-explainers.
+**Browse the design spaces and the explainers online: <https://andresdp.github.io/arch-design-wiki/>**. This
+repository holds everything else: the study, the code, and how to reproduce it.
+
+## The study
+
+Six cases for ML-enabled systems: four search problems (card-fraud scoring, on-device visual inspection, retail
+demand forecasting, large-scale document classification) and two solutions to explain (fraud, documents). Each
+problem has functional requirements, quality-attribute scenarios and constraints. A coding agent (Codex CLI
+0.165.0, `gpt-6-luna`, high reasoning effort) followed the search or explain skill in 24 sessions: each case with
+the expert ML-workflow space (**E**) and without a space (**N**), two repetitions each. Point descriptions used
+`gpt-5.6-luna` in both conditions.
+
+| What | Where |
+|---|---|
+| The problems and the solutions to explain | [`study/designing2027/cases/`](study/designing2027/cases/) |
+| The session prompt | [`study/designing2027/prompt.md`](study/designing2027/prompt.md) |
+| The 24 rationale files and session summaries | [`study/designing2027/results-v2/`](study/designing2027/results-v2/) |
+| The session runner and its controls | [`run_sessions.py`](study/designing2027/run_sessions.py), [`controls.py`](study/designing2027/controls.py) |
+| The paper's table, recomputed | [`analyze.py`](study/designing2027/analyze.py) |
+| The search and explain skills | [`src/delvedspace/templates/skills/`](src/delvedspace/templates/skills/) |
 
 ## Contents
 
@@ -40,6 +58,12 @@ python study/designing2027/analyze.py      # the paper's table, offline
 ```
 
 [REPRODUCE.md](REPRODUCE.md) checks every rationale file, rebuilds the explainers, and reruns the 24 sessions.
+
+## Cite
+
+The paper is under review for the 4th International Workshop on Designing Software (Designing 2027, co-located with
+ICSE 2027). Until it is published, please cite this repository ([CITATION.cff](CITATION.cff)); GitHub's "Cite this
+repository" button gives the reference in APA and BibTeX.
 
 ## Licence and credits
 
