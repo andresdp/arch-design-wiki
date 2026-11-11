@@ -93,28 +93,39 @@ work is not lost. To use the space, run the agent again in the space's folder.
 
 ## 4. Define your own design space
 
-A design space can be written by hand, in YAML (or the same structure in JSON): a name, the question it answers,
-its dimensions (the decisions) with their values (the options), and the relations between dimensions.
-[`examples/your-own/design-space.yaml`](examples/your-own/design-space.yaml) is the Git-hosting sample in this
-form:
+A design space can be written by hand, in YAML (or the same structure in JSON). It needs only a name and its
+dimensions (the decisions), each with its values (the options):
 
 ```yaml
 name: git-hosting
-question: Which decisions does hosting Git for a large engineering organization involve?
 dimensions:
-  - id: storage                                   # optional: relations can use the id or the name
+  - name: Source of truth for repository state
+    values: [Repository files on server disks, Write-ahead log in object storage]
+  - name: Replication for durability
+    values: [Three Git replicas with majority writes, Durability delegated to object storage]
+```
+
+Optionally, a dimension or a value can have a `description`, a dimension an `id`, and the file `relations` between
+dimensions (`requires`, `constrains`, `affects` or `co_occurs_with`), which the wiki and the agent then use:
+
+```yaml
+dimensions:
+  - id: storage
     name: Source of truth for repository state
     description: Where the authoritative copy of each repository's objects and references lives.
     values:
       - name: Repository files on server disks
         description: Plain Git repositories on the servers' local disks are the authoritative state.
-      - Write-ahead log in object storage          # a value can be just its name
+      - Write-ahead log in object storage
   - id: replication
     name: Replication for durability
     values: [Three Git replicas with majority writes, Durability delegated to object storage]
-relations:                                        # requires, constrains, affects or co_occurs_with
+relations:
   - {from: replication, to: storage, type: requires, note: What is replicated follows from where state lives.}
 ```
+
+[`examples/your-own/design-space.yaml`](examples/your-own/design-space.yaml) is the whole Git-hosting sample in this
+form.
 
 Turn it into a wiki:
 

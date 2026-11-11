@@ -2,7 +2,6 @@
 # Import it into a wiki:  ddspace init my-space --yes && cd my-space
 #                         ddspace import ../design-space.yaml --kind space --yes && ddspace wiki build --yes
 name: git-hosting
-question: Which decisions does hosting Git for a large engineering organization involve?
 dimensions:
   - id: storage
     name: Source of truth for repository state
