@@ -1,0 +1,65 @@
+# A design space written by hand: the Git-hosting sample of this repository, without its evidence.
+# Import it into a wiki:  ddspace init my-space --yes && cd my-space
+#                         ddspace import ../design-space.yaml --kind space --yes && ddspace wiki build --yes
+name: git-hosting
+question: Which decisions does hosting Git for a large engineering organization involve?
+dimensions:
+  - id: storage
+    name: Source of truth for repository state
+    description: Where the authoritative copy of each repository's objects and references lives.
+    values:
+      - name: Repository files on server disks
+        description: Plain Git repositories on the servers' local disks are the authoritative state.
+      - name: Write-ahead log in object storage
+        description: An append-only log in object storage is the authority; repositories on disk are derived from it.
+      - name: Objects in a distributed hash table
+        description: Git objects are stored individually in a distributed key-value store.
+      - name: Blobs plus a relational reference database
+        description: Pack data in blob storage and references in a relational database, two stores to keep consistent.
+  - id: replication
+    name: Replication for durability
+    description: How copies of a repository are kept so that a lost machine loses no data.
+    values:
+      - name: Block-level filesystem replication
+        description: The filesystem under Git is replicated block by block between paired machines.
+      - name: Three Git replicas with majority writes
+        description: Each repository has three plain Git replicas; a write succeeds once a majority has it.
+      - name: Durability delegated to object storage
+        description: The object store holding the log keeps the data durable; servers hold no unique data.
+      - name: Single copy on a file server
+        description: One file server holds each repository, reached by RPC, with no replica.
+  - id: references
+    name: Reference update coordination
+    description: How concurrent updates to a repository's references are ordered and made atomic.
+    values:
+      - name: Three-phase commit across replicas
+        description: Reference updates run as a transaction that all replicas vote on.
+      - name: Compare-and-swap on the log
+        description: Writers append to the log with a compare-and-swap, without a consensus protocol.
+      - name: One server serializes the updates
+        description: The single file server holding the repository applies updates one at a time.
+  - id: client
+    name: Client data transfer
+    description: What a developer's machine downloads to work on a repository.
+    values:
+      - name: Full clone over the Git protocol
+        description: The client fetches the whole history with standard Git.
+      - name: Partial clone with sparse checkout
+        description: The client fetches only the history and files it needs, with standard Git features.
+      - name: Virtualized filesystem with on-demand objects
+        description: A virtual filesystem shows every file and downloads objects only when a file is opened.
+  - id: reads
+    name: Serving reads
+    description: Where read traffic (fetches, clones, CI checkouts) is served from.
+    values:
+      - name: Nearest up-to-date replica
+        description: Reads go to the closest replica that has the latest state.
+      - name: Cache servers near the clients
+        description: Cache servers in each office or region serve objects and forward misses to the origin.
+      - name: Stateless servers with a local disk cache
+        description: Any server can serve any repository, rebuilding a warm copy on its local disk from the log.
+relations:
+  - {from: replication, to: storage, type: requires, note: What must be replicated, and where, follows from where the authoritative state lives.}
+  - {from: references, to: storage, type: requires, note: Updates are ordered by whatever holds the authoritative references.}
+  - {from: replication, to: reads, type: constrains, note: Serving from the nearest replica needs replicas; a single copy leaves one place to read from.}
+  - {from: client, to: reads, type: constrains, note: On-demand object downloads put every file open on the network, which cache servers near the clients absorb.}
