@@ -45,6 +45,7 @@ the expert ML-workflow space (**E**) and without a space (**N**), two repetition
 | `spaces/git-hosting-sample/` | The running example: a small Git-hosting space written by hand, with its explainers |
 | `spaces/no-space/` | The explainers of the 12 sessions without a space, and of the running example without a space |
 | `study/designing2027/` | The cases, the prompt, the session runner, the 24 rationale files and summaries, and `analyze.py`, which recomputes the paper's table |
+| `skills/` | The search and explain skills, ready to copy into your agent's skills folder |
 | `examples/your-own/` | Templates for your own `PROBLEM.md` and `SOLUTION.md`, to try the skills |
 | `examples/toy-git-hosting/` | The running example's run file, cases and recorded rationale files |
 | `src/`, `pyproject.toml` | `ddspace`, with the search and explain skills (`src/delvedspace/templates/skills/`) |
@@ -52,43 +53,28 @@ the expert ML-workflow space (**E**) and without a space (**N**), two repetition
 
 ## Use the skills with your own coding agent
 
-The search and explain skills are not tied to the study: you can install them for your own coding agent
-(Claude Code or Codex) and try them on your own problem, with a design space or without one.
+The search and explain skills are not tied to the study. They are ordinary agent skills, in
+[`skills/`](skills/): install them like any other skill and try them on your own problem, with a design space or
+without one.
 
-**1. Install `ddspace`** (Python 3.10 or later). `ddspace point` describes each design point with one LLM call, so
-set an OpenAI key; without one, the descriptions are left empty and everything else works.
+**1. Install the skills** by copying the two folders where your agent looks for skills:
 
 ```bash
-git clone https://github.com/andresdp/arch-design-wiki.git && cd arch-design-wiki
-pip install -e .
-export OPENAI_API_KEY=sk-...
+git clone https://github.com/andresdp/arch-design-wiki.git
+cp -R arch-design-wiki/skills/ddspace-search arch-design-wiki/skills/ddspace-explain ~/.claude/skills/   # Claude Code
+cp -R arch-design-wiki/skills/ddspace-search arch-design-wiki/skills/ddspace-explain ~/.agents/skills/   # Codex
 ```
 
-The model that writes the descriptions is the space's `models.generation_llm` in `ddspace.yaml` (without a space,
-`DDSPACE_POINT_MODEL`, e.g. `openai/gpt-4.1-mini`); change it if your key has no access to the one set there.
+Use a project's own `.claude/skills/` or `.agents/skills/` instead to install them for that project only. Each
+skill is a `SKILL.md` and a `references/design-space.md`, which the skill reads only when it works on a design
+space.
 
 **2. Write the problem**, in a folder of your own: `PROBLEM.md` with the context and the requirements (functional,
 quality-attribute scenarios, constraints), and, to explain an existing solution, `SOLUTION.md`. The templates are
 in [`examples/your-own/`](examples/your-own/); [`examples/toy-git-hosting/cases/`](examples/toy-git-hosting/cases/)
 has a complete example.
 
-**3a. With a design space.** Work in a copy of a space (one of `spaces/`, or one you build with `ddspace`), so the
-agent's choices are values of the space, checked against it:
-
-```bash
-cp -R spaces/git-hosting-sample ~/my-design && cd ~/my-design
-ddspace agent setup --skills --claude --yes      # the skills for Claude Code (.claude/skills/) and Codex (.agents/skills/)
-cp ~/my-problem/PROBLEM.md .                     # and SOLUTION.md, to explain
-```
-
-**3b. Without a space** (zero-shot: the agent names its own decisions and options), in any folder:
-
-```bash
-cd ~/my-problem
-ddspace agent setup --skills --no-space --claude --yes
-```
-
-**4. Ask the agent**, in that folder:
+**3. Ask the agent**, in that folder:
 
 ```text
 Use the ddspace-search skill. The problem is in PROBLEM.md.
@@ -100,16 +86,24 @@ or, to explain a solution:
 Use the ddspace-explain skill. The problem is in PROBLEM.md and the solution in SOLUTION.md.
 ```
 
-The agent explores within a budget of design points, writes `rationale/<id>.json` and runs `ddspace rationale
-check` until the file is clean. With Codex, allow the sandbox network access for the point descriptions
+The agent explores within a budget of design points and writes `rationale/<id>.json`: every point it examined, its
+assessment against each requirement, the trade-offs, the alternatives (search) or the explained solution
+(explain), and the gaps.
+
+**Without a design space** (any folder), the agent works zero-shot: it names its own decisions and options. The
+skills need nothing else. With [`ddspace`](USAGE.md) installed (`pip install -e arch-design-wiki`), they also
+describe each design point (one LLM call per point; set `OPENAI_API_KEY` and `DDSPACE_POINT_MODEL`, e.g.
+`openai/gpt-4.1-mini`), check the file, and render it as an explainer page:
+`ddspace rationale build rationale/<id>.json --out .` writes `explainers/<id>.html`.
+
+**With a design space**, run the agent inside the space's folder: one of [`spaces/`](spaces/), or one you build or
+import with `ddspace`. The skill finds the space there (`ddspace` is required, since it is how the agent reads the
+space), and every choice becomes a value of the space, checked against it. The explainer goes into the space's
+wiki: `ddspace rationale build rationale/<id>.json` writes `site/explainers/<id>.html`. The point descriptions use
+the space's `models.generation_llm` in `ddspace.yaml`; change it if your key has no access to the one set there.
+
+With Codex, allow the sandbox network access when `ddspace` describes points
 (`codex -c sandbox_workspace_write.network_access=true`).
-
-**5. Open the explainer:**
-
-```bash
-ddspace rationale build rationale/<id>.json            # with a space: site/explainers/<id>.html, inside the wiki
-ddspace rationale build rationale/<id>.json --out .    # without a space: explainers/<id>.html
-```
 
 ### An example: Git hosting on the sample space
 
@@ -117,8 +111,8 @@ The sample space's search problem asks for a self-hosted Git service for 3,000 e
 failover, 30-second CI fetches, read-after-push consistency, standard Git clients, a team of five):
 
 ```bash
-cp -R spaces/git-hosting-sample ~/git-hosting && cd ~/git-hosting
-ddspace agent setup --skills --claude --yes
+pip install -e arch-design-wiki && export OPENAI_API_KEY=sk-...
+cp -R arch-design-wiki/spaces/git-hosting-sample ~/git-hosting && cd ~/git-hosting
 cp ~/arch-design-wiki/examples/toy-git-hosting/cases/1-hosting-search/problem.md PROBLEM.md
 claude "Use the ddspace-search skill. The problem is in PROBLEM.md."
 ddspace rationale list                                  # the new file's id, next to the two recorded ones
@@ -129,8 +123,9 @@ open site/explainers/<id>.html                          # xdg-open on Linux
 The result should resemble the [recorded search](https://andresdp.github.io/arch-design-wiki/spaces/git-hosting-sample/site/explainers/hosting-search.html):
 two or three alternatives that differ where the requirements conflict (replicated Git repositories, or an
 object-storage log as the source of truth), each step's trade-offs, and the requirements the space has no
-dimension for. To explain a solution instead, also copy `cases/2-spokes-explain/solution.md` as `SOLUTION.md` and
-use the explain skill.
+dimension for. Run the same prompt in an empty folder with only `PROBLEM.md` for the zero-shot version, and
+compare. To explain a solution instead, also copy `cases/2-spokes-explain/solution.md` as `SOLUTION.md` and use the
+explain skill.
 
 ## Reproduce
 
