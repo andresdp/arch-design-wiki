@@ -41,14 +41,23 @@ product recommendations on every page. Recommendations must appear within 100 ms
 recommended within a day, and a team of four with no ML platform runs everything on the company's AWS account.
 ```
 
-To explain a solution, give the problem and then the solution:
+To explain a solution, describe the solution; the problem it solves is optional:
+
+```text
+/ddspace-explain Explain this solution: a nightly batch job trains a matrix-factorization model on SageMaker and
+writes the top 20 products per user to DynamoDB; the web servers read them with each page; new products are shown
+by popularity until the next night's run.
+```
+
+Without a problem, the skill infers the requirements the solution appears to be built for (only those its text
+supports), marks them as inferred, and explains the solution against them: the explainer shows them as
+"inferred from the solution", so you can correct them and run the skill again. With the problem, the explanation
+rests on your requirements instead:
 
 ```text
 /ddspace-explain Explain this solution. Problem: an online shop with 2 million visits a day wants product
 recommendations on every page, within 100 ms, with new products recommended within a day; a team of four runs it
-on AWS. Solution: a nightly batch job trains a matrix-factorization model on SageMaker and writes the top 20
-products per user to DynamoDB; the web servers read them with each page; new products are shown by popularity
-until the next night's run.
+on AWS. Solution: a nightly batch job trains a matrix-factorization model on SageMaker and ...
 ```
 
 The more the text says about the requirements, the better: what the system must do, the quality attributes it
@@ -57,9 +66,11 @@ provider, a budget). Labels are not needed: the skill takes the requirements fro
 Q1, C1, ...) and says how it read them.
 
 In an agent without slash commands for skills, name the skill instead: "Use the ddspace-search skill: I need
-alternatives for ...". For a long problem, a file works too: "/ddspace-search The problem is in PROBLEM.md." (the
-templates are in [`examples/your-own/`](examples/your-own/)); with no text and no file named, the skill looks for
-`PROBLEM.md` (and `SOLUTION.md`) in the working folder.
+alternatives for ...". Markdown files work as inputs too, for long texts: a file with the problem for search, and a file with the solution
+(and, optionally, another with the problem) for explain. Name them in the request: "/ddspace-search The problem is
+in PROBLEM.md." or "/ddspace-explain The solution is in SOLUTION.md and the problem in PROBLEM.md." The templates
+are in [`examples/your-own/`](examples/your-own/). With no text and no file named, the skill looks for `PROBLEM.md`
+(search), or `SOLUTION.md` and `PROBLEM.md` (explain), in the working folder.
 
 ## 3. Two ways to run them
 
@@ -186,8 +197,8 @@ that there is no space there). The agent names similar decisions in its own word
 there is no space for a requirement to fall outside of. The
 [recorded runs](https://andresdp.github.io/arch-design-wiki/#explainers) of this example show both.
 
-To explain a solution, follow the problem with it: "/ddspace-explain Explain this solution. Problem: ... Solution:
-every repository is stored as plain Git on the local disks of three file servers; a push updates references through
-a three-phase commit and succeeds once a majority agrees; reads go to the closest up-to-date replica; engineers use
-full clones." The full text of both is in
-[`examples/toy-git-hosting/cases/`](examples/toy-git-hosting/cases/).
+To explain a solution, describe it, with or without the problem: "/ddspace-explain Explain this solution: every
+repository is stored as plain Git on the local disks of three file servers; a push updates references through a
+three-phase commit and succeeds once a majority agrees; reads go to the closest up-to-date replica; engineers use
+full clones." Without the problem, the skill infers the requirements from the solution. The full text of the problem
+and the solution is in [`examples/toy-git-hosting/cases/`](examples/toy-git-hosting/cases/).
