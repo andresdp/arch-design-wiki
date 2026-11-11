@@ -1,9 +1,8 @@
-# arch-design-wiki
+<p align="center"><img src="assets/icon.svg" alt="" width="120"></p>
 
-<img src="assets/icon.svg" alt="" width="56" align="right">
+# Architecture Design Wiki
 
-Material for the paper **"Searching and Explaining Designs with a Design Space"** (J. Andrés Díaz-Pace; under
-review for the 4th International Workshop on Designing Software, Designing 2027).
+Material for the paper **"Searching and Explaining Designs with a Design Space"**.
 
 A design space records the decisions of a domain, the alternatives for each, the relations between them and the
 systems that adopted them. The paper studies how an architect can put a given space to work:
@@ -61,13 +60,14 @@ python study/designing2027/analyze.py      # the paper's table, offline
 
 ## Cite
 
-The paper is under review for the 4th International Workshop on Designing Software (Designing 2027, co-located with
-ICSE 2027). Until it is published, please cite this repository ([CITATION.cff](CITATION.cff)); GitHub's "Cite this
+Until the paper is published, please cite this repository ([CITATION.cff](CITATION.cff)); GitHub's "Cite this
 repository" button gives the reference in APA and BibTeX.
 
 ## Licence and credits
 
-Code: MIT ([LICENSE](LICENSE)). The expert space is derived from the decision model of S. J. Warnett and U. Zdun,
+Code: MIT ([LICENSE](LICENSE)).
+
+The expert space is derived from the decision model of S. J. Warnett and U. Zdun,
 "Architectural Design Decisions for the Machine Learning Workflow", *IEEE Computer* 55(3), 2022
 ([doi:10.1109/MC.2021.3134800](https://doi.org/10.1109/MC.2021.3134800)); see
 [spaces/ml-workflow-expert/ATTRIBUTION.md](spaces/ml-workflow-expert/ATTRIBUTION.md). The running example's
