@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git hosting for a fast-growing engineering organization · Explainer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="../assets/ddspace-icon.svg" type="image/svg+xml">
+<script>
+  // Theme: the reader's choice (kept in this browser) or the system setting.
+  (function () { try { var t = localStorage.getItem("ddspace-wiki-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {} })();
+</script>
+<style>
+  body { background: var(--bg); }
+  .ex-wrap { display: grid; grid-template-columns: minmax(0, var(--split-left, 1fr)) 8px minmax(0, 1fr); gap: 0; min-height: calc(100vh - 50px); }
+  .ex-text { padding: 22px 28px 60px; overflow-wrap: anywhere; }
+  .ex-side { background: var(--panel); display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh; }
+  #canvas { position: relative; flex: 0 0 var(--split-canvas, 60%); min-height: 160px; overflow: hidden; }
+  .splitter-v { position: sticky; top: 0; height: 100vh; cursor: col-resize; background: var(--border);
+    border-left: 3px solid var(--bg); border-right: 3px solid var(--panel); touch-action: none; }
+  .splitter-h { flex: none; height: 8px; cursor: row-resize; background: var(--border);
+    border-top: 3px solid var(--panel); border-bottom: 3px solid var(--panel); touch-action: none; }
+  .splitter-v:hover, .splitter-h:hover, .splitter-v:focus-visible, .splitter-h:focus-visible, .splitter-v.dragging,
+  .splitter-h.dragging { background: var(--accent); outline: none; }
+  body.resizing { user-select: none; }
+  body.resizing.col { cursor: col-resize; } body.resizing.row { cursor: row-resize; }
+  #svg { width: 100%; height: 100%; display: block; cursor: grab; }
+  #info { flex: 1 1 0; min-height: 80px; overflow-y: auto; padding: 12px 16px; border-top: 1px solid var(--border); font-size: 13.5px; }
+  #info h2 { margin: 4px 0; font-size: 17px; border: none; }
+  #info ul { padding-left: 16px; margin: 4px 0 10px; }
+  #info .info-h { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 14px 0 4px; font-weight: 600; }
+  #info .info-sub { color: var(--muted); margin: 2px 0 8px; line-height: 1.45; }
+  #info p { margin: 4px 0; line-height: 1.45; }
+  #info .info-link { margin-top: 14px; }
+  #info .node-chip { padding: 1px 7px; font-size: 11px; margin: 1px 3px 1px 0; }
+  #info .pair-chip { display: inline-block; margin: 0 8px 4px 0; white-space: nowrap; }
+  .muted, .hint { color: var(--muted); font-size: 12.5px; }
+  h1 { margin: 6px 0 4px; font-size: 24px; }
+  h2.sec { font-size: 16px; margin: 22px 0 8px; border: none; }
+  .banner { background: var(--mixed); color: #fff; padding: 9px 14px; border-radius: 8px; margin: 0 0 14px; font-size: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 6px 0; list-style: none; }
+  .chip { display: inline-flex; gap: 6px; align-items: baseline; border: 1px solid var(--border); background: var(--panel);
+    color: var(--fg); border-radius: 999px; padding: 4px 11px; font: inherit; font-size: 13px; cursor: pointer; text-align: left; }
+  .chip strong { color: var(--accent); }
+  /* in a flex chip, the id and the kind keep their width; only the text wraps */
+  .chip > strong, .chip > .muted { flex: none; white-space: nowrap; }
+  .chip { text-align: left; }
+  .chip.small { padding: 0 7px; font-size: 11.5px; margin-right: 3px; }
+  .chip:hover, .chip.sel { border-color: var(--accent); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--border); margin: 18px 0 0; }
+  .tab { font: inherit; font-size: 14px; padding: 7px 14px; border: 1px solid transparent; border-bottom: none;
+    border-radius: 8px 8px 0 0; background: none; color: var(--muted); cursor: pointer; }
+  .tab[aria-selected="true"] { background: var(--panel); border-color: var(--border); color: var(--fg); font-weight: 600;
+    margin-bottom: -1px; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-top: none; padding: 12px 16px 16px;
+    border-radius: 0 0 8px 8px; }
+  .panel[hidden] { display: none; }
+  .choice { border-top: 1px solid var(--border); padding: 9px 0; }
+  .choice:first-of-type { border-top: none; }
+  .choice .head { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+  .choice .arrow { color: var(--muted); }
+  .choice p { margin: 4px 0; line-height: 1.45; font-size: 14px; }
+  .quote { border-left: 3px solid var(--accent); padding: 2px 10px; margin: 6px 0; font-style: italic; }
+  .ev { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .vref, .dref { cursor: pointer; display: inline-flex; gap: 5px; align-items: center; }
+  .others { font-size: 12.5px; color: var(--muted); }
+  .scroll { overflow-x: auto; }
+  table.compare td.open { color: var(--muted); font-style: italic; }
+  tr.differs th { border-left: 3px solid var(--accent); }
+  .node text { font-size: 15px; fill: var(--fg); paint-order: stroke; stroke: var(--panel); stroke-width: 3px; pointer-events: none; }
+  .node.greyed path.shape { opacity: .35; }
+  .node.greyed text { opacity: .5; }
+  .node.in-point text { font-weight: 600; }
+  .link.explored { stroke: var(--accent); stroke-opacity: .7; stroke-width: 3px; }
+  .link.on-path { stroke-opacity: 1; stroke-width: 4px; }
+  .link.on-path.tree { stroke: var(--accent); }
+  .link.on-path:not(.tree) { stroke-width: 1.8px; stroke-opacity: .85; }
+  .zoom-ctl { position: absolute; top: 8px; right: 10px; display: flex; gap: 4px; z-index: 2; }
+  .zoom-ctl button { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel);
+    color: var(--fg); font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
+  .zoom-ctl button:hover { border-color: var(--accent); }
+  .link.shown { stroke-opacity: .95; stroke-width: 2.4px; }
+  .graph-toggle { position: absolute; top: 8px; left: 10px; font-size: 12px; color: var(--muted); background: var(--panel);
+    padding: 2px 6px; border-radius: 6px; display: flex; gap: 5px; align-items: center; cursor: pointer; }
+  .node.dim-out, .link.dim-out { opacity: .1; }
+  .graph-key { font-size: 11.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 12px; padding: 6px 12px;
+    border-top: 1px solid var(--border); }
+  .graph-key b { color: var(--fg); font-weight: 600; }
+  .traj-wrap { position: relative; }
+  svg.lineage { display: block; width: 100%; height: 46px; overflow: visible; }
+  table.traj { border-collapse: separate; border-spacing: 0; font-size: 12.5px; overflow-wrap: normal; word-break: normal; hyphens: none; }
+  table.traj th, table.traj td { padding: 4px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.traj thead th { position: sticky; top: 0; background: var(--panel); }
+  table.traj th.row-h { text-align: left; font-weight: 500; min-width: 140px; max-width: 220px; }
+  table.traj .step-h { cursor: pointer; text-align: center; min-width: 112px; border-top: 3px solid var(--muted); }
+  table.traj .step-h b { display: block; font-size: 14px; }
+  table.traj .step-h .mv, table.traj .step-h .vd, table.traj .step-h .alt { display: block; font-size: 11px; }
+  .mv-seed, .mv-solution { border-top-color: var(--dimension) !important; } .mv-seed .mv, .mv-solution .mv { color: var(--dimension); }
+  .mv-exploit, .mv-region { border-top-color: var(--accent) !important; } .mv-exploit .mv, .mv-region .mv { color: var(--accent); }
+  .mv-explore, .mv-contrast { border-top-color: var(--novel) !important; } .mv-explore .mv, .mv-contrast .mv { color: var(--novel); }
+  .vd-strong, .vd-grounded { color: var(--accepted); } .vd-mixed, .vd-partial { color: var(--mixed); }
+  .vd-weak, .vd-ungrounded { color: var(--rejected); }
+  table.traj .alt { font-weight: 700; color: var(--fg); }
+  table.traj td.c { text-align: left; min-width: 112px; max-width: 150px; }
+  table.traj td.changed { box-shadow: inset 0 0 0 2px var(--accent); border-radius: 4px; }
+  table.traj td.novel .cell-v { font-weight: 700; }
+  table.traj td.contrast { box-shadow: inset 0 0 0 2px var(--novel); border-radius: 4px; }
+  table.traj td.dropped { opacity: .55; }
+  table.traj .sel { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  table.traj .band-h { text-align: center; font-size: 12px; min-width: 40px; }
+  table.traj td.band span { display: block; height: 18px; border-radius: 3px; background: var(--accepted); opacity: .75; }
+  .cell-v { font-size: 12px; }
+  .legend { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0; }
+  .region { border: 1px solid var(--border); border-left: 4px solid var(--accepted); border-radius: 6px; padding: 8px 12px; margin: 8px 0; }
+  .link.off { display: none; }
+  .mode-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px;
+    margin-bottom: 6px; color: #fff; }
+  .mode-icon.mode-search { background: var(--accent); } .mode-icon.mode-explain { background: var(--mixed); }
+  .lanes-wrap, .qoc-wrap { position: relative; }
+  svg.lane-arrows, svg.qoc-links { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+  table.lanes { border-collapse: separate; border-spacing: 0; font-size: 13px; width: 100%; }
+  table.lanes th, table.lanes td { border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: middle; }
+  table.lanes thead th { font-size: 12px; color: var(--muted); font-weight: 600; }
+  table.lanes tbody th { min-width: 160px; max-width: 240px; font-weight: 400; }
+  table.lanes .idea { display: block; color: var(--muted); font-size: 12px; }
+  table.lanes tr.dropped th, table.lanes tr.dropped td:not(.outcome) { opacity: .7; }
+  table.lanes td.outcome { font-size: 12px; max-width: 220px; }
+  .node-chip { font: inherit; font-size: 12px; border-radius: 12px; padding: 3px 9px; margin: 2px 6px 2px 0; cursor: pointer;
+    border: 2px solid var(--border); background: var(--panel); color: var(--fg); position: relative; z-index: 1; white-space: nowrap; }
+  .node-chip small { color: var(--muted); }
+  .vb-strong, .vb-grounded { border-color: var(--accepted) !important; } .vb-mixed, .vb-partial { border-color: var(--mixed) !important; }
+  .vb-weak, .vb-ungrounded { border-color: var(--rejected) !important; }
+  .node-chip.sel, .story-step.sel, .opt.sel { box-shadow: 0 0 0 3px var(--accent); }
+  table.heat td.h.sel, table.heat th.sel { outline: 2px solid var(--fg); }
+  .alt-chip { font-size: 12px; font-weight: 600; color: var(--accepted); }
+  .dropped-mark { color: var(--rejected); font-weight: 600; }
+  table.heat { border-collapse: separate; border-spacing: 2px; font-size: 11px; width: auto; }
+  table.heat th, table.heat td { white-space: nowrap; }
+  table.heat th { color: var(--muted); font-weight: 600; padding: 0 3px; }
+  table.heat th.heat-r { text-align: left; border-bottom: 1px solid var(--border); }
+  table.heat td.h { width: 26px; height: 18px; border-radius: 3px; cursor: pointer; }
+  table.heat .rb { border-left: 6px solid var(--panel); }
+  .h-meets { background: var(--accepted); } .h-partly { background: var(--mixed); } .h-misses { background: var(--rejected); }
+  .h-none { background: var(--border); opacity: .5; }
+  .sw { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 3px; }
+  .chip-sm { cursor: pointer; }
+  .gaps { margin-top: 28px; border-top: 2px solid var(--border); padding-top: 6px; }
+  .gap-summary { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  .gap-count strong { color: var(--accent); font-size: 1.1em; }
+  .gap-h { font-size: 14px; margin: 16px 0 6px; }
+  .choice.gap .head .chip { margin: 0; }
+  .choice.fit { cursor: pointer; }
+  .choice.fit:hover, .choice.fit:focus { border-color: var(--accent); }
+  .badge.neutral { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .fit-note { font-size: 13px; color: var(--muted); }
+  .tradeoffs { margin: 4px 0; padding-left: 18px; font-size: 13px; }
+  .t-gain, .t-cost { font-size: 11px; border-radius: 9px; padding: 0 6px; border: 1px solid; }
+  .t-gain { color: var(--accepted); } .t-cost { color: var(--rejected); }
+  .own-tradeoff { font-size: 13px; border-left: 3px solid var(--mixed); padding-left: 8px; }
+  .round-head { margin: 18px 0 6px; font-size: 14px; border-bottom: 2px solid var(--border); padding-bottom: 4px; }
+  .round-end { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .story-step { border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 8px 0; cursor: pointer; }
+  .story-step.mv-explore, .story-step.mv-contrast { border-left-color: var(--novel); }
+  .story-step.mv-exploit, .story-step.mv-region { border-left-color: var(--accent); }
+  .story-step.mv-ablate { border-left-style: dotted; border-left-color: var(--accent); }
+  .story-step.mv-seed, .story-step.mv-solution { border-left-color: var(--dimension); }
+  .story-head { font-size: 14px; margin-bottom: 4px; }
+  .story-step p { margin: 4px 0; line-height: 1.45; font-size: 13.5px; }
+  .lbl { display: inline-block; min-width: 68px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+  .lbl-row { display: flex; gap: 0; font-size: 13px; } .lbl-row .lbl { padding-top: 2px; }
+  ul.moves { margin: 0; padding-left: 16px; } ul.moves li { margin: 1px 0; }
+  .vd-chip { font-size: 11px; border: 2px solid var(--border); border-radius: 10px; padding: 0 7px; margin-left: 4px; }
+  .judged { margin: 4px 0; } .j { font-size: 11px; border-radius: 9px; padding: 1px 7px; margin: 2px 4px 2px 0; display: inline-block; color: #fff; cursor: pointer; }
+  .j-meets { background: var(--accepted); } .j-partly { background: var(--mixed); } .j-misses { background: var(--rejected); }
+  .qoc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); column-gap: 90px; font-size: 13px; }
+  .qoc-hdr { display: grid; grid-template-columns: 1fr 1fr; color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+  .qoc-crit .qoc-hdr { grid-template-columns: 1fr; }
+  .qoc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid var(--border); padding: 6px 0; align-items: center; }
+  .opt { border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px; margin: 3px 0; cursor: pointer; background: var(--panel); position: relative; z-index: 1; }
+  .opt-solution { border-left: 4px solid var(--accent); } .opt-contrast { border-left: 4px solid var(--novel); }
+  .crit { border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; margin: 6px 0; cursor: pointer; background: var(--panel); position: relative; z-index: 1; }
+  svg.qoc-links path.traced { stroke-opacity: 1; stroke-width: 3px; }
+  details.grid-details { margin-top: 22px; } details.grid-details summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+  .solution, .option { border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 8px 0; cursor: pointer; }
+  .solution.sel, .option.sel { box-shadow: 0 0 0 2px var(--accent); }
+  .adr { border-top: 1px solid var(--border); margin-top: 18px; padding-top: 8px; }
+  .adr h3 { margin: 6px 0; font-size: 16px; }
+  .option.chosen { border-left: 4px solid var(--accepted); }
+  .option.discarded { border-left: 4px solid var(--rejected); opacity: .9; }
+  .option .values { font-size: 13px; margin: 4px 0; }
+  ul.pc { list-style: none; padding: 0; margin: 4px 0; font-size: 13px; }
+  ul.pc li::before { font-weight: 700; margin-right: 6px; }
+  ul.pc li.pro::before { content: "+"; color: var(--accepted); }
+  ul.pc li.con::before { content: "−"; color: var(--rejected); }
+  ul.parts { margin: 4px 0 6px; padding-left: 18px; font-size: 13px; }
+  ul.parts li { margin: 4px 0; }
+  .pairs { display: block; margin: 2px 0; }
+  .pairs .pair { display: block; padding-left: 10px; font-size: 13px; }
+  .node.unjudged path.shape { fill: var(--panel); stroke: var(--rejected); stroke-dasharray: 2,2; stroke-width: 1.5px; }
+  @media (max-width: 900px) {
+    .ex-wrap { grid-template-columns: 1fr; }
+    .splitter-v, .splitter-h { display: none; }
+    .ex-text { padding: 16px 16px 30px; }
+    .ex-side { position: static; height: auto; border-left: none; border-top: 1px solid var(--border); }
+    #canvas { height: 420px; flex: none; }
+    #info { flex: none; }
+  }
+</style>
+</head>
+<body class="page-explainer">
+<header class="top">
+<a class="brand" href="../index.html"><img src="../assets/ddspace-icon.svg" alt="" class="brand-icon" width="32" height="32">Git hosting at scale (sample)</a>  <nav><a href="../index.html">Wiki index</a><a href="../graph.html">Graph</a></nav>
+  <button class="theme-btn" id="theme-toggle" type="button" title="Switch light / dark mode" aria-label="Switch light / dark mode" style="margin-left:auto">◐</button>
+</header>
+<div class="ex-wrap">
+<main class="ex-text">
+  <div class="mode-icon mode-explain" role="img" aria-label="Explain: the rationale of a given solution" title="Explain: the rationale of a given solution">
+<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="kind">Explain · design rationale · run 20261109_000000</div>
+  <h1>Git hosting for a fast-growing engineering organization</h1>
+<p>A self-hosted Git service must support 3,000 engineers in four regions and about 40,000 CI jobs per day, including use of a 200 GB repository with 15 years of history. Five engineers build and operate it in the company&#39;s cloud account.</p>
+  <h2 class="sec">Requirements</h2>
+  <ul class="chips" id="requirements">
+    <li><button class="chip" type="button" data-requirement="R1" data-node="r:R1"><strong>R1</strong> Accept pushes and serve fetches and clones for every repository over the standard Git protocol. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="R2" data-node="r:R2"><strong>R2</strong> Let engineers work on the largest repository without downloading all of it. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q1" data-node="r:Q1"><strong>Q1</strong> When any single machine or disk is lost, no pushed commit is lost. <span class="muted">quality: durability</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q2" data-node="r:Q2"><strong>Q2</strong> When one server fails during working hours, pushes and fetches continue within one minute, without an operator. <span class="muted">quality: availability</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q3" data-node="r:Q3"><strong>Q3</strong> A CI job in any region fetches the latest state of a repository within 30 seconds at the 95th percentile, even right after a push. <span class="muted">quality: performance</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q4" data-node="r:Q4"><strong>Q4</strong> A fetch that starts after a push has succeeded always sees that push. <span class="muted">quality: consistency</span></button></li>
+    <li><button class="chip" type="button" data-requirement="C1" data-node="r:C1"><strong>C1</strong> Five engineers build and run the service. <span class="muted">constraint</span></button></li>
+    <li><button class="chip" type="button" data-requirement="C2" data-node="r:C2"><strong>C2</strong> Engineers keep using standard Git clients; no custom client may be required. <span class="muted">constraint</span></button></li>
+  </ul>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" type="button" role="tab" data-tab="adrs" aria-selected="true">Decisions (ADRs)</button>
+<button class="tab" type="button" role="tab" data-tab="trajectory" aria-selected="false">Trajectory</button>  </div>
+
+  <section class="panel" data-panel="adrs">
+    <p class="hint">The solution, then its decisions as architecture decision records: each ADR addresses a few related requirements, with the solution's option and the options it was contrasted with. Select an alternative or an option to see it in the graph.</p>
+    <h2 class="sec">The solution</h2>
+    <div class="solution" data-alt="S" tabindex="0"><strong>S · Replicated Git file servers with Spokes-style routing</strong>
+<p>Plain Git repositories on local server disks are replicated three ways, reference writes use three-phase commit, and reads go to the nearest current replica. Engineers use standard Git clients and full clones.</p>      <p class="muted">Composed of 3 partial design points, one per ADR:</p>
+      <ul class="parts">
+        <li><a href="#adr-ADR1" class="adr-link">ADR1</a> · Three server-disk Git replicas with majority writes and three-phase commit <span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q4">Q4</span><span class="chip small" data-node="r:R1">R1</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="d:1"><a href="../concepts/source-of-truth-for-repository-state.html">Source of truth for repository state</a></span> → <span class="vref" data-node="v:1.1"><span class="dot accepted"></span><a href="../entities/repository-files-on-server-disks.html">Repository files on server disks</a></span></span><span class="pair"><span class="dref" data-node="d:2"><a href="../concepts/replication-for-durability.html">Replication for durability</a></span> → <span class="vref" data-node="v:2.2"><span class="dot accepted"></span><a href="../entities/three-git-replicas-with-majority-writes.html">Three Git replicas with majority writes</a></span></span><span class="pair"><span class="dref" data-node="d:3"><a href="../concepts/reference-update-coordination.html">Reference update coordination</a></span> → <span class="vref" data-node="v:3.1"><span class="dot accepted"></span><a href="../entities/three-phase-commit-across-replicas.html">Three-phase commit across replicas</a></span></span></span></li>
+        <li><a href="#adr-ADR2" class="adr-link">ADR2</a> · Full clone over the Git protocol <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:C2">C2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="d:4"><a href="../concepts/client-data-transfer.html">Client data transfer</a></span> → <span class="vref" data-node="v:4.1"><span class="dot accepted"></span><a href="../entities/full-clone-over-the-git-protocol.html">Full clone over the Git protocol</a></span></span></span></li>
+        <li><a href="#adr-ADR3" class="adr-link">ADR3</a> · Nearest up-to-date replica, including remote read replicas <span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:Q4">Q4</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="d:5"><a href="../concepts/serving-reads.html">Serving reads</a></span> → <span class="vref" data-node="v:5.1"><span class="dot accepted"></span><a href="../entities/nearest-up-to-date-replica.html">Nearest up-to-date replica</a></span></span></span></li>
+      </ul>
+<p class="muted">As a whole: Plain Git repositories on local server disks are authoritative, with three replicas for each repository. Reference updates use three-phase commit across replicas, writes succeed after a majority, and clients perform full Git clones from the nearest replica with the latest state.</p>    </div>
+    <article class="adr" id="adr-ADR1">
+      <h3>ADR1 · Authoritative state, replication, and reference updates <span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q4">Q4</span><span class="chip small" data-node="r:R1">R1</span></h3>
+<p><strong>Context.</strong> The service must preserve every accepted push through one machine or disk loss and let subsequent fetches observe committed reference updates. Pushes must continue to use standard Git.</p>      <p><strong>Decision.</strong> Three server-disk Git replicas with majority writes and three-phase commit.</p>
+      <div class="option chosen" data-option="ADR1:O1" tabindex="0">
+        <div class="head"><strong>Three server-disk Git replicas with majority writes and three-phase commit</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="d:1"><a href="../concepts/source-of-truth-for-repository-state.html">Source of truth for repository state</a></span> → <span class="vref" data-node="v:1.1"><span class="dot accepted"></span><a href="../entities/repository-files-on-server-disks.html">Repository files on server disks</a></span></span><span class="pair"><span class="dref" data-node="d:2"><a href="../concepts/replication-for-durability.html">Replication for durability</a></span> → <span class="vref" data-node="v:2.2"><span class="dot accepted"></span><a href="../entities/three-git-replicas-with-majority-writes.html">Three Git replicas with majority writes</a></span></span><span class="pair"><span class="dref" data-node="d:3"><a href="../concepts/reference-update-coordination.html">Reference update coordination</a></span> → <span class="vref" data-node="v:3.1"><span class="dot accepted"></span><a href="../entities/three-phase-commit-across-replicas.html">Three-phase commit across replicas</a></span></span></p>
+<div class="quote">“Every repository is stored as a plain Git repository on the local disks of three file servers, placed in different racks. The three replicas are the authoritative copies; there is no separate database of repository contents.”</div><div class="quote">“The three replicas are the authoritative copies; there is no separate database of repository contents.”</div><div class="quote">“A push updates references through a three-phase commit: a proxy sends the update to all three replicas, each takes a lock and votes, and the update commits once a majority has agreed.”</div><ul class="pc"><li class="pro">Meets the single-machine durability scenario through three copies and majority writes.</li><li class="pro">Coordinates reference updates across replicas and supports current-state reads.</li><li class="pro">Attested in combination by Git at any scale and Stretching Spokes.</li><li class="con">Adds replication and transaction overhead to writes.</li><li class="con">The solution does not quantify failure recovery time.</li></ul><p>The requirements force a replicated durable design among the evaluated options: the single-copy contrast misses Q1. The exact server-disk authority and three-phase commit are not shown to be forced by the requirements.</p>      </div>
+      <div class="option discarded" data-option="ADR1:O2" tabindex="0">
+        <div class="head"><strong>Single copy on a file server</strong> <span class="badge rejected">discarded</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="d:1"><a href="../concepts/source-of-truth-for-repository-state.html">Source of truth for repository state</a></span> → <span class="vref" data-node="v:1.1"><span class="dot accepted"></span><a href="../entities/repository-files-on-server-disks.html">Repository files on server disks</a></span></span><span class="pair"><span class="dref" data-node="d:2"><a href="../concepts/replication-for-durability.html">Replication for durability</a></span> → <span class="vref" data-node="v:2.4"><span class="dot accepted"></span><a href="../entities/single-copy-on-a-file-server.html">Single copy on a file server</a></span></span></p>
+<ul class="pc"><li class="pro">Avoids the storage overhead of multiple repository copies.</li><li class="con">Loss of the file server can lose the only copy, failing Q1.</li><li class="con">Does not provide replica participants for three-phase commit.</li></ul><p>Rejected by the durability requirement; this is a design-space contrast, not an option the solution says its designers considered.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR2">
+      <h3>ADR2 · Client transfer for large repositories <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:C2">C2</span></h3>
+<p><strong>Context.</strong> Engineers must use standard Git, and the largest repository must be usable without downloading its full contents and history.</p>      <p><strong>Decision.</strong> Full clone over the Git protocol.</p>
+      <div class="option chosen" data-option="ADR2:O1" tabindex="0">
+        <div class="head"><strong>Full clone over the Git protocol</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="d:4"><a href="../concepts/client-data-transfer.html">Client data transfer</a></span> → <span class="vref" data-node="v:4.1"><span class="dot accepted"></span><a href="../entities/full-clone-over-the-git-protocol.html">Full clone over the Git protocol</a></span></span></p>
+<div class="quote">“Engineers use standard Git clients and full clones.”</div><ul class="pc"><li class="pro">Uses the standard Git protocol and client features.</li><li class="pro">Provides a complete local history.</li><li class="con">Downloads the whole repository, failing R2 for the largest repository.</li></ul><p>The solution chooses this option freely, but it does not satisfy R2. The contrast shows partial clone can retain standard Git while meeting R2.</p>      </div>
+      <div class="option discarded" data-option="ADR2:O2" tabindex="0">
+        <div class="head"><strong>Partial clone with sparse checkout</strong> <span class="badge rejected">discarded</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="d:4"><a href="../concepts/client-data-transfer.html">Client data transfer</a></span> → <span class="vref" data-node="v:4.2"><span class="dot accepted"></span><a href="../entities/partial-clone-with-sparse-checkout.html">Partial clone with sparse checkout</a></span></span></p>
+<ul class="pc"><li class="pro">Meets R2 by fetching only needed history and files.</li><li class="pro">Retains standard Git features, satisfying C2.</li><li class="con">Unselected files or history may need to be fetched later.</li></ul><p>This design-space contrast would better fit the problem&#39;s large-repository requirement, but the solution text does not choose it.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR3">
+      <h3>ADR3 · Regional read routing <span class="chip small" data-node="r:Q3">Q3</span><span class="chip small" data-node="r:Q4">Q4</span></h3>
+<p><strong>Context.</strong> CI and engineers across regions need reads from the latest repository state with low latency, including after a successful push.</p>      <p><strong>Decision.</strong> Nearest up-to-date replica, including remote read replicas.</p>
+      <div class="option chosen" data-option="ADR3:O1" tabindex="0">
+        <div class="head"><strong>Nearest up-to-date replica, including remote read replicas</strong> <span class="badge accepted">chosen</span> <span class="badge mixed approx" title="The mapped value captures nearest up-to-date reads but not the non-voting status of the extra remote replicas.">approximate fit</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="d:5"><a href="../concepts/serving-reads.html">Serving reads</a></span> → <span class="vref" data-node="v:5.1"><span class="dot accepted"></span><a href="../entities/nearest-up-to-date-replica.html">Nearest up-to-date replica</a></span></span></p>
+<div class="quote">“Reads go to the closest replica that is up to date; in remote regions, extra non-voting replicas serve reads without slowing down writes.”</div><ul class="pc"><li class="pro">Serves reads near clients when a current replica is available.</li><li class="pro">Supports the requirement that a post-push fetch sees the committed state.</li><li class="con">The 30-second P95 fetch target has no measured validation in the solution or design space.</li><li class="con">A stale nearby replica must be bypassed.</li></ul><p>The routing choice is supported and directly fits Q4, while it only partly supports Q3 because no latency measurements establish the target. The extra non-voting replica detail is not represented by the value.</p><p class="fit-note"><strong>Approximate fit.</strong> The mapped value captures nearest up-to-date reads but not the non-voting status of the extra remote replicas.</p>      </div>
+    </article>
+    <h2 class="sec">Requirements not addressed</h2>
+    <p class="hint">No ADR names these requirements as drivers; more on each under <a href="#gaps">Gaps in the space</a>.</p>
+    <ul class="chips"><li><button class="chip" type="button" data-requirement="Q2" data-node="r:Q2"><strong>Q2</strong> When one server fails during working hours, pushes and fetches continue within one minute, without an operator. <span class="muted">· the space has no dimension for it</span></button></li><li><button class="chip" type="button" data-requirement="C1" data-node="r:C1"><strong>C1</strong> Five engineers build and run the service. <span class="muted">· the space has no dimension for it</span></button></li></ul>
+  </section>
+
+  <section class="panel" data-panel="trajectory" hidden>
+    <p class="hint">How the agent explained the solution: 6 points or regions evaluated of a budget of 8. The story follows the agent's thinking step by step; the questions, options and criteria then show which of the solution's choices the requirements force. Select a point anywhere to see it in the graph.</p>
+
+
+
+    <h2 class="sec">The explanation, step by step</h2>
+    <article class="story-step mv-solution" data-step="1">
+      <div class="story-head"><b>#1</b> The solution as one design point <span class="vd-chip vb-partial">partial</span> <span class="alt-chip">the solution</span></div>
+<p><span class="lbl">Thought</span> The complete solution combines disk-backed Git repositories, three replicas, transactional ref updates, full client clones, and locality-aware reads.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="d:1"><a href="../concepts/source-of-truth-for-repository-state.html">Source of truth for repository state</a></span> → <span class="vref" data-node="v:1.1"><span class="dot accepted"></span><a href="../entities/repository-files-on-server-disks.html">Repository files on server disks</a></span></li><li><span class="dref" data-node="d:2"><a href="../concepts/replication-for-durability.html">Replication for durability</a></span> → <span class="vref" data-node="v:2.2"><span class="dot accepted"></span><a href="../entities/three-git-replicas-with-majority-writes.html">Three Git replicas with majority writes</a></span></li><li><span class="dref" data-node="d:3"><a href="../concepts/reference-update-coordination.html">Reference update coordination</a></span> → <span class="vref" data-node="v:3.1"><span class="dot accepted"></span><a href="../entities/three-phase-commit-across-replicas.html">Three-phase commit across replicas</a></span></li><li><span class="dref" data-node="d:4"><a href="../concepts/client-data-transfer.html">Client data transfer</a></span> → <span class="vref" data-node="v:4.1"><span class="dot accepted"></span><a href="../entities/full-clone-over-the-git-protocol.html">Full clone over the Git protocol</a></span></li><li><span class="dref" data-node="d:5"><a href="../concepts/serving-reads.html">Serving reads</a></span> → <span class="vref" data-node="v:5.1"><span class="dot accepted"></span><a href="../entities/nearest-up-to-date-replica.html">Nearest up-to-date replica</a></span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The combination is attested by Git at any scale. The value descriptions support standard Git use, durability, and read-after-push routing. The stated 30-second P95 and one-minute operator-free failover targets are not demonstrated by the design-space evidence or solution details; they remain unproven rather than measured misses. Full clones directly conflict with R2. The five-person staffing constraint is not addressed by an operational-effort dimension.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-misses" data-node="r:R2">R2 misses</span><span class="j j-meets" data-node="r:Q1">Q1 meets</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span><span class="j j-partly" data-node="r:C1">C1 partly</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="v:4.1"><span class="dot accepted"></span><a href="../entities/full-clone-over-the-git-protocol.html">Full clone over the Git protocol</a></span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R1">R1</span>, <span class="vref" data-node="r:C2">C2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:R2">R2</span>: <span class="muted">Full Git clones support standard-client repository access but transfer the whole history, which conflicts with working on the largest repository without downloading it all.</span></li></ul><p class="muted">Plain Git repositories on local server disks are authoritative, with three replicas for each repository. Reference updates use three-phase commit across replicas, writes succeed after a majority, and clients perform full Git clones from the nearest replica with the latest state.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides durable copies, coordinated reference updates, and lower read latency. It sacrifices storage efficiency and write performance to maintain three replicas and coordinate commits, while full clones consume substantial client bandwidth and time.</p><p class="muted">Attested by <a href="../sources/s1.html">Git at any scale</a></p>    </article>
+    <article class="story-step mv-region" data-step="2">
+      <div class="story-head"><b>#2</b> A region of #1: part of the solution <span class="vd-chip vb-grounded">grounded</span></div>
+<p><span class="lbl">Thought</span> Q1 and Q4 call for authoritative repository state on servers with replicated writes and coordinated reference updates.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="d:1"><a href="../concepts/source-of-truth-for-repository-state.html">Source of truth for repository state</a></span> → <span class="vref" data-node="v:1.1"><span class="dot accepted"></span><a href="../entities/repository-files-on-server-disks.html">Repository files on server disks</a></span></li><li><span class="dref" data-node="d:2"><a href="../concepts/replication-for-durability.html">Replication for durability</a></span> → <span class="vref" data-node="v:2.2"><span class="dot accepted"></span><a href="../entities/three-git-replicas-with-majority-writes.html">Three Git replicas with majority writes</a></span></li><li><span class="dref" data-node="d:3"><a href="../concepts/reference-update-coordination.html">Reference update coordination</a></span> → <span class="vref" data-node="v:3.1"><span class="dot accepted"></span><a href="../entities/three-phase-commit-across-replicas.html">Three-phase commit across replicas</a></span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The point has no warnings, satisfies the required source-of-truth dependency, and is attested by Git at any scale and Stretching Spokes. Its replica and majority-write choices directly support loss tolerance; transactional ref updates and latest-state reads support the consistency requirement. The point description flags added write and transaction latency, but neither requirement sets a write-latency target.</p><div class="judged"><span class="j j-meets" data-node="r:Q1">Q1 meets</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span></div><p class="muted">Each repository’s authoritative state is stored as plain Git repositories on server disks, with three replicas maintained for every repository. Reference updates run through a three-phase transaction across replicas, while a write is considered durable after a majority has recorded it.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides disk-based simplicity, replication-based durability, and coordinated reference updates, but adds replication and transaction latency and operational complexity. The majority-write rule is in tension with all-replica voting: an unavailable replica may prevent a transaction even when two replicas are ready.</p><p class="muted">Attested by <a href="../sources/s1.html">Git at any scale</a>; <a href="../sources/s2.html">Stretching Spokes</a></p>    </article>
+    <article class="story-step mv-contrast" data-step="3">
+      <div class="story-head"><b>#3</b> A contrast on #2: one option changed <span class="vd-chip vb-ungrounded">ungrounded</span></div>
+<p><span class="lbl">Thought</span> Does Q1 force three replicas rather than the single-copy alternative offered for durability?</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="d:2"><a href="../concepts/replication-for-durability.html">Replication for durability</a></span>: <span class="vref" data-node="v:2.2"><span class="dot accepted"></span><a href="../entities/three-git-replicas-with-majority-writes.html">Three Git replicas with majority writes</a></span> → <span class="vref" data-node="v:2.4"><span class="dot accepted"></span><a href="../entities/single-copy-on-a-file-server.html">Single copy on a file server</a></span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> This contrast changes the replication value to a single copy. Its point description says loss of the file server can lose the sole copy, so it misses Q1. Q1 therefore forces the three-replica choice among this contrast and the solution value.</p><div class="judged"><span class="j j-misses" data-node="r:Q1">Q1 misses</span></div><p class="muted">The system would expose a plain Git repository stored on a file server’s local disk as the authoritative state, accessed by RPC. Reference updates would be handled as three-phase transactions requiring replica votes.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This saves storage and replication overhead, but failure of the file server can lose the sole copy, while three-phase coordination adds complexity without improving durability. The single-copy choice conflicts with three-phase commit across replicas because it provides no replica participants to vote.</p><p class="muted">Attested by <a href="../sources/s1.html">Git at any scale</a></p>    </article>
+    <article class="story-step mv-region" data-step="4">
+      <div class="story-head"><b>#4</b> A region of #1: part of the solution <span class="vd-chip vb-partial">partial</span></div>
+<p><span class="lbl">Thought</span> R1 and C2 call for full repository access through the standard Git protocol and clients.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="d:4"><a href="../concepts/client-data-transfer.html">Client data transfer</a></span> → <span class="vref" data-node="v:4.1"><span class="dot accepted"></span><a href="../entities/full-clone-over-the-git-protocol.html">Full clone over the Git protocol</a></span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Git at any scale and Introducing Scalar attest full clone over the Git protocol. This choice preserves the standard client constraint but fails the explicit requirement to work without downloading all of the largest repository.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-misses" data-node="r:R2">R2 misses</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="v:4.1"><span class="dot accepted"></span><a href="../entities/full-clone-over-the-git-protocol.html">Full clone over the Git protocol</a></span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R1">R1</span>, <span class="vref" data-node="r:C2">C2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:R2">R2</span>: <span class="muted">A full clone offers standard Git access and a complete local history, but requires downloading all of the large repository.</span></li></ul><p class="muted">The system lets a developer obtain a repository by performing a standard Git clone over the Git protocol. The clone includes the repository’s complete history, enabling normal local Git work against that full copy.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides compatibility with standard Git and complete local history, but increases initial download time, bandwidth use, and local storage compared with a partial or shallow transfer.</p><p class="muted">Attested by <a href="../sources/s1.html">Git at any scale</a>; <a href="../sources/s5.html">Introducing Scalar</a></p>    </article>
+    <article class="story-step mv-contrast" data-step="5">
+      <div class="story-head"><b>#5</b> A contrast on #4: one option changed <span class="vd-chip vb-grounded">grounded</span></div>
+<p><span class="lbl">Thought</span> Does R2 force a partial clone rather than the solution&#39;s full-clone choice, while retaining C2?</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="d:4"><a href="../concepts/client-data-transfer.html">Client data transfer</a></span>: <span class="vref" data-node="v:4.1"><span class="dot accepted"></span><a href="../entities/full-clone-over-the-git-protocol.html">Full clone over the Git protocol</a></span> → <span class="vref" data-node="v:4.2"><span class="dot accepted"></span><a href="../entities/partial-clone-with-sparse-checkout.html">Partial clone with sparse checkout</a></span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The partial-clone contrast is supported by Scalar philosophy and Introducing Scalar, and it meets both R2 and the standard-Git-client constraint. The design space therefore offers an alternative that better meets these requirements; full clone is not forced and appears to be a free choice that conflicts with R2.</p><div class="judged"><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-meets" data-node="r:C2">C2 meets</span></div><p class="muted">Each developer uses standard Git to create a partial clone, configuring sparse checkout to materialize only the files needed for their work. The client fetches only the relevant history and content while retaining standard Git features for that reduced view.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This reduces download size and local storage for focused work, but unselected files or history are unavailable locally and may require later fetching. Workflows requiring the complete repository may be less convenient.</p><p class="muted">Attested by <a href="../sources/s4.html">Scalar philosophy</a>; <a href="../sources/s5.html">Introducing Scalar</a></p>    </article>
+    <article class="story-step mv-region" data-step="6">
+      <div class="story-head"><b>#6</b> A region of #1: part of the solution <span class="vd-chip vb-partial">partial</span></div>
+<p><span class="lbl">Thought</span> Q3 and Q4 call for serving reads from a nearby replica that already has the latest state.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="d:1"><a href="../concepts/source-of-truth-for-repository-state.html">Source of truth for repository state</a></span> → <span class="vref" data-node="v:1.1"><span class="dot accepted"></span><a href="../entities/repository-files-on-server-disks.html">Repository files on server disks</a></span></li><li><span class="dref" data-node="d:2"><a href="../concepts/replication-for-durability.html">Replication for durability</a></span> → <span class="vref" data-node="v:2.2"><span class="dot accepted"></span><a href="../entities/three-git-replicas-with-majority-writes.html">Three Git replicas with majority writes</a></span></li><li><span class="dref" data-node="d:5"><a href="../concepts/serving-reads.html">Serving reads</a></span> → <span class="vref" data-node="v:5.1"><span class="dot accepted"></span><a href="../entities/nearest-up-to-date-replica.html">Nearest up-to-date replica</a></span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The solution&#39;s routing rule matches nearest up-to-date replica and the point is attested by Git at any scale and Stretching Spokes. This gives a plausible basis for low-latency regional fetches and directly serves read-after-success consistency. The space and solution provide no benchmark for the 30-second P95 target, so Q3 is only partly supported. Remote non-voting replicas also extend the mapped value, which does not encode voting status.</p><div class="judged"><span class="j j-partly" data-node="r:Q3">Q3 partly</span><span class="j j-meets" data-node="r:Q4">Q4 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="v:5.1"><span class="dot accepted"></span><a href="../entities/nearest-up-to-date-replica.html">Nearest up-to-date replica</a></span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q4">Q4</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q3">Q3</span>: <span class="muted">Routing to the nearest current replica supports read-after-push consistency and regional locality, but does not by itself establish the 30-second P95 fetch bound.</span></li></ul><p class="muted">Each repository is stored as a plain Git repository on server disks, with three replicas maintained for every repository. Writes complete after a majority of replicas records them, while fetches, clones, and checkouts are routed to the nearest replica with the latest state.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides durable data across one machine failure and reduces read latency through locality. It requires maintaining three copies and coordinating majority writes, and reads may need to bypass a nearer replica if it is stale.</p><p class="muted">Attested by <a href="../sources/s1.html">Git at any scale</a>; <a href="../sources/s2.html">Stretching Spokes</a></p>    </article>
+
+    <h2 class="sec">Questions, options and criteria</h2>
+    <p class="hint">Each question is a dimension the solution settles; its options are the solution's value and the values contrasts tried; each option links to the requirements (criteria), as judged by the most specific point that evaluated it. Links of an option judged only within the whole solution are faint; hover an option to trace its links.</p>
+    <div class="qoc-wrap">
+      <svg class="qoc-links" aria-hidden="true"></svg>
+      <div class="qoc">
+        <div class="qoc-left">
+          <div class="qoc-hdr"><span>Question</span><span>Options</span></div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="d:1"><a href="../concepts/source-of-truth-for-repository-state.html">Source of truth for repository state</a></span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="0:0" data-step="2"><span class="vref" data-node="v:1.1"><span class="dot accepted"></span><a href="../entities/repository-files-on-server-disks.html">Repository files on server disks</a></span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="d:2"><a href="../concepts/replication-for-durability.html">Replication for durability</a></span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="1:0" data-step="2"><span class="vref" data-node="v:2.2"><span class="dot accepted"></span><a href="../entities/three-git-replicas-with-majority-writes.html">Three Git replicas with majority writes</a></span> <span class="muted">the solution · forced</span></div><div class="opt opt-contrast" data-qoc="1:1" data-step="3"><span class="vref" data-node="v:2.4"><span class="dot accepted"></span><a href="../entities/single-copy-on-a-file-server.html">Single copy on a file server</a></span> <span class="muted">contrast #3</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="d:3"><a href="../concepts/reference-update-coordination.html">Reference update coordination</a></span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="2:0" data-step="2"><span class="vref" data-node="v:3.1"><span class="dot accepted"></span><a href="../entities/three-phase-commit-across-replicas.html">Three-phase commit across replicas</a></span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="d:4"><a href="../concepts/client-data-transfer.html">Client data transfer</a></span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="3:0" data-step="4"><span class="vref" data-node="v:4.1"><span class="dot accepted"></span><a href="../entities/full-clone-over-the-git-protocol.html">Full clone over the Git protocol</a></span> <span class="muted">the solution · free</span></div><div class="opt opt-contrast" data-qoc="3:1" data-step="5"><span class="vref" data-node="v:4.2"><span class="dot accepted"></span><a href="../entities/partial-clone-with-sparse-checkout.html">Partial clone with sparse checkout</a></span> <span class="muted">contrast #5</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="d:5"><a href="../concepts/serving-reads.html">Serving reads</a></span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="4:0" data-step="6"><span class="vref" data-node="v:5.1"><span class="dot accepted"></span><a href="../entities/nearest-up-to-date-replica.html">Nearest up-to-date replica</a></span> <span class="muted">the solution</span></div></div>
+          </div>
+        </div>
+        <div class="qoc-crit">
+          <div class="qoc-hdr"><span>Criteria</span></div>
+<div class="crit" data-crit="R1" data-node="r:R1"><b>R1</b> Accept pushes and serve fetches and clones for every repository over the standard Git protocol.</div><div class="crit" data-crit="R2" data-node="r:R2"><b>R2</b> Let engineers work on the largest repository without downloading all of it.</div><div class="crit" data-crit="Q1" data-node="r:Q1"><b>Q1</b> When any single machine or disk is lost, no pushed commit is lost.</div><div class="crit" data-crit="Q2" data-node="r:Q2"><b>Q2</b> When one server fails during working hours, pushes and fetches continue within one minute, without an operator.</div><div class="crit" data-crit="Q3" data-node="r:Q3"><b>Q3</b> A CI job in any region fetches the latest state of a repository within 30 seconds at the 95th percentile, even right after a push.</div><div class="crit" data-crit="Q4" data-node="r:Q4"><b>Q4</b> A fetch that starts after a push has succeeded always sees that push.</div><div class="crit" data-crit="C1" data-node="r:C1"><b>C1</b> Five engineers build and run the service.</div><div class="crit" data-crit="C2" data-node="r:C2"><b>C2</b> Engineers keep using standard Git clients; no custom client may be required.</div>        </div>
+      </div>
+    </div>
+    <div class="legend"><span><b style="color:var(--accepted)">——</b> meets</span><span><b style="color:var(--mixed)">——</b> partly</span><span><b style="color:var(--rejected)">- - -</b> misses</span></div>
+
+    <h2 class="sec">Regions that justify the solution</h2>
+    <div class="region" data-step="2"><strong>G1 · Replicated authoritative state and coordinated refs</strong> <span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q4">Q4</span> <span class="muted">investigated at step 2</span>
+      <p><span class="dref" data-node="d:1"><a href="../concepts/source-of-truth-for-repository-state.html">Source of truth for repository state</a></span> → <span class="vref" data-node="v:1.1"><span class="dot accepted"></span><a href="../entities/repository-files-on-server-disks.html">Repository files on server disks</a></span> · <span class="dref" data-node="d:2"><a href="../concepts/replication-for-durability.html">Replication for durability</a></span> → <span class="vref" data-node="v:2.2"><span class="dot accepted"></span><a href="../entities/three-git-replicas-with-majority-writes.html">Three Git replicas with majority writes</a></span> · <span class="dref" data-node="d:3"><a href="../concepts/reference-update-coordination.html">Reference update coordination</a></span> → <span class="vref" data-node="v:3.1"><span class="dot accepted"></span><a href="../entities/three-phase-commit-across-replicas.html">Three-phase commit across replicas</a></span></p>
+<p>This grounded region is attested by two sources and meets the requirements for no lost pushes after one machine or disk failure and for fetches to see successful pushes. A single-copy contrast misses durability, so the three-replica choice is forced by Q1 among the evaluated alternatives.</p>    </div>
+    <details class="grid-details"><summary>Dimension grid: every point, dimension by dimension</summary>
+    <div class="legend">
+<span><b style="color:var(--dimension)">solution</b> the solution as a point</span><span><b style="color:var(--accent)">region</b> a part of it</span><span><b style="color:var(--novel)">contrast</b> an option changed (outlined)</span>    </div>
+    <div class="scroll traj-wrap">
+      <svg class="lineage" aria-hidden="true"></svg>
+      <table class="traj">
+        <thead><tr><th class="row-h">Dimension</th>
+<th class="band-h" title="Replicated authoritative state and coordinated refs">G1</th><th class="step-h mv-solution" data-step="1" title="The complete solution combines disk-backed Git repositories, three replicas, transactional ref updates, full client clones, and locality-aware reads."><b>1</b><span class="mv">solution</span><span class="vd vd-partial">partial</span><span class="alt">→ S</span></th><th class="step-h mv-region" data-step="2" title="Q1 and Q4 call for authoritative repository state on servers with replicated writes and coordinated reference updates."><b>2</b><span class="mv">region</span><span class="vd vd-grounded">grounded</span></th><th class="step-h mv-contrast" data-step="3" title="Does Q1 force three replicas rather than the single-copy alternative offered for durability?"><b>3</b><span class="mv">contrast</span><span class="vd vd-ungrounded">ungrounded</span></th><th class="step-h mv-region" data-step="4" title="R1 and C2 call for full repository access through the standard Git protocol and clients."><b>4</b><span class="mv">region</span><span class="vd vd-partial">partial</span></th><th class="step-h mv-contrast" data-step="5" title="Does R2 force a partial clone rather than the solution&#39;s full-clone choice, while retaining C2?"><b>5</b><span class="mv">contrast</span><span class="vd vd-grounded">grounded</span></th><th class="step-h mv-region" data-step="6" title="Q3 and Q4 call for serving reads from a nearby replica that already has the latest state."><b>6</b><span class="mv">region</span><span class="vd vd-partial">partial</span></th>        </tr></thead>
+        <tbody>
+          <tr><th class="row-h"><span class="dref" data-node="d:1"><a href="../concepts/source-of-truth-for-repository-state.html">Source of truth for repository state</a></span></th>
+<td class="band" title="Replicated authoritative state and coordinated refs"><span></span></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="v:1.1" title="Repository files on server disks"><span class="dot accepted"></span>Repository files on serve…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="v:1.1" title="Repository files on server disks"><span class="dot accepted"></span>Repository files on serve…</span></td>
+            <td class="c" data-step="3"><span class="vref cell-v " data-node="v:1.1" title="Repository files on server disks"><span class="dot accepted"></span>Repository files on serve…</span></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"><span class="vref cell-v " data-node="v:1.1" title="Repository files on server disks"><span class="dot accepted"></span>Repository files on serve…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="d:2"><a href="../concepts/replication-for-durability.html">Replication for durability</a></span></th>
+<td class="band" title="Replicated authoritative state and coordinated refs"><span></span></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="v:2.2" title="Three Git replicas with majority writes"><span class="dot accepted"></span>Three Git replicas with m…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="v:2.2" title="Three Git replicas with majority writes"><span class="dot accepted"></span>Three Git replicas with m…</span></td>
+            <td class="c contrast" data-step="3"><span class="vref cell-v " data-node="v:2.4" title="Single copy on a file server"><span class="dot accepted"></span>Single copy on a file server</span></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"><span class="vref cell-v " data-node="v:2.2" title="Three Git replicas with majority writes"><span class="dot accepted"></span>Three Git replicas with m…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="d:3"><a href="../concepts/reference-update-coordination.html">Reference update coordination</a></span></th>
+<td class="band" title="Replicated authoritative state and coordinated refs"><span></span></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="v:3.1" title="Three-phase commit across replicas"><span class="dot accepted"></span>Three-phase commit across…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="v:3.1" title="Three-phase commit across replicas"><span class="dot accepted"></span>Three-phase commit across…</span></td>
+            <td class="c" data-step="3"><span class="vref cell-v " data-node="v:3.1" title="Three-phase commit across replicas"><span class="dot accepted"></span>Three-phase commit across…</span></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="d:4"><a href="../concepts/client-data-transfer.html">Client data transfer</a></span></th>
+<td class="band" title="Replicated authoritative state and coordinated refs"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="v:4.1" title="Full clone over the Git protocol"><span class="dot accepted"></span>Full clone over the Git p…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"><span class="vref cell-v " data-node="v:4.1" title="Full clone over the Git protocol"><span class="dot accepted"></span>Full clone over the Git p…</span></td>
+            <td class="c contrast" data-step="5"><span class="vref cell-v " data-node="v:4.2" title="Partial clone with sparse checkout"><span class="dot accepted"></span>Partial clone with sparse…</span></td>
+            <td class="c" data-step="6"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="d:5"><a href="../concepts/serving-reads.html">Serving reads</a></span></th>
+<td class="band" title="Replicated authoritative state and coordinated refs"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="v:5.1" title="Nearest up-to-date replica"><span class="dot accepted"></span>Nearest up-to-date replica</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"><span class="vref cell-v " data-node="v:5.1" title="Nearest up-to-date replica"><span class="dot accepted"></span>Nearest up-to-date replica</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </details>
+  </section>
+
+  <section class="gaps" id="gaps">
+  <h2 class="sec">Gaps in the space</h2>
+  <p class="hint">Where the space fell short of the problem or the solution. The agent does not change the space: it records each gap here instead of forcing a fit.</p>
+  <p class="gap-summary">
+<span class="gap-count"><strong>2</strong> decisions not covered</span>    <span class="gap-count"><strong>2</strong> requirements not addressed (2 with no dimension)</span>
+    <span class="gap-count"><strong>1</strong> approximate fit</span>
+  </p>
+  <h3 class="gap-h">Decisions the space does not cover</h3>
+  <p class="hint">Decisions in the solution that no dimension or value of the space describes.</p>
+  <div class="choice gap"><div class="head"><strong>Repair missed reference updates by comparing checksums and restoring replicas in the background, and re-replicate after a server failure until three copies are restored.</strong> <span class="muted">nearest dimension:</span> <a href="../concepts/replication-for-durability.html">Replication for durability</a></div>
+    <div class="quote">“Replicas that miss an update are detected by comparing checksums of their references and repaired in the background from a healthy replica. When a replica fails, its repositories are re-replicated to other servers from the remaining copies until each again has three.”</div></div>
+  <div class="choice gap"><div class="head"><strong>Use Git&#39;s packfile format and periodically repack each replica.</strong> <span class="muted">nearest dimension:</span> <a href="../concepts/source-of-truth-for-repository-state.html">Source of truth for repository state</a></div>
+    <div class="quote">“The team relies on Git&#39;s own packfile format and runs periodic repacking on every replica.”</div></div>
+  <h3 class="gap-h">Requirements no ADR addresses</h3>
+  <div class="choice gap"><div class="head"><button class="chip" type="button" data-requirement="Q2" data-node="r:Q2"><strong>Q2</strong> When one server fails during working hours, pushes and fetches continue within one minute, without an operator.</button></div>
+    <p><span class="badge rejected">the space has no dimension for it</span> <span class="muted">nearest dimension:</span> <a href="../concepts/replication-for-durability.html">Replication for durability</a></p>
+<p>Replication is the closest concern, but the design space has no dimension for automatic failover or a one-minute availability bound. The solution says replicas are restored in the background but gives no operator-free recovery time.</p></div>
+  <div class="choice gap"><div class="head"><button class="chip" type="button" data-requirement="C1" data-node="r:C1"><strong>C1</strong> Five engineers build and run the service.</button></div>
+    <p><span class="badge rejected">the space has no dimension for it</span></p>
+<p>The design space has no dimension for operating-team size or operational burden, so it cannot evaluate whether five engineers can build and run this design.</p></div>
+  <h3 class="gap-h">Approximate fits</h3>
+  <p class="hint">Values the agent kept although they only roughly match what they stand for. Select one to see it.</p>
+  <div class="choice gap fit" tabindex="0" data-gap-option="ADR3:O1">
+    <div class="head"><strong>ADR3 · Nearest up-to-date replica, including remote read replicas</strong></div>
+    <p class="pairs"><span class="pair"><span class="dref" data-node="d:5"><a href="../concepts/serving-reads.html">Serving reads</a></span> → <span class="vref" data-node="v:5.1"><span class="dot accepted"></span><a href="../entities/nearest-up-to-date-replica.html">Nearest up-to-date replica</a></span></span></p>
+<p>The mapped value captures nearest up-to-date reads but not the non-voting status of the extra remote replicas.</p></div>
+  </section>
+</main>
+<div class="splitter-v" role="separator" aria-orientation="vertical" aria-label="Resize the text and the graph" tabindex="0" title="Drag to resize (double-click to reset)"></div>
+<aside class="ex-side">
+  <div id="canvas"><svg id="svg" role="img" aria-label="The dimensions this rationale involves"></svg>
+    <label class="graph-toggle"><input type="checkbox" id="show-all"> Show every value the space offers</label>
+    <div class="zoom-ctl"><button type="button" data-zoom="in" title="Zoom in" aria-label="Zoom in">+</button><button type="button" data-zoom="out" title="Zoom out" aria-label="Zoom out">−</button><button type="button" data-zoom="fit" title="Fit the graph" aria-label="Fit the graph">⤢</button></div></div>
+  <div class="splitter-h" role="separator" aria-orientation="horizontal" aria-label="Resize the graph and its details" tabindex="0" title="Drag to resize (double-click to reset)"></div>
+  <div class="graph-key"><span>from the centre: dimensions, values, <b>design points</b> (▲, one per step, coloured by its rating), requirements (■, linked by how each point meets them)</span><span><b>blue</b>: explored paths</span><span><b>outlined</b>: the design point shown</span><span>select a node: its path to the centre and the paths from it to design points and requirements</span></div>
+  <div id="info"><p class="hint">Select a dimension, value or requirement (in the graph or the text) to see its details.</p></div>
+</aside>
+</div>
+<script type="application/json" id="explainer-data">{"adrs": [{"consequences": "", "context": "The service must preserve every accepted push through one machine or disk loss and let subsequent fetches observe committed reference updates. Pushes must continue to use standard Git.", "drivers": ["Q1", "Q4", "R1"], "id": "ADR1", "options": [{"cons": ["Adds replication and transaction overhead to writes.", "The solution does not quantify failure recovery time."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR1:O1", "name": "Three server-disk Git replicas with majority writes and three-phase commit", "point": {"d:1": "v:1.1", "d:2": "v:2.2", "d:3": "v:3.1"}, "pros": ["Meets the single-machine durability scenario through three copies and majority writes.", "Coordinates reference updates across replicas and supports current-state reads.", "Attested in combination by Git at any scale and Stretching Spokes."], "quotes": ["Every repository is stored as a plain Git repository on the local disks of three file servers, placed in different racks. The three replicas are the authoritative copies; there is no separate database of repository contents.", "The three replicas are the authoritative copies; there is no separate database of repository contents.", "A push updates references through a three-phase commit: a proxy sends the update to all three replicas, each takes a lock and votes, and the update commits once a majority has agreed."], "reason": "The requirements force a replicated durable design among the evaluated options: the single-copy contrast misses Q1. The exact server-disk authority and three-phase commit are not shown to be forced by the requirements.", "status": "chosen", "step": 2}, {"cons": ["Loss of the file server can lose the only copy, failing Q1.", "Does not provide replica participants for three-phase commit."], "fit": "exact", "fit_note": "", "id": "O2", "in": [], "key": "ADR1:O2", "name": "Single copy on a file server", "point": {"d:1": "v:1.1", "d:2": "v:2.4"}, "pros": ["Avoids the storage overhead of multiple repository copies."], "quotes": [], "reason": "Rejected by the durability requirement; this is a design-space contrast, not an option the solution says its designers considered.", "status": "discarded", "step": 3}], "title": "Authoritative state, replication, and reference updates"}, {"consequences": "", "context": "Engineers must use standard Git, and the largest repository must be usable without downloading its full contents and history.", "drivers": ["R1", "R2", "C2"], "id": "ADR2", "options": [{"cons": ["Downloads the whole repository, failing R2 for the largest repository."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR2:O1", "name": "Full clone over the Git protocol", "point": {"d:4": "v:4.1"}, "pros": ["Uses the standard Git protocol and client features.", "Provides a complete local history."], "quotes": ["Engineers use standard Git clients and full clones."], "reason": "The solution chooses this option freely, but it does not satisfy R2. The contrast shows partial clone can retain standard Git while meeting R2.", "status": "chosen", "step": 4}, {"cons": ["Unselected files or history may need to be fetched later."], "fit": "exact", "fit_note": "", "id": "O2", "in": [], "key": "ADR2:O2", "name": "Partial clone with sparse checkout", "point": {"d:4": "v:4.2"}, "pros": ["Meets R2 by fetching only needed history and files.", "Retains standard Git features, satisfying C2."], "quotes": [], "reason": "This design-space contrast would better fit the problem's large-repository requirement, but the solution text does not choose it.", "status": "discarded", "step": 5}], "title": "Client transfer for large repositories"}, {"consequences": "", "context": "CI and engineers across regions need reads from the latest repository state with low latency, including after a successful push.", "drivers": ["Q3", "Q4"], "id": "ADR3", "options": [{"cons": ["The 30-second P95 fetch target has no measured validation in the solution or design space.", "A stale nearby replica must be bypassed."], "fit": "approximate", "fit_note": "The mapped value captures nearest up-to-date reads but not the non-voting status of the extra remote replicas.", "id": "O1", "in": ["S"], "key": "ADR3:O1", "name": "Nearest up-to-date replica, including remote read replicas", "point": {"d:5": "v:5.1"}, "pros": ["Serves reads near clients when a current replica is available.", "Supports the requirement that a post-push fetch sees the committed state."], "quotes": ["Reads go to the closest replica that is up to date; in remote regions, extra non-voting replicas serve reads without slowing down writes."], "reason": "The routing choice is supported and directly fits Q4, while it only partly supports Q3 because no latency measurements establish the target. The extra non-voting replica detail is not represented by the value.", "status": "chosen", "step": 6}], "title": "Regional read routing"}], "alternatives": [{"approach": null, "choices": [{"dimension": "d:1", "drivers": ["Q1", "Q4"], "evidence": [{"doc": "s01_p02", "stance": "accepts"}, {"doc": "s01_p04", "stance": "accepts"}, {"doc": "s01_p05", "stance": "accepts"}, {"doc": "s01_p07", "stance": "accepts"}, {"doc": "s02_p01", "stance": "accepts"}, {"doc": "s02_p02", "stance": "accepts"}], "fit": "exact", "fit_note": "", "forced": null, "quote": "Every repository is stored as a plain Git repository on the local disks of three file servers, placed in different racks. The three replicas are the authoritative copies; there is no separate database of repository contents.", "reason": "Server disks are the authoritative repository state in the solution and fit the replica and ref-coordination choices. The requirements and evaluated contrasts do not establish that this source of truth is forced over every other source option.", "value": "v:1.1"}, {"dimension": "d:2", "drivers": ["Q1", "Q4"], "evidence": [{"doc": "s01_p08", "stance": "accepts"}, {"doc": "s02_p01", "stance": "accepts"}, {"doc": "s03_p01", "stance": "accepts"}, {"doc": "s03_p02", "stance": "accepts"}, {"doc": "s03_p03", "stance": "accepts"}, {"doc": "s03_p05", "stance": "accepts"}, {"doc": "s03_p06", "stance": "accepts"}, {"doc": "s03_p09", "stance": "accepts"}], "fit": "exact", "fit_note": "", "forced": true, "quote": "The three replicas are the authoritative copies; there is no separate database of repository contents.", "reason": "Q1 requires surviving any single machine or disk loss without losing pushed commits. Three replicas with majority writes satisfy that need; the evaluated single-copy contrast loses the only copy on server failure and misses Q1.", "value": "v:2.2"}, {"dimension": "d:3", "drivers": ["R1", "Q4"], "evidence": [{"doc": "s01_p07", "stance": "accepts"}, {"doc": "s01_p08", "stance": "accepts"}, {"doc": "s02_p03", "stance": "accepts"}, {"doc": "s02_p04", "stance": "accepts"}], "fit": "exact", "fit_note": "", "forced": null, "quote": "A push updates references through a three-phase commit: a proxy sends the update to all three replicas, each takes a lock and votes, and the update commits once a majority has agreed.", "reason": "Three-phase commit coordinates push reference updates across the replicas, supporting standard Git pushes and the requirement that subsequent fetches see a successful push. The evaluated points did not compare another coordination value, so this specific protocol is not established as forced.", "value": "v:3.1"}, {"dimension": "d:4", "drivers": ["R1", "C2"], "evidence": [{"doc": "s01_p03", "stance": "accepts"}, {"doc": "s01_p06", "stance": "accepts"}, {"doc": "s01_p10", "stance": "accepts"}, {"doc": "s05_p03", "stance": "accepts"}], "fit": "exact", "fit_note": "", "forced": false, "quote": "Engineers use standard Git clients and full clones.", "reason": "Full clones use standard Git and provide the full repository, but the contrast shows partial clone also retains standard Git while meeting R2. Full clone is therefore not forced and conflicts with the large-repository download requirement.", "value": "v:4.1"}, {"dimension": "d:5", "drivers": ["Q3", "Q4"], "evidence": [{"doc": "s01_p07", "stance": "accepts"}, {"doc": "s02_p01", "stance": "accepts"}, {"doc": "s02_p06", "stance": "accepts"}, {"doc": "s03_p04", "stance": "accepts"}], "fit": "approximate", "fit_note": "The value captures reads from the nearest replica that is up to date, but does not capture the solution's additional non-voting replicas in remote regions.", "forced": null, "quote": "Reads go to the closest replica that is up to date; in remote regions, extra non-voting replicas serve reads without slowing down writes.", "reason": "Routing reads to the closest replica that has the latest state supports regional fetch performance and read-after-push consistency. The solution adds non-voting regional replicas, a detail not represented by the value; the numeric latency target is not established, so the choice is not proven forced.", "value": "v:5.1"}], "considered": [], "id": "S", "name": "Replicated Git file servers with Spokes-style routing", "open": [], "parts": [{"adr": "ADR1", "drivers": ["Q1", "Q4", "R1"], "name": "Three server-disk Git replicas with majority writes and three-phase commit", "option": "O1", "point": {"d:1": "v:1.1", "d:2": "v:2.2", "d:3": "v:3.1"}, "title": "Authoritative state, replication, and reference updates"}, {"adr": "ADR2", "drivers": ["R1", "R2", "C2"], "name": "Full clone over the Git protocol", "option": "O1", "point": {"d:4": "v:4.1"}, "title": "Client transfer for large repositories"}, {"adr": "ADR3", "drivers": ["Q3", "Q4"], "name": "Nearest up-to-date replica, including remote read replicas", "option": "O1", "point": {"d:5": "v:5.1"}, "title": "Regional read routing"}], "point": "Plain Git repositories on local server disks are authoritative, with three replicas for each repository. Reference updates use three-phase commit across replicas, writes succeed after a majority, and clients perform full Git clones from the nearest replica with the latest state.", "relations": [{"holds": true, "note": "", "source": "d:2", "source_label": "d:2", "target": "d:1", "target_label": "d:1", "type": "requires"}, {"holds": true, "note": "", "source": "d:2", "source_label": "d:2", "target": "d:5", "target_label": "d:5", "type": "constrains"}, {"holds": true, "note": "", "source": "d:3", "source_label": "d:3", "target": "d:1", "target_label": "d:1", "type": "requires"}, {"holds": true, "note": "", "source": "d:4", "source_label": "d:4", "target": "d:5", "target_label": "d:5", "type": "constrains"}], "step": 1, "summary": "Plain Git repositories on local server disks are replicated three ways, reference writes use three-phase commit, and reads go to the nearest current replica. Engineers use standard Git clients and full clones."}], "approaches": [], "budget": {"max_points": 8, "used": 6}, "context": "A self-hosted Git service must support 3,000 engineers in four regions and about 40,000 CI jobs per day, including use of a 200 GB repository with 15 years of history. Five engineers build and operate it in the company's cloud account.", "dimensions": {"d:1": {"core": true, "href": "../concepts/source-of-truth-for-repository-state.html", "id": "d:1", "label": "Source of truth for repository state", "question": "Where the authoritative copy of each repository's objects and references lives.", "values": ["v:1.1", "v:1.2", "v:1.3", "v:1.4"]}, "d:2": {"core": true, "href": "../concepts/replication-for-durability.html", "id": "d:2", "label": "Replication for durability", "question": "How copies of a repository are kept so that a lost machine loses no data.", "values": ["v:2.1", "v:2.2", "v:2.3", "v:2.4"]}, "d:3": {"core": true, "href": "../concepts/reference-update-coordination.html", "id": "d:3", "label": "Reference update coordination", "question": "How concurrent updates to a repository's references are ordered and made atomic.", "values": ["v:3.1", "v:3.2", "v:3.3"]}, "d:4": {"core": true, "href": "../concepts/client-data-transfer.html", "id": "d:4", "label": "Client data transfer", "question": "What a developer's machine downloads to work on a repository.", "values": ["v:4.1", "v:4.2", "v:4.3"]}, "d:5": {"core": true, "href": "../concepts/serving-reads.html", "id": "d:5", "label": "Serving reads", "question": "Where read traffic (fetches, clones, CI checkouts) is served from.", "values": ["v:5.1", "v:5.2", "v:5.3"]}}, "fits": [{"alt": null, "note": "The mapped value captures nearest up-to-date reads but not the non-voting status of the extra remote replicas.", "option": "ADR3:O1", "point": {"d:5": "v:5.1"}, "where": "ADR3 · Nearest up-to-date replica, including remote read replicas"}], "graph_changed": false, "id": "spokes-explain", "lanes": null, "links": {"graph": "../graph.html", "index": "../index.html"}, "mode": "explain", "qoc": [{"dimension": "d:1", "options": [{"assessment": {"Q1": "meets", "Q4": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 2, "value": "v:1.1"}]}, {"dimension": "d:2", "options": [{"assessment": {"Q1": "meets", "Q4": "meets"}, "forced": true, "kind": "solution", "specific": true, "step": 2, "value": "v:2.2"}, {"assessment": {"Q1": "misses"}, "forced": null, "kind": "contrast", "specific": true, "step": 3, "value": "v:2.4"}]}, {"dimension": "d:3", "options": [{"assessment": {"Q1": "meets", "Q4": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 2, "value": "v:3.1"}]}, {"dimension": "d:4", "options": [{"assessment": {"C2": "meets", "R1": "meets", "R2": "misses"}, "forced": false, "kind": "solution", "specific": true, "step": 4, "value": "v:4.1"}, {"assessment": {"C2": "meets", "R2": "meets"}, "forced": null, "kind": "contrast", "specific": true, "step": 5, "value": "v:4.2"}]}, {"dimension": "d:5", "options": [{"assessment": {"Q3": "partly", "Q4": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 6, "value": "v:5.1"}]}], "regions": [{"drivers": ["Q1", "Q4"], "id": "G1", "name": "Replicated authoritative state and coordinated refs", "point": {"d:1": "v:1.1", "d:2": "v:2.2", "d:3": "v:3.1"}, "reason": "This grounded region is attested by two sources and meets the requirements for no lost pushes after one machine or disk failure and for fetches to see successful pushes. A single-copy contrast misses durability, so the three-replica choice is forced by Q1 among the evaluated alternatives.", "step": 2}], "relations": [{"directed": true, "reading": "Replication for durability requires Source of truth for repository state to be decided first", "source": "d:2", "target": "d:1", "type": "requires"}, {"directed": true, "reading": "Choices on Replication for durability limit the options available on Serving reads", "source": "d:2", "target": "d:5", "type": "constrains"}, {"directed": true, "reading": "Reference update coordination requires Source of truth for repository state to be decided first", "source": "d:3", "target": "d:1", "type": "requires"}, {"directed": true, "reading": "Choices on Client data transfer limit the options available on Serving reads", "source": "d:4", "target": "d:5", "type": "constrains"}], "requirements": [{"attribute": "", "id": "R1", "kind": "functional", "text": "Accept pushes and serve fetches and clones for every repository over the standard Git protocol."}, {"attribute": "", "id": "R2", "kind": "functional", "text": "Let engineers work on the largest repository without downloading all of it."}, {"attribute": "durability", "id": "Q1", "kind": "quality", "text": "When any single machine or disk is lost, no pushed commit is lost."}, {"attribute": "availability", "id": "Q2", "kind": "quality", "text": "When one server fails during working hours, pushes and fetches continue within one minute, without an operator."}, {"attribute": "performance", "id": "Q3", "kind": "quality", "text": "A CI job in any region fetches the latest state of a repository within 30 seconds at the 95th percentile, even right after a push."}, {"attribute": "consistency", "id": "Q4", "kind": "quality", "text": "A fetch that starts after a push has succeeded always sees that push."}, {"attribute": "", "id": "C1", "kind": "constraint", "text": "Five engineers build and run the service."}, {"attribute": "", "id": "C2", "kind": "constraint", "text": "Engineers keep using standard Git clients; no custom client may be required."}], "rows": [{"cells": [{"kind": "choice", "reason": "Server disks are the authoritative repository state in the solution and fit the replica and ref-coordination choices. The requirements and evaluated contrasts do not establish that this source of truth is forced over every other source option.", "value": "v:1.1"}], "differs": false, "dimension": "d:1", "note": ""}, {"cells": [{"kind": "choice", "reason": "Q1 requires surviving any single machine or disk loss without losing pushed commits. Three replicas with majority writes satisfy that need; the evaluated single-copy contrast loses the only copy on server failure and misses Q1.", "value": "v:2.2"}], "differs": false, "dimension": "d:2", "note": ""}, {"cells": [{"kind": "choice", "reason": "Three-phase commit coordinates push reference updates across the replicas, supporting standard Git pushes and the requirement that subsequent fetches see a successful push. The evaluated points did not compare another coordination value, so this specific protocol is not established as forced.", "value": "v:3.1"}], "differs": false, "dimension": "d:3", "note": ""}, {"cells": [{"kind": "choice", "reason": "Full clones use standard Git and provide the full repository, but the contrast shows partial clone also retains standard Git while meeting R2. Full clone is therefore not forced and conflicts with the large-repository download requirement.", "value": "v:4.1"}], "differs": false, "dimension": "d:4", "note": ""}, {"cells": [{"kind": "choice", "reason": "Routing reads to the closest replica that has the latest state supports regional fetch performance and read-after-push consistency. The solution adds non-voting regional replicas, a detail not represented by the value; the numeric latency target is not established, so the choice is not proven forced.", "value": "v:5.1"}], "differs": false, "dimension": "d:5", "note": ""}], "space": {"domain": "Git hosting at scale (sample)", "run": "20261109_000000", "workspace": "Git hosting at scale (sample)"}, "title": "Git hosting for a fast-growing engineering organization", "trajectory": [{"alternative": "S", "approach": null, "assessment": {"C1": "partly", "C2": "meets", "Q1": "meets", "Q2": "partly", "Q3": "partly", "Q4": "meets", "R1": "meets", "R2": "misses"}, "attested_by": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale"}], "changed": [], "description": "Plain Git repositories on local server disks are authoritative, with three replicas for each repository. Reference updates use three-phase commit across replicas, writes succeed after a majority, and clients perform full Git clones from the nearest replica with the latest state.", "diff": [{"after": "v:1.1", "before": null, "dimension": "d:1"}, {"after": "v:2.2", "before": null, "dimension": "d:2"}, {"after": "v:3.1", "before": null, "dimension": "d:3"}, {"after": "v:4.1", "before": null, "dimension": "d:4"}, {"after": "v:5.1", "before": null, "dimension": "d:5"}], "drivers": ["R1", "R2", "Q1", "Q2", "Q3", "Q4", "C1", "C2"], "move": "solution", "novel": ["d:1", "d:2", "d:3", "d:4", "d:5"], "observation": "The combination is attested by Git at any scale. The value descriptions support standard Git use, durability, and read-after-push routing. The stated 30-second P95 and one-minute operator-free failover targets are not demonstrated by the design-space evidence or solution details; they remain unproven rather than measured misses. Full clones directly conflict with R2. The five-person staffing constraint is not addressed by an operational-effort dimension.", "own_tradeoff": "This provides durable copies, coordinated reference updates, and lower read latency. It sacrifices storage efficiency and write performance to maintain three replicas and coordinate commits, while full clones consume substantial client bandwidth and time.", "parent": null, "point": {"d:1": "v:1.1", "d:2": "v:2.2", "d:3": "v:3.1", "d:4": "v:4.1", "d:5": "v:5.1"}, "point_id": "P1", "reuses": null, "round": null, "step": 1, "tradeoffs": [{"causes": ["v:4.1"], "costs": ["R2"], "gains": ["R1", "C2"], "note": "Full Git clones support standard-client repository access but transfer the whole history, which conflicts with working on the largest repository without downloading it all."}], "verdict": "partial", "why": "The complete solution combines disk-backed Git repositories, three replicas, transactional ref updates, full client clones, and locality-aware reads."}, {"alternative": null, "approach": null, "assessment": {"Q1": "meets", "Q4": "meets"}, "attested_by": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale"}, {"href": "../sources/s2.html", "id": "s:s2", "label": "Stretching Spokes"}], "changed": ["d:4", "d:5"], "description": "Each repository’s authoritative state is stored as plain Git repositories on server disks, with three replicas maintained for every repository. Reference updates run through a three-phase transaction across replicas, while a write is considered durable after a majority has recorded it.", "diff": [{"after": null, "before": "v:4.1", "dimension": "d:4"}, {"after": null, "before": "v:5.1", "dimension": "d:5"}], "drivers": ["Q1", "Q4"], "move": "region", "novel": [], "observation": "The point has no warnings, satisfies the required source-of-truth dependency, and is attested by Git at any scale and Stretching Spokes. Its replica and majority-write choices directly support loss tolerance; transactional ref updates and latest-state reads support the consistency requirement. The point description flags added write and transaction latency, but neither requirement sets a write-latency target.", "own_tradeoff": "This provides disk-based simplicity, replication-based durability, and coordinated reference updates, but adds replication and transaction latency and operational complexity. The majority-write rule is in tension with all-replica voting: an unavailable replica may prevent a transaction even when two replicas are ready.", "parent": 1, "point": {"d:1": "v:1.1", "d:2": "v:2.2", "d:3": "v:3.1"}, "point_id": "P2", "reuses": null, "round": null, "step": 2, "tradeoffs": [], "verdict": "grounded", "why": "Q1 and Q4 call for authoritative repository state on servers with replicated writes and coordinated reference updates."}, {"alternative": null, "approach": null, "assessment": {"Q1": "misses"}, "attested_by": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale"}], "changed": ["d:2"], "description": "The system would expose a plain Git repository stored on a file server’s local disk as the authoritative state, accessed by RPC. Reference updates would be handled as three-phase transactions requiring replica votes.", "diff": [{"after": "v:2.4", "before": "v:2.2", "dimension": "d:2"}], "drivers": ["Q1"], "move": "contrast", "novel": ["d:2"], "observation": "This contrast changes the replication value to a single copy. Its point description says loss of the file server can lose the sole copy, so it misses Q1. Q1 therefore forces the three-replica choice among this contrast and the solution value.", "own_tradeoff": "This saves storage and replication overhead, but failure of the file server can lose the sole copy, while three-phase coordination adds complexity without improving durability. The single-copy choice conflicts with three-phase commit across replicas because it provides no replica participants to vote.", "parent": 2, "point": {"d:1": "v:1.1", "d:2": "v:2.4", "d:3": "v:3.1"}, "point_id": "P3", "reuses": null, "round": null, "step": 3, "tradeoffs": [], "verdict": "ungrounded", "why": "Does Q1 force three replicas rather than the single-copy alternative offered for durability?"}, {"alternative": null, "approach": null, "assessment": {"C2": "meets", "R1": "meets", "R2": "misses"}, "attested_by": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale"}, {"href": "../sources/s5.html", "id": "s:s5", "label": "Introducing Scalar"}], "changed": ["d:1", "d:2", "d:3", "d:5"], "description": "The system lets a developer obtain a repository by performing a standard Git clone over the Git protocol. The clone includes the repository’s complete history, enabling normal local Git work against that full copy.", "diff": [{"after": null, "before": "v:1.1", "dimension": "d:1"}, {"after": null, "before": "v:2.2", "dimension": "d:2"}, {"after": null, "before": "v:3.1", "dimension": "d:3"}, {"after": null, "before": "v:5.1", "dimension": "d:5"}], "drivers": ["R1", "R2", "C2"], "move": "region", "novel": [], "observation": "Git at any scale and Introducing Scalar attest full clone over the Git protocol. This choice preserves the standard client constraint but fails the explicit requirement to work without downloading all of the largest repository.", "own_tradeoff": "This provides compatibility with standard Git and complete local history, but increases initial download time, bandwidth use, and local storage compared with a partial or shallow transfer.", "parent": 1, "point": {"d:4": "v:4.1"}, "point_id": "P4", "reuses": null, "round": null, "step": 4, "tradeoffs": [{"causes": ["v:4.1"], "costs": ["R2"], "gains": ["R1", "C2"], "note": "A full clone offers standard Git access and a complete local history, but requires downloading all of the large repository."}], "verdict": "partial", "why": "R1 and C2 call for full repository access through the standard Git protocol and clients."}, {"alternative": null, "approach": null, "assessment": {"C2": "meets", "R2": "meets"}, "attested_by": [{"href": "../sources/s4.html", "id": "s:s4", "label": "Scalar philosophy"}, {"href": "../sources/s5.html", "id": "s:s5", "label": "Introducing Scalar"}], "changed": ["d:4"], "description": "Each developer uses standard Git to create a partial clone, configuring sparse checkout to materialize only the files needed for their work. The client fetches only the relevant history and content while retaining standard Git features for that reduced view.", "diff": [{"after": "v:4.2", "before": "v:4.1", "dimension": "d:4"}], "drivers": ["R2", "C2"], "move": "contrast", "novel": ["d:4"], "observation": "The partial-clone contrast is supported by Scalar philosophy and Introducing Scalar, and it meets both R2 and the standard-Git-client constraint. The design space therefore offers an alternative that better meets these requirements; full clone is not forced and appears to be a free choice that conflicts with R2.", "own_tradeoff": "This reduces download size and local storage for focused work, but unselected files or history are unavailable locally and may require later fetching. Workflows requiring the complete repository may be less convenient.", "parent": 4, "point": {"d:4": "v:4.2"}, "point_id": "P5", "reuses": null, "round": null, "step": 5, "tradeoffs": [], "verdict": "grounded", "why": "Does R2 force a partial clone rather than the solution's full-clone choice, while retaining C2?"}, {"alternative": null, "approach": null, "assessment": {"Q3": "partly", "Q4": "meets"}, "attested_by": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale"}, {"href": "../sources/s2.html", "id": "s:s2", "label": "Stretching Spokes"}], "changed": ["d:3", "d:4"], "description": "Each repository is stored as a plain Git repository on server disks, with three replicas maintained for every repository. Writes complete after a majority of replicas records them, while fetches, clones, and checkouts are routed to the nearest replica with the latest state.", "diff": [{"after": null, "before": "v:3.1", "dimension": "d:3"}, {"after": null, "before": "v:4.1", "dimension": "d:4"}], "drivers": ["Q3", "Q4"], "move": "region", "novel": [], "observation": "The solution's routing rule matches nearest up-to-date replica and the point is attested by Git at any scale and Stretching Spokes. This gives a plausible basis for low-latency regional fetches and directly serves read-after-success consistency. The space and solution provide no benchmark for the 30-second P95 target, so Q3 is only partly supported. Remote non-voting replicas also extend the mapped value, which does not encode voting status.", "own_tradeoff": "This provides durable data across one machine failure and reduces read latency through locality. It requires maintaining three copies and coordinating majority writes, and reads may need to bypass a nearer replica if it is stale.", "parent": 1, "point": {"d:1": "v:1.1", "d:2": "v:2.2", "d:5": "v:5.1"}, "point_id": "P6", "reuses": null, "round": null, "step": 6, "tradeoffs": [{"causes": ["v:5.1"], "costs": ["Q3"], "gains": ["Q4"], "note": "Routing to the nearest current replica supports read-after-push consistency and regional locality, but does not by itself establish the 30-second P95 fetch bound."}], "verdict": "partial", "why": "Q3 and Q4 call for serving reads from a nearby replica that already has the latest state."}], "trajectory_dimensions": ["d:1", "d:2", "d:3", "d:4", "d:5"], "unaddressed": [{"id": "Q2", "nearest": {"href": "../concepts/replication-for-durability.html", "id": "d:2", "label": "Replication for durability"}, "note": "Replication is the closest concern, but the design space has no dimension for automatic failover or a one-minute availability bound. The solution says replicas are restored in the background but gives no operator-free recovery time.", "reason": "no_dimension", "reason_text": "the space has no dimension for it", "text": "When one server fails during working hours, pushes and fetches continue within one minute, without an operator."}, {"id": "C1", "nearest": null, "note": "The design space has no dimension for operating-team size or operational burden, so it cannot evaluate whether five engineers can build and run this design.", "reason": "no_dimension", "reason_text": "the space has no dimension for it", "text": "Five engineers build and run the service."}], "uncovered": [{"decision": "Repair missed reference updates by comparing checksums and restoring replicas in the background, and re-replicate after a server failure until three copies are restored.", "nearest": {"href": "../concepts/replication-for-durability.html", "id": "d:2", "label": "Replication for durability"}, "quote": "Replicas that miss an update are detected by comparing checksums of their references and repaired in the background from a healthy replica. When a replica fails, its repositories are re-replicated to other servers from the remaining copies until each again has three."}, {"decision": "Use Git's packfile format and periodically repack each replica.", "nearest": {"href": "../concepts/source-of-truth-for-repository-state.html", "id": "d:1", "label": "Source of truth for repository state"}, "quote": "The team relies on Git's own packfile format and runs periodic repacking on every replica."}], "values": {"v:1.1": {"description": "Plain Git repositories on the servers' local disks are the authoritative state.", "dimension": "d:1", "href": "../entities/repository-files-on-server-disks.html", "id": "v:1.1", "label": "Repository files on server disks", "passages": [{"doc": "s01_p02", "stance": "accepts"}, {"doc": "s01_p04", "stance": "accepts"}, {"doc": "s01_p05", "stance": "accepts"}, {"doc": "s01_p07", "stance": "accepts"}, {"doc": "s02_p01", "stance": "accepts"}, {"doc": "s02_p02", "stance": "accepts"}], "roles": {"S": "chosen"}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}, {"href": "../sources/s2.html", "id": "s:s2", "label": "Stretching Spokes", "stance": "accepts"}], "status": "accepted", "steps": [1, 2, 3, 6]}, "v:1.2": {"description": "An append-only log in object storage is the authority; repositories on disk are derived from it.", "dimension": "d:1", "href": "../entities/write-ahead-log-in-object-storage.html", "id": "v:1.2", "label": "Write-ahead log in object storage", "passages": [{"doc": "s01_p09", "stance": "accepts"}, {"doc": "s01_p10", "stance": "accepts"}, {"doc": "s01_p11", "stance": "accepts"}, {"doc": "s01_p12", "stance": "accepts"}, {"doc": "s01_p14", "stance": "accepts"}, {"doc": "s01_p15", "stance": "accepts"}], "roles": {}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}], "status": "accepted", "steps": []}, "v:1.3": {"description": "Git objects are stored individually in a distributed key-value store.", "dimension": "d:1", "href": "../entities/objects-in-a-distributed-hash-table.html", "id": "v:1.3", "label": "Objects in a distributed hash table", "passages": [{"doc": "s01_p03", "stance": "both"}, {"doc": "s01_p09", "stance": "accepts"}], "roles": {}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "both"}], "status": "mixed", "steps": []}, "v:1.4": {"description": "Pack data in blob storage and references in a relational database, two stores to keep consistent.", "dimension": "d:1", "href": "../entities/blobs-plus-a-relational-reference-database.html", "id": "v:1.4", "label": "Blobs plus a relational reference database", "passages": [{"doc": "s01_p15", "stance": "rejects"}], "roles": {}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "rejects"}], "status": "rejected", "steps": []}, "v:2.1": {"description": "The filesystem under Git is replicated block by block between paired machines.", "dimension": "d:2", "href": "../entities/block-level-filesystem-replication.html", "id": "v:2.1", "label": "Block-level filesystem replication", "passages": [{"doc": "s01_p05", "stance": "rejects"}, {"doc": "s02_p01", "stance": "rejects"}, {"doc": "s02_p02", "stance": "rejects"}], "roles": {}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "rejects"}, {"href": "../sources/s2.html", "id": "s:s2", "label": "Stretching Spokes", "stance": "rejects"}], "status": "rejected", "steps": []}, "v:2.2": {"description": "Each repository has three plain Git replicas; a write succeeds once a majority has it.", "dimension": "d:2", "href": "../entities/three-git-replicas-with-majority-writes.html", "id": "v:2.2", "label": "Three Git replicas with majority writes", "passages": [{"doc": "s01_p08", "stance": "accepts"}, {"doc": "s02_p01", "stance": "accepts"}, {"doc": "s03_p01", "stance": "accepts"}, {"doc": "s03_p02", "stance": "accepts"}, {"doc": "s03_p03", "stance": "accepts"}, {"doc": "s03_p05", "stance": "accepts"}, {"doc": "s03_p06", "stance": "accepts"}, {"doc": "s03_p09", "stance": "accepts"}], "roles": {"S": "chosen"}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}, {"href": "../sources/s2.html", "id": "s:s2", "label": "Stretching Spokes", "stance": "accepts"}, {"href": "../sources/s3.html", "id": "s:s3", "label": "Building resilience in Spokes", "stance": "accepts"}], "status": "accepted", "steps": [1, 2, 6]}, "v:2.3": {"description": "The object store holding the log keeps the data durable; servers hold no unique data.", "dimension": "d:2", "href": "../entities/durability-delegated-to-object-storage.html", "id": "v:2.3", "label": "Durability delegated to object storage", "passages": [{"doc": "s01_p10", "stance": "accepts"}, {"doc": "s01_p11", "stance": "accepts"}, {"doc": "s01_p12", "stance": "accepts"}, {"doc": "s01_p14", "stance": "accepts"}], "roles": {}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}], "status": "accepted", "steps": []}, "v:2.4": {"description": "One file server holds each repository, reached by RPC, with no replica.", "dimension": "d:2", "href": "../entities/single-copy-on-a-file-server.html", "id": "v:2.4", "label": "Single copy on a file server", "passages": [{"doc": "s01_p05", "stance": "accepts"}], "roles": {}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}], "status": "accepted", "steps": [3]}, "v:3.1": {"description": "Reference updates run as a transaction that all replicas vote on.", "dimension": "d:3", "href": "../entities/three-phase-commit-across-replicas.html", "id": "v:3.1", "label": "Three-phase commit across replicas", "passages": [{"doc": "s01_p07", "stance": "accepts"}, {"doc": "s01_p08", "stance": "accepts"}, {"doc": "s02_p03", "stance": "accepts"}, {"doc": "s02_p04", "stance": "accepts"}], "roles": {"S": "chosen"}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}, {"href": "../sources/s2.html", "id": "s:s2", "label": "Stretching Spokes", "stance": "accepts"}], "status": "accepted", "steps": [1, 2, 3]}, "v:3.2": {"description": "Writers append to the log with a compare-and-swap, without a consensus protocol.", "dimension": "d:3", "href": "../entities/compare-and-swap-on-the-log.html", "id": "v:3.2", "label": "Compare-and-swap on the log", "passages": [{"doc": "s01_p10", "stance": "accepts"}, {"doc": "s01_p11", "stance": "accepts"}], "roles": {}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}], "status": "accepted", "steps": []}, "v:3.3": {"description": "The single file server holding the repository applies updates one at a time.", "dimension": "d:3", "href": "../entities/one-server-serializes-the-updates.html", "id": "v:3.3", "label": "One server serializes the updates", "passages": [{"doc": "s01_p05", "stance": "accepts"}], "roles": {}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}], "status": "accepted", "steps": []}, "v:4.1": {"description": "The client fetches the whole history with standard Git.", "dimension": "d:4", "href": "../entities/full-clone-over-the-git-protocol.html", "id": "v:4.1", "label": "Full clone over the Git protocol", "passages": [{"doc": "s01_p03", "stance": "accepts"}, {"doc": "s01_p06", "stance": "accepts"}, {"doc": "s01_p10", "stance": "accepts"}, {"doc": "s05_p03", "stance": "accepts"}], "roles": {"S": "chosen"}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}, {"href": "../sources/s5.html", "id": "s:s5", "label": "Introducing Scalar", "stance": "accepts"}], "status": "accepted", "steps": [1, 4]}, "v:4.2": {"description": "The client fetches only the history and files it needs, with standard Git features.", "dimension": "d:4", "href": "../entities/partial-clone-with-sparse-checkout.html", "id": "v:4.2", "label": "Partial clone with sparse checkout", "passages": [{"doc": "s04_p01", "stance": "accepts"}, {"doc": "s04_p02", "stance": "accepts"}, {"doc": "s05_p01", "stance": "accepts"}, {"doc": "s05_p04", "stance": "accepts"}, {"doc": "s05_p06", "stance": "accepts"}, {"doc": "s05_p08", "stance": "accepts"}, {"doc": "s05_p15", "stance": "accepts"}], "roles": {}, "sources": [{"href": "../sources/s4.html", "id": "s:s4", "label": "Scalar philosophy", "stance": "accepts"}, {"href": "../sources/s5.html", "id": "s:s5", "label": "Introducing Scalar", "stance": "accepts"}], "status": "accepted", "steps": [5]}, "v:4.3": {"description": "A virtual filesystem shows every file and downloads objects only when a file is opened.", "dimension": "d:4", "href": "../entities/virtualized-filesystem-with-on-demand-objects.html", "id": "v:4.3", "label": "Virtualized filesystem with on-demand objects", "passages": [{"doc": "s01_p03", "stance": "accepts"}, {"doc": "s05_p01", "stance": "accepts"}, {"doc": "s05_p03", "stance": "accepts"}, {"doc": "s05_p06", "stance": "accepts"}, {"doc": "s05_p08", "stance": "accepts"}, {"doc": "s05_p15", "stance": "rejects"}], "roles": {}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}, {"href": "../sources/s5.html", "id": "s:s5", "label": "Introducing Scalar", "stance": "both"}], "status": "mixed", "steps": []}, "v:5.1": {"description": "Reads go to the closest replica that has the latest state.", "dimension": "d:5", "href": "../entities/nearest-up-to-date-replica.html", "id": "v:5.1", "label": "Nearest up-to-date replica", "passages": [{"doc": "s01_p07", "stance": "accepts"}, {"doc": "s02_p01", "stance": "accepts"}, {"doc": "s02_p06", "stance": "accepts"}, {"doc": "s03_p04", "stance": "accepts"}], "roles": {"S": "chosen"}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}, {"href": "../sources/s2.html", "id": "s:s2", "label": "Stretching Spokes", "stance": "accepts"}, {"href": "../sources/s3.html", "id": "s:s3", "label": "Building resilience in Spokes", "stance": "accepts"}], "status": "accepted", "steps": [1, 6]}, "v:5.2": {"description": "Cache servers in each office or region serve objects and forward misses to the origin.", "dimension": "d:5", "href": "../entities/cache-servers-near-the-clients.html", "id": "v:5.2", "label": "Cache servers near the clients", "passages": [{"doc": "s05_p03", "stance": "accepts"}, {"doc": "s05_p08", "stance": "accepts"}], "roles": {}, "sources": [{"href": "../sources/s5.html", "id": "s:s5", "label": "Introducing Scalar", "stance": "accepts"}], "status": "accepted", "steps": []}, "v:5.3": {"description": "Any server can serve any repository, rebuilding a warm copy on its local disk from the log.", "dimension": "d:5", "href": "../entities/stateless-servers-with-a-local-disk-cache.html", "id": "v:5.3", "label": "Stateless servers with a local disk cache", "passages": [{"doc": "s01_p02", "stance": "accepts"}, {"doc": "s01_p07", "stance": "accepts"}, {"doc": "s01_p11", "stance": "accepts"}, {"doc": "s01_p13", "stance": "accepts"}, {"doc": "s05_p08", "stance": "accepts"}], "roles": {}, "sources": [{"href": "../sources/s1.html", "id": "s:s1", "label": "Git at any scale", "stance": "accepts"}, {"href": "../sources/s5.html", "id": "s:s5", "label": "Introducing Scalar", "stance": "accepts"}], "status": "accepted", "steps": []}}, "wiki": true, "with_space": true}</script>
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById("theme-toggle");
+    function current() {
+      return root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    }
+    function label() { btn.textContent = current() === "dark" ? "☀" : "☾"; }
+    btn.addEventListener("click", function () {
+      var next = current() === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      try { localStorage.setItem("ddspace-wiki-theme", next); } catch (e) {}
+      label();
+      document.dispatchEvent(new CustomEvent("themechange"));
+    });
+    label();
+  })();
+</script>
+<script src="../assets/d3.min.js"></script>
+<script src="../assets/graph-layout.js"></script>
+<script>
+(function () {
+  const data = JSON.parse(document.getElementById("explainer-data").textContent);
+  const COLOR = {};
+  function readColors() {
+    const cs = getComputedStyle(document.documentElement), get = (name) => cs.getPropertyValue(name).trim();
+    ["dimension", "source", "accepted", "mixed", "rejected", "outcome", "muted", "fg", "accent", "novel"]
+      .forEach((k) => { COLOR[k] = get("--" + k); });
+  }
+  readColors();
+  const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const alts = data.alternatives;
+  const altName = (a) => a.id + " · " + a.name;
+
+  // The subgraph, as a tree from the centre: the domain, the involved dimensions, their values, then the design
+  // points the agent evaluated (one per step), then the requirements on the outer ring, linked to the points
+  // whose assessment judges them.
+  const steps = data.trajectory || [];
+  const pointValues = new Set();  // explored: every value a design point of the page takes (a step's or a choice's)
+  steps.forEach((s) => Object.values(s.point).forEach((v) => pointValues.add(v)));
+  alts.forEach((a) => a.choices.forEach((c) => c.value && pointValues.add(c.value)));
+  const consideredValues = new Set();
+  alts.forEach((a) => a.considered.forEach((c) => c.value && consideredValues.add(c.value)));
+  const options = new Map();  // "ADR:option" -> option, from every ADR
+  (data.adrs || []).forEach((r) => r.options.forEach((o) => {
+    options.set(o.key, o); Object.values(o.point).forEach((v) => consideredValues.add(v)); }));
+  const exploredDims = new Set([...pointValues].map((v) => (data.values[v] || {}).dimension).filter(Boolean));
+  const nodes = [{ id: "domain", kind: "domain", label: data.space ? (data.space.domain || "") : data.title }];
+  const edges = [];
+  Object.values(data.dimensions).forEach((dm) => {
+    nodes.push({ ...dm, kind: "dimension" });
+    edges.push({ source: "domain", target: dm.id, type: "domain" });
+    dm.values.forEach((vid) => edges.push({ source: dm.id, target: vid, type: "has_value" }));
+  });
+  Object.values(data.values).forEach((v) => nodes.push({ ...v, kind: "value" }));
+  const pid = (n) => "p:" + n;
+  steps.forEach((s) => {
+    nodes.push({ id: pid(s.step), kind: "point", step: s.step, verdict: s.verdict, values: Object.values(s.point),
+      label: (s.alternative ? s.alternative + " · " : "") + "#" + s.step, description: s.description });
+    Object.values(s.point).forEach((v) => edges.push({ source: v, target: pid(s.step), type: "member" }));
+    Object.entries(s.assessment || {}).forEach(([r, judged]) =>
+      edges.push({ source: pid(s.step), target: "r:" + r, type: "assess", judged }));
+  });
+  data.relations.forEach((r) => edges.push({ source: r.source, target: r.target, type: "relation", relation: r.type,
+    directed: r.directed, reading: r.reading }));
+  data.requirements.forEach((r) => nodes.push({ ...r, id: "r:" + r.id, req: r.id, kind: "requirement", label: r.id }));
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const links = edges.filter((e) => byId.has(e.source) && byId.has(e.target));
+  const TREE = new Set(["domain", "has_value", "member"]);
+
+  const SYMBOL = { domain: d3.symbolCircle, dimension: d3.symbolCircle, value: d3.symbolDiamond, point: d3.symbolTriangle,
+    requirement: d3.symbolSquare };
+  const radius = (n) => n.kind === "domain" ? 14 : n.kind === "dimension" ? 10 : n.kind === "value" ? 6 : n.kind === "point" ? 8 : 7;
+  const shapePath = (n) => d3.symbol().type(SYMBOL[n.kind] || d3.symbolCircle)
+    .size(Math.PI * radius(n) * radius(n) * (n.kind === "value" ? 1.25 : 1))();
+  const JUDGED = { strong: "accepted", grounded: "accepted", mixed: "mixed", partial: "mixed", weak: "rejected",
+    ungrounded: "rejected", meets: "accepted", partly: "mixed", misses: "rejected" };
+  const nodeColor = (n) => n.kind === "value" ? (COLOR[n.status] || COLOR.accent) : n.kind === "domain" ? COLOR.fg
+    : n.kind === "requirement" ? COLOR.novel : n.kind === "point" ? (COLOR[JUDGED[n.verdict]] || COLOR.accent) : COLOR.dimension;
+
+  // The shared radial layout (graph-layout.js). Dimension labels point inwards, so each dimension sits just inside
+  // its values; the other rings start beyond the longest label of the ring inside them. Points (in step order,
+  // clockwise from the top) and requirements sit evenly around their rings.
+  const LABEL_MAX = 22;  // short labels keep the rings tight, so the graph (and its text) is drawn larger
+  const shortLabel = (s) => { s = String(s ?? ""); return s.length > LABEL_MAX ? s.slice(0, LABEL_MAX - 1).trimEnd() + "…" : s; };
+  const measure = (() => {
+    const ctx = document.createElement("canvas").getContext("2d");
+    ctx.font = "15px " + getComputedStyle(document.body).fontFamily;
+    return (s) => ctx ? ctx.measureText(s).width : s.length * 6.5;
+  })();
+  const labelReach = (ns) => d3.max(ns, (n) => radius(n) + 4 + measure(shortLabel(n.label)) + 3) || 0;
+  const radialTargets = (nodes, links, cx, cy) => DelveLayout.radialTargets(nodes, links, cx, cy, {
+    rings: ["domain", "dimension", "value", "point", "requirement"],
+    spacing: { dimension: 90, value: 30, point: 34, requirement: 40 }, ringGap: 70,
+    labelReach, restJitter: 0.04, inward: ["dimension"], inset: { dimension: 36 }, even: ["point", "requirement"] });
+
+  const svg = d3.select("#svg"), g = svg.append("g");
+  svg.append("defs").append("marker").attr("id", "arrow").attr("viewBox", "0 -5 10 10").attr("refX", 20).attr("refY", 0)
+    .attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto")
+    .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", COLOR.dimension);
+  const zoom = d3.zoom().scaleExtent([0.2, 6]).on("zoom", (ev) => g.attr("transform", ev.transform));
+  svg.call(zoom);
+  const linkLayer = g.append("g"), nodeLayer = g.append("g");
+  const REL_DASH = { requires: null, affects: "7,3", constrains: "2,3", co_occurs_with: "1,5", refines: "9,3,2,3" };
+  function edgeStyle(e) {
+    if (e.type === "relation") return { stroke: COLOR.dimension, width: 2, dash: REL_DASH[e.relation] || null, op: 0.85, arrow: e.directed !== false };
+    if (e.type === "assess") return { stroke: COLOR[JUDGED[e.judged]] || COLOR.muted, width: 1.2, dash: e.judged === "misses" ? "4,3" : null, op: 0.22 };
+    if (e.type === "member") return { stroke: COLOR.muted, width: 1, dash: null, op: 0.12 };
+    if (e.type === "domain") return { stroke: COLOR.muted, width: 0.8, dash: null, op: 0.3 };
+    return { stroke: COLOR.muted, width: 1, dash: null, op: 0.5 };
+  }
+  const width = () => document.getElementById("canvas").clientWidth;
+  const height = () => document.getElementById("canvas").clientHeight;
+  const cx = 0, cy = 0;  // the layout's own frame; fit() maps it onto the canvas
+  const pos = (id) => byId.get(id);
+  const linkSel = linkLayer.selectAll("line").data(links).enter().append("line")
+    .attr("class", (d) => "link" + (TREE.has(d.type) ? " tree" : ""));
+  function styleLinks() {
+    linkSel.each(function (d) { const st = edgeStyle(d); d3.select(this).attr("stroke", st.stroke).attr("stroke-width", st.width)
+      .attr("stroke-dasharray", st.dash).attr("stroke-opacity", st.op).attr("marker-end", st.arrow ? "url(#arrow)" : null); });
+  }
+  styleLinks();
+  linkSel.filter((d) => d.reading).append("title").text((d) => d.reading);
+  linkSel.filter((d) => d.type === "assess").append("title").text((d) => byId.get(d.source).label + " " + d.judged + " " + d.target.slice(2));
+  const nodeSel = nodeLayer.selectAll("g.node").data(nodes).enter().append("g").attr("class", "node")
+    .style("cursor", "pointer").on("click", (ev, d) => { ev.stopPropagation(); select(d.id); });
+  nodeSel.append("circle").attr("r", (d) => Math.max(radius(d), 10)).attr("fill", "transparent");
+  nodeSel.append("path").attr("class", "shape").attr("d", shapePath);
+  nodeSel.append("text").text((d) => d.kind === "domain" ? d.label : shortLabel(d.label));
+  // A selected path shows its nodes' full labels (the rest of the graph is faded); otherwise labels are short.
+  function labels(keep) {
+    nodeSel.select("text").text((d) => d.kind === "domain" || (keep && keep.has(d.id)) ? d.label : shortLabel(d.label));
+  }
+  nodeSel.append("title").text((d) => d.kind === "requirement" ? d.req + ": " + d.text
+    : d.kind === "point" ? "Step " + d.step + " · " + d.verdict + (d.description ? ": " + d.description : "")
+    : d.label + (d.status ? " (" + d.status + ")" : ""));
+  const orientLabels = () => DelveLayout.orientLabels(nodeSel.select("text"), cx, cy, { radius, centreDy: "-1.4em",
+    inward: (d) => d.kind === "dimension" });
+  function fit() {
+    const shown = nodes.filter(visible);
+    const xs = shown.map((d) => d.x), ys = shown.map((d) => d.y), pad = 70;
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const k = Math.min(2.5, 0.95 / Math.max((x1 - x0 + 2 * pad) / (width() || 1), (y1 - y0 + 2 * pad) / (height() || 1)));
+    svg.call(zoom.transform, d3.zoomIdentity.translate(width() / 2, height() / 2).scale(k).translate(-(x0 + x1) / 2, -(y0 + y1) / 2));
+  }
+  // Shown: every node but the values no design point takes and no alternative considered, unless the reader asks
+  // for every value the space offers. The layout is computed over the shown nodes only.
+  let showAll = false;
+  const visible = (d) => d.kind !== "value" || showAll || pointValues.has(d.id) || consideredValues.has(d.id);
+  function layout() {
+    const shown = nodes.filter(visible), ids = new Set(shown.map((n) => n.id));
+    const target = radialTargets(shown, links.filter((l) => ids.has(l.source) && ids.has(l.target)), cx, cy);
+    shown.forEach((n) => { const t = target.get(n.id); n.x = t.x; n.y = t.y; });
+    nodeSel.style("display", (d) => ids.has(d.id) ? null : "none").attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
+    linkSel.style("display", (d) => ids.has(d.source) && ids.has(d.target) ? null : "none")
+      .attr("x1", (d) => pos(d.source).x).attr("y1", (d) => pos(d.source).y)
+      .attr("x2", (d) => pos(d.target).x).attr("y2", (d) => pos(d.target).y);
+    orientLabels();
+    fit();
+  }
+  layout();
+  document.querySelectorAll("[data-zoom]").forEach((b) => b.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (b.dataset.zoom === "fit") fit(); else svg.transition().duration(200).call(zoom.scaleBy, b.dataset.zoom === "in" ? 1.4 : 1 / 1.4);
+  }));
+  // A requirement no design point is judged against: drawn hollow, with a dashed outline.
+  const judgedReqs = new Set(links.filter((e) => e.type === "assess").map((e) => e.target));
+  nodeSel.classed("unjudged", (d) => d.kind === "requirement" && !judgedReqs.has(d.id));
+  nodeSel.filter((d) => d.kind === "requirement" && !judgedReqs.has(d.id)).select("title")
+    .text((d) => d.req + ": " + d.text + " (no design point is judged against it)");
+  const toggle = document.getElementById("show-all");
+  if (toggle) toggle.addEventListener("change", () => { showAll = toggle.checked; layout(); });
+
+  // The active view: the trajectory (every step's point, or the selected step's), one alternative, or the compare
+  // view (every alternative). Explored dimensions and values stay coloured in every view; the point shown is outlined.
+  let view = "adrs", selected = null, selectedStep = null, selectedAlt = null, selectedOption = null;
+  const explored = (d) => d.kind === "value" ? pointValues.has(d.id) : d.kind === "dimension" ? exploredDims.has(d.id) : true;
+  linkSel.classed("explored", (d) => (d.type === "has_value" && pointValues.has(d.target))
+    || (d.type === "domain" && exploredDims.has(d.target)));
+  const stepOf = (n) => steps.find((s) => s.step === n);
+  function shownPoint() {
+    const lit = new Set();
+    const add = (s) => { if (!s) return; lit.add(pid(s.step)); Object.values(s.point).forEach((v) => lit.add(v)); };
+    if (view === "trajectory") { if (selectedStep !== null) add(stepOf(selectedStep)); return lit; }
+    if (view === "adrs" && selectedOption) {
+      const o = options.get(selectedOption); Object.values(o.point).forEach((v) => lit.add(v)); if (o.step) lit.add(pid(o.step));
+      return lit;
+    }
+    alts.filter((a) => view === "compare" || (view === "adrs" && a.id === selectedAlt)).forEach((a) => {
+      add(stepOf(a.step)); a.choices.forEach((c) => c.value && lit.add(c.value)); });
+    return lit;
+  }
+  function applyView() {
+    const lit = shownPoint();
+    nodeSel.classed("greyed", (d) => !explored(d)).classed("in-point", (d) => lit.has(d.id))
+      .select("path.shape").attr("fill", (d) => explored(d) ? nodeColor(d) : COLOR.muted)
+      .attr("stroke", (d) => d.id === selected || lit.has(d.id) ? COLOR.fg : d.kind === "dimension" ? "#fff" : "none")
+      .attr("stroke-width", (d) => d.id === selected ? 3 : lit.has(d.id) ? 2.2 : 1.5)
+      .attr("transform", (d) => lit.has(d.id) ? "scale(1.45)" : null);
+    // The point shown: its links to its values and to the requirements stand out.
+    linkSel.classed("shown", (d) => (d.type === "member" && lit.has(d.target)) || (d.type === "assess" && lit.has(d.source)));
+    document.querySelectorAll("[data-step]").forEach((el) =>
+      el.classList.toggle("sel", view === "trajectory" && selectedStep !== null && Number(el.dataset.step) === selectedStep));
+    document.querySelectorAll(".solution").forEach((el) => el.classList.toggle("sel", el.dataset.alt === selectedAlt));
+    document.querySelectorAll(".option").forEach((el) => el.classList.toggle("sel", el.dataset.option === selectedOption));
+  }
+  // A selected node's lineage in the tree (domain -> dimension -> value -> design point -> requirement): its
+  // ancestors up to the centre, and the paths down from it through design points to the requirements they are
+  // judged against. A requirement lights the points judged against it and their ancestors.
+  function lineage(id) {
+    const keep = new Set([id, "domain"]);
+    const up = (vid) => { keep.add(vid); const v = data.values[vid]; if (v) keep.add(v.dimension); };
+    const pointUp = (p) => { keep.add(p); (byId.get(p).values || []).forEach(up); };
+    const pointsWith = (vid) => links.filter((e) => e.type === "member" && e.source === vid).forEach((e) => keep.add(e.target));
+    const n = byId.get(id);
+    if (!n) return keep;
+    if (n.kind === "domain") { pointValues.forEach(up); steps.forEach((s) => keep.add(pid(s.step))); }
+    else if (n.kind === "dimension") (data.dimensions[id].values || []).filter((v) => pointValues.has(v))
+      .forEach((v) => { up(v); pointsWith(v); });
+    else if (n.kind === "value") { up(id); pointsWith(id); }
+    else if (n.kind === "point") pointUp(id);
+    else if (n.kind === "requirement") links.filter((e) => e.type === "assess" && e.target === id).forEach((e) => pointUp(e.source));
+    if (n.kind !== "requirement")  // down to the requirements the kept points are judged against
+      links.filter((e) => e.type === "assess" && keep.has(e.source)).forEach((e) => keep.add(e.target));
+    return keep;
+  }
+  function highlight(id) {
+    const keep = lineage(id);
+    labels(keep);
+    nodeSel.classed("dim-out", (d) => !keep.has(d.id));
+    linkSel.classed("dim-out", (d) => !(keep.has(d.source) && keep.has(d.target)))
+      .classed("on-path", (d) => d.type !== "relation" && keep.has(d.source) && keep.has(d.target));
+  }
+  const HINT = '<p class="hint">Select anything in the graph or the text (a dimension, a value, a design point, a requirement, an alternative or an option) to see what it is and the part it plays in this rationale.</p>';
+  function clearSelection() {
+    selected = null; selectedStep = null; selectedAlt = null; selectedOption = null;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    document.querySelectorAll(".chip.sel").forEach((c) => c.classList.remove("sel"));
+    document.getElementById("info").innerHTML = HINT;
+    applyView();
+  }
+  // The details panel: every kind of element reads the same way: what it is (kind, name, one sentence), then
+  // sections named as on the page (in the decisions, in the alternatives, in the trajectory, requirements, sources).
+  const EXPLAIN = data.mode === "explain";
+  const link = (n) => n.href ? '<p class="info-link"><a class="open-page" href="' + esc(n.href) + '">Open its page in the wiki →</a></p>' : "";
+  const vlabel = (vid) => { const v = data.values[vid]; return v ? '<span data-id="' + esc(v.id) + '" class="vref">' + esc(v.label) + "</span>" : "—"; };
+  const dlabel = (did) => { const x = data.dimensions[did]; return x ? '<span data-id="' + esc(x.id) + '" class="dref">' + esc(x.label) + "</span>" : "—"; };
+  const rlabel = (rid) => '<span data-id="r:' + esc(rid) + '" class="vref">' + esc(rid) + "</span>";
+  const pair = (did, vid) => dlabel(did) + " → " + vlabel(vid);
+  const head = (kind, title, sub) => '<div class="kind">' + kind + "</div><h2>" + title + "</h2>" + (sub ? '<p class="info-sub">' + sub + "</p>" : "");
+  const sec = (title, body) => body ? '<h3 class="info-h">' + esc(title) + "</h3>" + body : "";
+  const list = (items) => items.length ? "<ul>" + items.map((i) => "<li>" + i + "</li>").join("") + "</ul>" : "";
+  const para = (text) => text ? "<p>" + text + "</p>" : "";
+  // A step's trade-off against the requirements, and the one the point's description names.
+  const tradeoffLine = (t) => (t.causes && t.causes.length ? t.causes.map(vlabel).join(", ") + ": " : "") + '<span class="t-gain">gains</span> ' + t.gains.map(rlabel).join(", ")
+    + ' <span class="t-cost">gives up</span> ' + t.costs.map(rlabel).join(", ") + (t.note ? '<br><span class="muted">' + esc(t.note) + "</span>" : "");
+  const tradeoffSecs = (s) => sec("Trade-offs against the requirements", list((s.tradeoffs || []).map(tradeoffLine)))
+    + sec("The point's own trade-off", para(esc(s.own_tradeoff || "")));
+  const judgedChip = (rid, j) => '<span class="j j-' + esc(j) + '" data-id="r:' + esc(rid) + '">' + esc(rid) + " " + esc(j) + "</span>";
+  const judgedWord = (j) => '<span class="j j-' + esc(j) + '">' + esc(j) + "</span>";  // inside a requirement's own panel
+  const chips = (assessment) => { const e = Object.entries(assessment || {}); return e.length ? '<div class="judged">' + e.map(([r, j]) => judgedChip(r, j)).join("") + "</div>" : ""; };
+  const stepChip = (s) => '<span class="node-chip vb-' + esc(s.verdict) + '" data-step-ref="' + s.step + '" title="' + esc(s.verdict) + '">#' + s.step + "</span>";
+  const MEANS = {
+    strong: "it meets every constraint and serves every requirement at least partly",
+    mixed: "good on some requirements, but it misses one or carries a conflict",
+    weak: "it breaks a constraint or misses a key requirement",
+    grounded: "the requirements call for these values and what is known supports them",
+    partial: "only part of that holds: the requirements or what is known support it, not both",
+    ungrounded: "neither the requirements nor what is known support it" };
+  const STATUS = { accepted: "The sources accept this value.", mixed: "The sources are divided on this value.",
+    rejected: "The sources reject this value.", outcome: "The sources report this as an outcome." };
+  const STANCE = { accepts: "accepts it", rejects: "rejects it", supports: "supports it", both: "both accepts and rejects it" };
+  function phrase(s) {
+    const p = s.parent ? "#" + s.parent : "";
+    return { seed: "Seed of approach " + s.approach, exploit: "Refined " + p + (s.approach ? " (approach " + s.approach + ")" : ""),
+      explore: "New approach " + s.approach + (s.parent ? ", started from " + p : ""), ablate: "Ablation of " + p + ": which value made it work?",
+      solution: "The solution as one design point", region: "A region of " + p + ": part of the solution",
+      contrast: "A contrast on " + p + ": one option changed" }[s.move] || s.move;
+  }
+  function moveItems(s) {
+    if (["seed", "solution", "region"].includes(s.move) || !s.parent || !(s.diff || []).length)
+      return Object.entries(s.point).map(([d, v]) => pair(d, v));
+    return s.diff.map((c) => c.before == null ? "add " + pair(c.dimension, c.after)
+      : c.after == null ? "drop " + dlabel(c.dimension) + ' <span class="muted">(was ' + vlabel(c.before) + ")</span>"
+      : "change " + dlabel(c.dimension) + ": " + vlabel(c.before) + " → " + vlabel(c.after));
+  }
+  const adrOptions = [];  // [{r, o}] over every ADR option
+  (data.adrs || []).forEach((r) => r.options.forEach((o) => adrOptions.push({ r, o })));
+  const statusBadge = (o) => o.status === "chosen"
+    ? '<span class="badge accepted">chosen' + (EXPLAIN ? "" : " in " + esc(o.in.join(", "))) + "</span>"
+    : '<span class="badge rejected">discarded</span>';
+  const adrRef = (id, title) => '<a href="#adr-' + esc(id) + '" class="adr-link">' + esc(id) + "</a> · " + esc(title);
+  const optLine = ({ r, o }) => adrRef(r.id, r.title) + ": <b>" + esc(o.name) + "</b> " + statusBadge(o);
+  const altsTitle = EXPLAIN ? "In the solution" : "In the alternatives";
+  const ev = (list) => list.map((e) => esc(e.doc) + (e.stance ? " (" + esc(e.stance) + ")" : "")).join(", ");
+  const taking = (vid) => steps.filter((s) => Object.values(s.point).includes(vid));
+
+  function details(n) {
+    if (n.kind === "dimension") {
+      const dm = data.dimensions[n.id];
+      const explored = (dm.values || []).filter((v) => pointValues.has(v));
+      return head("Dimension · a design concern", esc(n.label), esc(n.question || ""))
+        + sec("In the decisions", list(adrOptions.filter(({ o }) => o.point[n.id]).map((x) => optLine(x) + "<br>" + pair(n.id, x.o.point[n.id]))))
+        + sec(altsTitle, list(alts.map((a) => {
+            const c = a.choices.find((x) => x.dimension === n.id), o = a.open.find((x) => x.dimension === n.id);
+            return "<b>" + esc(a.id) + "</b> " + (c ? vlabel(c.value) + (c.reason ? '<br><span class="muted">' + esc(c.reason) + "</span>" : "")
+              : o ? "leaves it open" + (o.reason ? ': <span class="muted">' + esc(o.reason) + "</span>" : "") : '<span class="muted">does not settle it</span>');
+          })))
+        + sec("In the trajectory", explored.length
+            ? para(explored.length + " of the " + dm.values.length + " values " + (data.wiki ? "the space offers" : "the agent named") + " were taken by some design point:")
+              + list(explored.map((v) => vlabel(v) + " " + taking(v).map(stepChip).join("")))
+            : para('<span class="muted">No design point settled this dimension.</span>'))
+        + sec("Relations", list(data.relations.filter((r) => r.source === n.id || r.target === n.id)
+            .map((r) => dlabel(r.source) + " <em>" + esc(r.type) + "</em> " + dlabel(r.target) + ' <span class="muted">(in the space)</span>')
+            .concat(alts.flatMap((a) => a.relations.filter((r) => r.source === n.id || r.target === n.id).map((r) =>
+              (r.source ? dlabel(r.source) : esc(r.source_label)) + " <em>" + esc(r.type) + "</em> " + (r.target ? dlabel(r.target) : esc(r.target_label))
+              + ' <span class="muted">(' + esc(a.id) + (r.holds ? ": holds" : ": does not hold") + (r.note ? ", " + esc(r.note) : "") + ")</span>")))))
+        + link(n);
+    }
+    if (n.kind === "value") {
+      const points = taking(n.id);
+      const roles = [];
+      alts.forEach((a) => {
+        const c = a.choices.find((x) => x.value === n.id), k = a.considered.find((x) => x.value === n.id);
+        if (c) roles.push("<b>Chosen in " + esc(a.id) + "</b>" + (c.drivers.length ? " for " + c.drivers.map(rlabel).join(", ") : "")
+          + (c.reason ? "<br>" + esc(c.reason) : "") + (c.quote ? '<div class="quote">“' + esc(c.quote) + "”</div>" : "")
+          + (c.evidence.length ? '<br><span class="ev">Cited evidence: ' + ev(c.evidence) + "</span>" : ""));
+        else if (k) roles.push("<b>Weighed and set aside in " + esc(a.id) + "</b>" + (k.reason ? "<br>" + esc(k.reason) : ""));
+      });
+      return head("Value · an option for " + dlabel(n.dimension), esc(n.label), esc(n.description || ""))
+        + (n.status && STATUS[n.status] ? para('<span class="badge ' + esc(n.status) + '">' + esc(n.status) + "</span> " + STATUS[n.status]) : "")
+        + sec("In the decisions", list(adrOptions.filter(({ o }) => Object.values(o.point).includes(n.id)).map(optLine)))
+        + sec(altsTitle, list(roles))
+        + sec("In the trajectory", points.length
+            ? para("Taken by " + points.length + " design point" + (points.length > 1 ? "s" : "") + ": " + points.map(stepChip).join("")
+              + "<br>First tried in #" + points[0].step + ": " + esc(phrase(points[0])) + ".")
+            : para('<span class="muted">No design point took it: ' + (data.wiki ? "the space offers it, but the agent did not try it." : "the agent named it as an option, but did not try it.") + "</span>"))
+        + sec("What the sources say", list(n.sources.map((s) => (s.href ? '<a href="' + esc(s.href) + '">' + esc(s.label) + "</a>" : esc(s.label))
+            + (s.stance ? " " + esc(STANCE[s.stance] || s.stance) : "")))
+            + (n.passages.length ? '<p class="ev">Passages: ' + ev(n.passages) + "</p>" : ""))
+        + link(n);
+    }
+    if (n.kind === "requirement") {
+      const rq = data.requirements.find((r) => r.id === n.req) || {};
+      const adrsFor = (data.adrs || []).filter((r) => r.drivers.includes(n.req));
+      const judged = steps.filter((s) => s.assessment && s.assessment[n.req]);
+      const drives = [];
+      alts.forEach((a) => a.choices.filter((c) => c.drivers.includes(n.req)).forEach((c) =>
+        drives.push("<b>" + esc(a.id) + "</b> " + pair(c.dimension, c.value))));
+      return head("Requirement · " + esc(rq.kind || "requirement") + (rq.attribute ? ": " + esc(rq.attribute) : ""), esc(n.req), esc(n.text))
+        + sec("In the decisions", adrsFor.length
+            ? list(adrsFor.map((r) => adrRef(r.id, r.title) + ": "
+                + r.options.filter((o) => o.status === "chosen").map((o) => "<b>" + esc(o.name) + "</b>" + (EXPLAIN ? "" : " (" + esc(o.in.join(", ")) + ")")).join("; ")))
+            : para('<span class="muted">No ADR addresses it.</span>'))
+        + sec(altsTitle, list(alts.map((a) => { const s = stepOf(a.step), j = s && s.assessment ? s.assessment[n.req] : null;
+            return "<b>" + esc(a.id) + "</b> " + (j ? judgedWord(j) : '<span class="muted">not judged</span>'); })))
+        + sec("In the trajectory", judged.length
+            ? para(judged.length + " design point" + (judged.length > 1 ? "s were" : " was") + " judged against it:")
+              + '<div class="judged">' + judged.map((s) => '<span class="pair-chip">' + stepChip(s) + judgedWord(s.assessment[n.req]) + "</span>").join(" ") + "</div>"
+            : para('<span class="muted">No design point was judged against it.</span>'))
+        + sec("Choices that name it as a driver", list(drives));
+    }
+    return head("Design space", esc(n.label || data.title),
+        data.space ? "The centre of the graph. Around it: the dimensions this rationale involves, their values, the design points the agent evaluated and the requirements."
+          : "The problem. Around it: the dimensions the agent named, their values, the design points it evaluated and the requirements.")
+      + sec("At a glance", list([exploredDims.size + " of " + Object.keys(data.dimensions).length + " dimensions settled by some design point",
+          pointValues.size + " values taken by some design point", steps.length + " design points evaluated"
+          + (data.budget && data.budget.max_points ? " (budget " + data.budget.max_points + ")" : ""),
+          alts.length + (EXPLAIN ? " solution explained" : " alternative" + (alts.length > 1 ? "s" : "") + " proposed"),
+          (data.adrs || []).length + " ADRs"]))
+      + link(n);
+  }
+  function select(id) {
+    const n = byId.get(id); if (!n) return;
+    if (n.kind === "point") { selectStep(n.step); return; }
+    selected = id; applyView(); highlight(id);
+    document.querySelectorAll(".chip.sel").forEach((c) => c.classList.remove("sel"));
+    if (n.kind === "requirement") document.querySelectorAll('[data-requirement="' + n.req + '"]').forEach((c) => c.classList.add("sel"));
+    showInfo(details(n));
+  }
+  svg.on("click", () => clearSelection());
+
+  // The trajectory: selecting a step (its column, its entry or its point in the graph) lights its point and its lineage.
+  function stepInfo(s) {
+    const sub = (s.approach ? "Approach " + esc(s.approach) + (s.round ? ", round " + esc(s.round) : "") + ". " : "") + esc(s.description || "");
+    const inAdrs = adrOptions.filter(({ o }) => o.step === s.step);
+    return head("Design point" + (s.point_id ? " · " + esc(s.point_id) : ""), "#" + s.step + " · " + esc(phrase(s)),
+        sub + (s.reuses ? " The same point as #" + s.reuses + ": reused, not evaluated again." : ""))
+      + para('<span class="vd-chip vb-' + esc(s.verdict) + '">' + esc(s.verdict) + "</span> " + esc(MEANS[s.verdict] || "")
+        + (s.alternative ? '<br><span class="alt-chip">' + (EXPLAIN ? "This is the solution." : "It became alternative " + esc(s.alternative) + ".") + "</span>" : ""))
+      + sec("Thought", para(esc(s.why)))
+      + sec("Move", list(moveItems(s)))
+      + sec("Observed", para(esc(s.observation)))
+      + sec("Requirements", chips(s.assessment))
+      + tradeoffSecs(s)
+      + (["seed", "solution", "region"].includes(s.move) ? "" : sec("The whole point", list(Object.entries(s.point).map(([d, v]) => pair(d, v)))))
+      + sec("In the decisions", list(inAdrs.map(optLine)))
+      + (data.wiki ? sec("What the sources say", s.attested_by.length
+          ? para("Attested by " + s.attested_by.map((a) => a.href ? '<a href="' + esc(a.href) + '">' + esc(a.label) + "</a>" : esc(a.label)).join("; ") + ".")
+          : para('<span class="muted">No source attests this combination.</span>')) : "");
+  }
+  function selectStep(n) {
+    const s = stepOf(n); if (!s) return;
+    selected = null; selectedStep = n;
+    if (view !== "trajectory") document.querySelector('.tab[data-tab="trajectory"]')?.click();
+    selectedStep = n; applyView(); highlight(pid(n));
+    showInfo(stepInfo(s));
+  }
+  document.querySelectorAll(".step-h, .region, .node-chip, .heat-h, td.h, .story-step, .opt").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    selectStep(Number(el.dataset.step));
+  }));
+  // The ADRs tab: an alternative or an option lights its point in the graph.
+  function altInfo(a) {
+    const s = stepOf(a.step);
+    return head(EXPLAIN ? "The solution" : "Alternative" + (a.approach ? " · from approach " + esc(a.approach) : ""), esc(altName(a)), esc(a.summary || ""))
+      + sec("Composed of", list((a.parts || []).map((p) => adrRef(p.adr, p.name)
+          + "<br>" + Object.entries(p.point).map(([d, v]) => pair(d, v)).join("<br>"))))
+      + sec("Requirements", s ? chips(s.assessment) : "")
+      + (s ? tradeoffSecs(s) : "")
+      + sec("Left open", list(a.open.map((o) => dlabel(o.dimension) + (o.reason ? ': <span class="muted">' + esc(o.reason) + "</span>" : ""))))
+      + sec("Each choice", list(a.choices.map((c) => pair(c.dimension, c.value) + (c.drivers.length ? " · for " + c.drivers.map(rlabel).join(", ") : "")
+          + (c.reason ? '<br><span class="muted">' + esc(c.reason) + "</span>" : "")
+          + (c.fit === "approximate" ? '<br><span class="badge mixed approx">approximate fit</span> ' + esc(c.fit_note || "") : "") + (c.quote ? '<div class="quote">“' + esc(c.quote) + "”</div>" : "")
+          + (c.evidence.length ? '<br><span class="ev">Cited evidence: ' + ev(c.evidence) + "</span>" : ""))));
+  }
+  function optionInfo(o) {
+    const { r } = adrOptions.find((x) => x.o === o) || {};
+    return head("Option · " + (r ? esc(r.id) + " " + esc(r.title) : "ADR"), esc(o.name), statusBadge(o) + " " + esc(o.reason || ""))
+      + sec("Values", list(Object.entries(o.point).map(([d, v]) => pair(d, v))))
+      + (o.fit === "approximate" ? sec("Approximate fit", para(esc(o.fit_note || "The values only roughly match this option."))) : "")
+      + sec("Pros", list(o.pros.map(esc))) + sec("Cons", list(o.cons.map(esc)))
+      + (o.quotes && o.quotes.length ? sec("In the solution's words", o.quotes.map((q) => '<div class="quote">“' + esc(q) + "”</div>").join("")) : "")
+      + (r ? sec("The decision it answers", para(esc(r.context)) + '<div class="judged">' + r.drivers.map((d) => '<span class="chip-sm">' + rlabel(d) + "</span>").join(" ") + "</div>") : "");
+  }
+  function showInfo(html) {
+    const info = document.getElementById("info"); info.innerHTML = html; info.scrollTop = 0;
+    info.querySelectorAll("[data-id]").forEach((el) => el.addEventListener("click", () => select(el.dataset.id)));
+    info.querySelectorAll("[data-step-ref]").forEach((el) => el.addEventListener("click", () => selectStep(Number(el.dataset.stepRef))));
+    info.querySelectorAll("a.adr-link").forEach((el) => el.addEventListener("click", () => {
+      if (view !== "adrs") document.querySelector('.tab[data-tab="adrs"]')?.click(); }));
+  }
+  document.querySelectorAll(".solution").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    const a = alts.find((x) => x.id === el.dataset.alt); if (!a) return;
+    selected = null; selectedOption = null; selectedAlt = a.id;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    applyView(); showInfo(altInfo(a));
+  }));
+  document.querySelectorAll(".option").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    const o = options.get(el.dataset.option); if (!o) return;
+    selected = null; selectedAlt = null; selectedOption = o.key;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    applyView(); showInfo(optionInfo(o));
+  }));
+  // A gap's approximate fit selects its ADR option (or its alternative) in the ADRs tab.
+  document.querySelectorAll("[data-gap-option], [data-gap-alt]").forEach((el) => {
+    const go = () => {
+      if (view !== "adrs") document.querySelector('.tab[data-tab="adrs"]')?.click();
+      const target = el.dataset.gapOption ? document.querySelector('.option[data-option="' + CSS.escape(el.dataset.gapOption) + '"]')
+        : document.querySelector('.solution[data-alt="' + CSS.escape(el.dataset.gapAlt) + '"]');
+      if (target) { target.click(); target.scrollIntoView({ block: "center", behavior: "smooth" }); }
+    };
+    el.addEventListener("click", (e) => { if (!e.target.closest("a") && !e.target.closest("[data-node]")) go(); });
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+  });
+  // The lanes: an arrow from each point's parent to it (refine along a lane, a new approach across lanes,
+  // an ablation dotted).
+  function overlay(wrapSel, svgSel) {
+    const wrap = document.querySelector(wrapSel), svgEl = wrap && wrap.querySelector(svgSel);
+    if (!wrap || !svgEl || !wrap.offsetParent) return null;
+    svgEl.setAttribute("width", wrap.scrollWidth); svgEl.setAttribute("height", wrap.scrollHeight);
+    const box = wrap.getBoundingClientRect();
+    const at = (el, side) => { const r = el.getBoundingClientRect();
+      return [(side === "left" ? r.left : side === "right" ? r.right : r.left + r.width / 2) - box.left + wrap.scrollLeft,
+        r.top + r.height / 2 - box.top]; };
+    return { svgEl, at };
+  }
+  const MOVE_COLOR = (m) => m === "explore" || m === "contrast" ? COLOR.novel : m === "seed" || m === "solution" ? COLOR.dimension : COLOR.accent;
+  function drawLanes() {
+    const o = overlay(".lanes-wrap", "svg.lane-arrows"); if (!o) return;
+    let html = "";
+    steps.forEach((s) => {
+      if (!s.parent) return;
+      const a = document.querySelector('.node-chip[data-step="' + s.parent + '"]'), b = document.querySelector('.node-chip[data-step="' + s.step + '"]');
+      if (!a || !b) return;
+      const [x0, y0] = o.at(a, "right"), [x1, y1] = o.at(b, "left");
+      const mx = (x0 + x1) / 2, dash = s.move === "ablate" ? "2,3" : s.move === "explore" ? "6,4" : null;
+      html += '<path d="M' + x0 + "," + y0 + " C" + mx + "," + y0 + " " + mx + "," + y1 + " " + x1 + "," + y1 + '" fill="none" stroke="'
+        + MOVE_COLOR(s.move) + '" stroke-width="1.8"' + (dash ? ' stroke-dasharray="' + dash + '"' : "") + ' marker-end="url(#lane-arrow)"></path>';
+    });
+    o.svgEl.innerHTML = '<defs><marker id="lane-arrow" viewBox="0 -5 10 10" refX="9" refY="0" markerWidth="6" markerHeight="6" orient="auto">'
+      + '<path d="M0,-5L10,0L0,5" fill="' + COLOR.muted + '"></path></marker></defs>' + html;
+  }
+  // The questions, options and criteria: a link from each option to each requirement its point was judged against.
+  const JUDGE_STYLE = { meets: [() => COLOR.accepted, null], partly: [() => COLOR.mixed, null], misses: [() => COLOR.rejected, "5,4"] };
+  function drawQoc() {
+    const o = overlay(".qoc-wrap", "svg.qoc-links"); if (!o) return;
+    let html = "";
+    document.querySelectorAll(".opt[data-qoc]").forEach((el) => {
+      const [qi, oi] = el.dataset.qoc.split(":").map(Number), opt = (data.qoc[qi] || { options: [] }).options[oi];
+      if (!opt) return;
+      const [x0, y0] = o.at(el, "right");
+      Object.entries(opt.assessment || {}).forEach(([rid, judged]) => {
+        const c = document.querySelector('.crit[data-crit="' + rid + '"]'); if (!c) return;
+        const [x1, y1] = o.at(c, "left"), st = JUDGE_STYLE[judged] || [() => COLOR.muted, null], mx = (x0 + x1) / 2;
+        html += '<path data-from="' + el.dataset.qoc + '" d="M' + x0 + "," + y0 + " C" + mx + "," + y0 + " " + mx + "," + y1 + " " + x1 + "," + y1
+          + '" fill="none" stroke="' + st[0]() + '" stroke-width="1.5" stroke-opacity="' + (opt.specific ? 0.8 : 0.14) + '"'
+          + (st[1] ? ' stroke-dasharray="' + st[1] + '"' : "") + "></path>";
+      });
+    });
+    o.svgEl.innerHTML = html;
+  }
+  document.querySelectorAll(".opt[data-qoc]").forEach((el) => {
+    const mark = (on) => document.querySelectorAll('svg.qoc-links path[data-from="' + el.dataset.qoc + '"]')
+      .forEach((p) => p.classList.toggle("traced", on));
+    el.addEventListener("mouseenter", () => mark(true)); el.addEventListener("mouseleave", () => mark(false));
+  });
+  function drawTrajectory() { drawLanes(); drawQoc(); drawLineage(); }
+  document.querySelector("details.grid-details")?.addEventListener("toggle", drawLineage);
+  // The lineage: an arc from each step's parent column to its own, above the grid.
+  function drawLineage() {
+    const svgL = document.querySelector("svg.lineage"); if (!svgL) return;
+    const box = svgL.getBoundingClientRect(), table = document.querySelector("table.traj");
+    svgL.style.width = table.scrollWidth + "px";
+    const x = (n) => { const th = document.querySelector('.step-h[data-step="' + n + '"]'); if (!th) return null;
+      const r = th.getBoundingClientRect(); return r.left - box.left + r.width / 2; };
+    const colorOf = (m) => m === "explore" || m === "contrast" ? COLOR.novel : m === "exploit" || m === "region" ? COLOR.accent : COLOR.dimension;
+    let html = "";
+    steps.forEach((s) => {
+      const x1 = x(s.step); if (x1 === null) return;
+      html += '<circle cx="' + x1 + '" cy="40" r="3" fill="' + colorOf(s.move) + '"></circle>';
+      const x0 = s.parent ? x(s.parent) : null; if (x0 === null) return;
+      const h = Math.min(36, 10 + Math.abs(x1 - x0) / 8);
+      html += '<path d="M' + x0 + ",40 C" + x0 + "," + (40 - h) + " " + x1 + "," + (40 - h) + " " + x1 + ',40" fill="none" stroke="'
+        + colorOf(s.move) + '" stroke-width="1.6"></path>';
+    });
+    svgL.innerHTML = html;
+  }
+  document.querySelectorAll("main [data-node]").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a")) return;  // a wiki link opens its page
+    e.preventDefault(); select(el.dataset.node);
+  }));
+
+  // Tabs: switching shows the tab's panel, re-lights the graph and drops the selection fade.
+  document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => {
+    view = t.dataset.tab;
+    document.querySelectorAll(".tab").forEach((x) => x.setAttribute("aria-selected", x === t ? "true" : "false"));
+    document.querySelectorAll(".panel").forEach((p) => { p.hidden = p.dataset.panel !== view; });
+    clearSelection();
+    if (view === "trajectory") drawTrajectory();
+  }));
+  applyView();
+  drawTrajectory();
+  // The dividers: drag (or use the arrow keys on) the vertical one to share the width between the text and the
+  // graph, the horizontal one to share the height between the graph and its details. Double-click resets. The
+  // split is kept in this browser only (a convenience; the page works without storage).
+  (function splitters() {
+    const KEY = "delve-explainer-split", root = document.documentElement, wrap = document.querySelector(".ex-wrap");
+    const side = document.querySelector(".ex-side");
+    const LIMITS = { left: [20, 80], canvas: [20, 85] }, DEFAULT = { left: 50, canvas: 60 };
+    let split = { ...DEFAULT };
+    try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) split = { ...split, ...s }; } catch (e) { /* no storage */ }
+    const clamp = (k, v) => Math.min(LIMITS[k][1], Math.max(LIMITS[k][0], v));
+    let pending = null;
+    function apply(save) {
+      root.style.setProperty("--split-left", clamp("left", split.left) + "%");
+      root.style.setProperty("--split-canvas", clamp("canvas", split.canvas) + "%");
+      if (!pending) pending = requestAnimationFrame(() => { pending = null; fit(); drawTrajectory(); });
+      if (save) { try { localStorage.setItem(KEY, JSON.stringify(split)); } catch (e) { /* no storage */ } }
+    }
+    function drag(handle, key, axis) {
+      if (!handle) return;
+      handle.addEventListener("pointerdown", (e) => {
+        e.preventDefault(); handle.setPointerCapture(e.pointerId); handle.classList.add("dragging");
+        document.body.classList.add("resizing", axis === "x" ? "col" : "row");
+        const move = (ev) => {
+          if (axis === "x") { const r = wrap.getBoundingClientRect(); split.left = clamp("left", (ev.clientX - r.left) / r.width * 100); }
+          else { const r = side.getBoundingClientRect(); split.canvas = clamp("canvas", (ev.clientY - r.top) / r.height * 100); }
+          apply(false);
+        };
+        const up = () => { handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up);
+          handle.classList.remove("dragging"); document.body.classList.remove("resizing", "col", "row"); apply(true); };
+        handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up);
+      });
+      handle.addEventListener("keydown", (e) => {
+        const step = e.shiftKey ? 10 : 2;
+        const delta = { ArrowLeft: -step, ArrowUp: -step, ArrowRight: step, ArrowDown: step }[e.key];
+        if (delta === undefined) return;
+        e.preventDefault(); split[key] = clamp(key, split[key] + delta); apply(true);
+      });
+      handle.addEventListener("dblclick", () => { split[key] = DEFAULT[key]; apply(true); });
+    }
+    drag(document.querySelector(".splitter-v"), "left", "x");
+    drag(document.querySelector(".splitter-h"), "canvas", "y");
+    apply(false);
+  })();
+
+  let lastSize = width() + "x" + height(), timer = null;
+  window.addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(() => {
+    const size = width() + "x" + height(); if (size !== lastSize) { lastSize = size; fit(); drawTrajectory(); } }, 200); });
+  document.addEventListener("themechange", () => { readColors(); styleLinks(); applyView(); drawTrajectory(); });
+})();
+</script>
+</body>
+</html>

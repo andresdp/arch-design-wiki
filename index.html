@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>arch-design-wiki: searching and explaining designs with a design space</title>
-<meta name="description" content="Design spaces as wikis, the rationale an agent wrote with and without them, and how to reproduce the study.">
+<meta name="description" content="Design spaces as wikis, the rationale an agent wrote with and without them, and the explainers written against them.">
 <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
 <style>
   :root {
@@ -76,22 +76,20 @@
       <div class="repo">arch-design-wiki</div>
     </div>
     <h1>Searching and Explaining Designs with a Design Space</h1>
-    <p class="authors">J. Andrés Díaz-Pace · ISISTAN, CONICET – UNICEN University, Tandil, Argentina</p>
     <p class="lead">A design space records the decisions of a domain, the alternatives for each, the relations between
       them and the systems that adopted them. This site holds the material of our paper on how an architect can put a
       given space to work: <strong>search</strong>, from a system's requirements to a few alternative designs, and
       <strong>explain</strong>, from an existing solution back to the space's decisions. Both produce a rationale
       file, rendered as a browsable <strong>explainer</strong> next to the space's wiki.</p>
     <nav class="jump" aria-label="Sections">
-      <a href="#spaces">The design spaces</a><a href="#explainers">Explainers</a>
-      <a href="https://github.com/andresdp/arch-design-wiki">Study, code and how to reproduce (GitHub)</a>
+      <a href="#spaces">Design spaces</a><a href="#explainers">Explainers</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
   <section id="spaces">
-    <h2>The design spaces</h2>
+    <h2>Design spaces</h2>
     <p class="sub">Each space is a wiki: one page per dimension and value, the relations between dimensions, and the
       explainers written against it.</p>
     <div class="cards">
@@ -103,11 +101,11 @@
         <a class="btn" href="spaces/ml-workflow-expert/site/index.html">Open the wiki</a>
       </div>
       <div class="card">
-        <h3>Git hosting at scale (toy)</h3>
+        <h3>Git hosting at scale (sample)</h3>
         <div class="stats"><span>5 dimensions</span><span>17 values</span><span>written by hand</span></div>
         <p>A small space written by hand from public engineering descriptions of large Git hosts: the paper's
           running example.</p>
-        <a class="btn" href="spaces/git-hosting-toy/site/index.html">Open the wiki</a>
+        <a class="btn" href="spaces/git-hosting-sample/site/index.html">Open the wiki</a>
       </div>
     </div>
   </section>
@@ -146,17 +144,17 @@
     <div class="legend"><span><b class="e">E</b>: pages inside the expert wiki, linked to its dimensions and values</span>
       <span><b class="n">N</b>: standalone pages; the agent named its own decisions</span></div>
 
-    <h3 style="margin:28px 0 10px">The running example</h3>
+    <h3 style="margin:28px 0 10px">Running example</h3>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Case</th><th>With the toy space</th><th>Without a space</th></tr></thead>
+        <thead><tr><th>Case</th><th>With the sample space</th><th>Without a space</th></tr></thead>
         <tbody>
           <tr><td>Git hosting for a growing engineering organization<span class="mode">search</span></td>
-            <td class="runs e"><a href="spaces/git-hosting-toy/site/explainers/hosting-search.html">explainer</a></td>
-            <td class="runs n"><a href="spaces/no-space/explainers/toy-hosting-search.html">explainer</a></td></tr>
+            <td class="runs e"><a href="spaces/git-hosting-sample/site/explainers/hosting-search.html">explainer</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/sample-hosting-search.html">explainer</a></td></tr>
           <tr><td>Replicated Git file servers<span class="mode">explain</span></td>
-            <td class="runs e"><a href="spaces/git-hosting-toy/site/explainers/spokes-explain.html">explainer</a></td>
-            <td class="runs n"><a href="spaces/no-space/explainers/toy-spokes-explain.html">explainer</a></td></tr>
+            <td class="runs e"><a href="spaces/git-hosting-sample/site/explainers/spokes-explain.html">explainer</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/sample-spokes-explain.html">explainer</a></td></tr>
         </tbody>
       </table>
     </div>
@@ -167,6 +165,9 @@
 <footer>
   <div class="wrap">The expert space is derived from the decision model of Warnett and Zdun, "Architectural Design
     Decisions for the Machine Learning Workflow" (IEEE Computer, 2022). Code: MIT licence.
+    The Git-hosting sample space follows the systems discussed in
+    <a href="https://cursor.com/en-US/blog/git-at-any-scale">"Git at any scale"</a> (Cursor) and the engineering
+    descriptions it cites.
     <a href="https://github.com/andresdp/arch-design-wiki">Repository</a>.</div>
 </footer>
 

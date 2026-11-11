@@ -13,12 +13,12 @@ not quoted).
 | `cases/2-spokes-explain/` | The same problem, and a solution to explain: replicated Git file servers |
 | `runs/space/`, `runs/no-space/` | The rationale files of the paper's running example, with and without the space |
 
-The space's workspace and wiki are in `spaces/git-hosting-toy/` (open `site/index.html`); the explainers of the
-runs are in `spaces/git-hosting-toy/site/explainers/` and `spaces/no-space/explainers/toy-*.html`.
+The space's workspace and wiki are in `spaces/git-hosting-sample/` (open `site/index.html`); the explainers of the
+runs are in `spaces/git-hosting-sample/site/explainers/` and `spaces/no-space/explainers/sample-*.html`.
 
 To check a run against the space:
 
 ```bash
-cd spaces/git-hosting-toy
+cd spaces/git-hosting-sample
 ddspace rationale check ../../examples/toy-git-hosting/runs/space/hosting-search.json
 ```

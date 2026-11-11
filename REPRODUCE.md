@@ -51,7 +51,7 @@ ddspace rationale build ../../study/designing2027/results-v2/rationale/fraud-sea
 open my-explainers/explainers/fraud-search.html        # xdg-open on Linux
 ```
 
-**Browse the spaces.** `spaces/ml-workflow-expert/site/index.html` and `spaces/git-hosting-toy/site/index.html`
+**Browse the spaces.** `spaces/ml-workflow-expert/site/index.html` and `spaces/git-hosting-sample/site/index.html`
 open in a browser from disk, or online from the [landing page](https://andresdp.github.io/arch-design-wiki/).
 `ddspace query` reads a space from the command line, as the agent did:
 
@@ -110,6 +110,6 @@ The runner keeps, under `study/designing2027/<results>/`, each session's rationa
 | `study/designing2027/inputs/` | The expert decision model the E space is built from, and its manifest |
 | `src/delvedspace/templates/skills/` | The search and explain skills |
 | `spaces/ml-workflow-expert/` | The E workspace: `site/` (the wiki, with the E explainers), `raw/graph.json`, `AGENTS.md` |
-| `spaces/git-hosting-toy/` | The running example's workspace and its explainers |
+| `spaces/git-hosting-sample/` | The running example's workspace and its explainers |
 | `spaces/no-space/explainers/` | The N explainers and the running example's runs without a space |
 | `examples/toy-git-hosting/` | The running example's run file, cases and recorded rationale files |

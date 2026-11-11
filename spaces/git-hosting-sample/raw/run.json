@@ -1,0 +1,16 @@
+{
+  "producer": "delvedspace/0.1.0.dev0",
+  "run": "20261111_144051",
+  "taxonomy": "runs/20261111_144051/toy-git-hosting_taxonomy_20261109_000000.json",
+  "view": "selected",
+  "quotes": false,
+  "source_summaries": false,
+  "design_points": "none",
+  "core_min_sources": 2,
+  "stale_after": null,
+  "models": {
+    "generation_llm": "openai/gpt-5.6-luna",
+    "evaluation_llm": "openai/gpt-5.6-luna",
+    "embedding": "openai/text-embedding-3-small"
+  }
+}

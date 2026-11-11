@@ -43,7 +43,7 @@ the expert ML-workflow space (**E**) and without a space (**N**), two repetition
 | Path | What |
 |---|---|
 | `spaces/ml-workflow-expert/` | The expert ML-workflow design space (28 dimensions, 124 values) as a workspace and wiki, with the 12 explainers of the sessions that used it |
-| `spaces/git-hosting-toy/` | The running example: a small Git-hosting space written by hand, with its explainers |
+| `spaces/git-hosting-sample/` | The running example: a small Git-hosting space written by hand, with its explainers |
 | `spaces/no-space/` | The explainers of the 12 sessions without a space, and of the running example without a space |
 | `study/designing2027/` | The cases, the prompt, the session runner, the 24 rationale files and summaries, and `analyze.py`, which recomputes the paper's table |
 | `examples/toy-git-hosting/` | The running example's run file, cases and recorded rationale files |
