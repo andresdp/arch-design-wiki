@@ -3,18 +3,18 @@ type: Design Alternative
 title: Batch-based learning
 description: train the model in batches, possibly offline
 id: '19.1'
-dimension: /concepts/when-and-how-to-train-the-model.md
+dimension: /concepts/model-training-timing-and-mode.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- when-and-how-to-train-the-model
+- model-training-timing-and-mode
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # Batch-based learning

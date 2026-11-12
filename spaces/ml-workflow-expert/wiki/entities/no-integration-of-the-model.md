@@ -3,18 +3,18 @@ type: Design Alternative
 title: No integration of the model
 description: model is not integrated, maybe results are used, e.g.
 id: '1.7'
-dimension: /concepts/how-to-integrate-a-machine-learning-model-in-an-application.md
+dimension: /concepts/ml-model-integration-into-the-application.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- how-to-integrate-a-machine-learning-model-in-an-application
+- ml-model-integration-into-the-application
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # No integration of the model

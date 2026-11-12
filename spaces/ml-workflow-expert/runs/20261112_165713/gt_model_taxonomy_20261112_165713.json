@@ -1,0 +1,3311 @@
+{
+  "taxonomy_name": "gt_model",
+  "selected_clusters": [
+    {
+      "id": "1",
+      "name": "ML model integration into the application",
+      "description": "How to integrate a machine learning model in an application?",
+      "relations": [
+        {
+          "target_id": "5",
+          "type": "affects",
+          "rationale": "Consider If Not Decided Yet",
+          "reading": "Choices on ML model integration into the application affect the outcomes of Model serving"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "1.1",
+          "label": "Model as a service",
+          "description": "create one service per model",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_as_a_service"
+        },
+        {
+          "id": "1.2",
+          "label": "Model in monolith",
+          "description": "embed the model in the code of the application",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_in_monolith"
+        },
+        {
+          "id": "1.3",
+          "label": "Model as module in modular monolith",
+          "description": "create a module for the model in the application",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_as_module_in_modular_monolith"
+        },
+        {
+          "id": "1.4",
+          "label": "Model in batch prediction system",
+          "description": "call an external batch prediction system",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_in_batch_prediction_system"
+        },
+        {
+          "id": "1.5",
+          "label": "Event-driven model as a service",
+          "description": "event-driven pub/sub or queueing interface for model",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "event_driven_model_as_a_service"
+        },
+        {
+          "id": "1.6",
+          "label": "Serverless model as a service",
+          "description": "serverless/function-as-a-service computing model for offering the model",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "serverless_model_as_a_service"
+        },
+        {
+          "id": "1.7",
+          "label": "No integration of the model",
+          "description": "model is not integrated, maybe results are used, e.g. as a forecast",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_integration_of_the_model"
+        }
+      ],
+      "external_id": "integrating_ml_model_decision"
+    },
+    {
+      "id": "2",
+      "name": "Data storage for ML applications",
+      "description": "How to store data used in machine learning applications?",
+      "relations": [
+        {
+          "target_id": "3",
+          "type": "affects",
+          "rationale": "offer an abstraction layer for data access",
+          "reading": "Choices on Data storage for ML applications affect the outcomes of Data access interface"
+        },
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "store data decision",
+          "reading": "Choices on Data storage for ML applications affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "2.1",
+          "label": "Shared data store",
+          "description": "store data in shared data store",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "shared_data_store"
+        },
+        {
+          "id": "2.2",
+          "label": "Data service",
+          "description": "store data in services",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_service"
+        },
+        {
+          "id": "2.3",
+          "label": "Event store",
+          "description": "store data as events being exchanged in the systems",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "event_store"
+        },
+        {
+          "id": "2.4",
+          "label": "No data store",
+          "description": "get data without storing it, e.g. manual ingested raw data or only event streaming",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_data_store"
+        }
+      ],
+      "external_id": "store_data_decision"
+    },
+    {
+      "id": "3",
+      "name": "Data access interface",
+      "description": "How to design the interface for data access?",
+      "relations": [],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "3.1",
+          "label": "Local data access API",
+          "description": "data provider encapsulated by local data access API abstraction",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "local_data_access_api"
+        },
+        {
+          "id": "3.2",
+          "label": "Service-based data access API",
+          "description": "data provider encapsulated by data access services",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "service_based_data_access_api"
+        },
+        {
+          "id": "3.3",
+          "label": "Pub/sub data access API",
+          "description": "subscription for data access; publisher notifies upon data availability",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "pub_sub_data_access_api"
+        },
+        {
+          "id": "3.4",
+          "label": "Message/event queueing-based data access API",
+          "description": "new data queued in messages/events; message/event raised upon data availability",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "message_event_queueing_based_data_access_api"
+        },
+        {
+          "id": "3.5",
+          "label": "Data provider is accessed directly",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_provider_is_accessed_directly"
+        }
+      ],
+      "external_id": "data_access_interface_decision"
+    },
+    {
+      "id": "4",
+      "name": "Feature persistence and access",
+      "description": "How to persist and provide access to features?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "feature persistence and access decision",
+          "reading": "Choices on Feature persistence and access affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "4.1",
+          "label": "Feature store",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "feature_store"
+        },
+        {
+          "id": "4.2",
+          "label": "Store features in data stores without specific support",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "store_features_in_data_stores_without_specific_support"
+        }
+      ],
+      "external_id": "feature_persistence_and_access_decision"
+    },
+    {
+      "id": "5",
+      "name": "Model serving",
+      "description": "How to serve model predictions or scores?",
+      "relations": [
+        {
+          "target_id": "4",
+          "type": "affects",
+          "rationale": "how to access features for model serving",
+          "reading": "Choices on Model serving affect the outcomes of Feature persistence and access"
+        },
+        {
+          "target_id": "6",
+          "type": "affects",
+          "rationale": "Consider If Not Decided Yet",
+          "reading": "Choices on Model serving affect the outcomes of Notification of prediction results"
+        },
+        {
+          "target_id": "7",
+          "type": "affects",
+          "rationale": "ingest data required during model serving",
+          "reading": "Choices on Model serving affect the outcomes of Data ingestion"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "5.1",
+          "label": "Microservice based model serving",
+          "description": "deliver predictions or scores in real time by distributed service",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "microservice_based_model_serving"
+        },
+        {
+          "id": "5.2",
+          "label": "Local service/API based model serving",
+          "description": "deliver predictions or scores in real time by local service",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "local_service_api_based_model_serving"
+        },
+        {
+          "id": "5.3",
+          "label": "Data batch based model serving",
+          "description": "process data in batches on-schedule and write predictions or scores to data storage",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_batch_based_model_serving"
+        },
+        {
+          "id": "5.4",
+          "label": "Precompute serving",
+          "description": "precompute models e.g. as forecasts and deliver as reports",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "precompute_serving"
+        },
+        {
+          "id": "5.5",
+          "label": "Hybrid online/offline model serving",
+          "description": "combine online computations by services with offline computations in batches",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "hybrid_online_offline_model_serving"
+        }
+      ],
+      "external_id": "model_serving_decision"
+    },
+    {
+      "id": "6",
+      "name": "Notification of prediction results",
+      "description": "How to inform clients about prediction result availability?",
+      "relations": [],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "6.1",
+          "label": "Push notification",
+          "description": "notify clients about results",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "push_notification"
+        },
+        {
+          "id": "6.2",
+          "label": "Polling",
+          "description": "clients poll for the results",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "polling"
+        },
+        {
+          "id": "6.3",
+          "label": "Block on result",
+          "description": "clients blocks until the results are available",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "block_on_result"
+        }
+      ],
+      "external_id": "result_availability_information_decision"
+    },
+    {
+      "id": "7",
+      "name": "Data ingestion",
+      "description": "How to ingest data into ML projects or applications?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "how should data be ingested in MLOps?",
+          "reading": "Choices on Data ingestion affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "7.1",
+          "label": "Streamed data ingestion",
+          "description": "receive a continuous stream of data",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "streamed_data_ingestion"
+        },
+        {
+          "id": "7.2",
+          "label": "Data ingestion by request",
+          "description": "actively get raw data from data sources",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_ingestion_by_request"
+        },
+        {
+          "id": "7.3",
+          "label": "Data ingestion in batches",
+          "description": "get data in one or more batches, possibly only in part automated",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_ingestion_in_batches"
+        },
+        {
+          "id": "7.4",
+          "label": "Manual data ingestion",
+          "description": "provide data for ingestion manually",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "manual_data_ingestion"
+        }
+      ],
+      "external_id": "data_ingestion_decision"
+    },
+    {
+      "id": "8",
+      "name": "Automated integration and delivery for ML",
+      "description": "How to perform automatic integration and delivery in a machine learning context?",
+      "relations": [
+        {
+          "target_id": "10",
+          "type": "affects",
+          "rationale": "Consider If Not Decided Yet",
+          "reading": "Choices on Automated integration and delivery for ML affect the outcomes of Model versions in production"
+        },
+        {
+          "target_id": "11",
+          "type": "affects",
+          "rationale": "Consider If Not Decided Yet",
+          "reading": "Choices on Automated integration and delivery for ML affect the outcomes of Data versioning"
+        },
+        {
+          "target_id": "12",
+          "type": "affects",
+          "rationale": "Consider If Not Decided Yet",
+          "reading": "Choices on Automated integration and delivery for ML affect the outcomes of Pipeline and orchestrator triggering"
+        },
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "automated integration and delivery decision",
+          "reading": "Choices on Automated integration and delivery for ML affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "8.1",
+          "label": "CI/CD pipeline",
+          "description": "continuously automate the deployment e.g. upon commits",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "ci_cd_pipeline"
+        },
+        {
+          "id": "8.2",
+          "label": "Build and Deployment scripts",
+          "description": "manually perform automated deployments",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "build_and_deployment_scripts"
+        },
+        {
+          "id": "8.3",
+          "label": "Machine learning orchestrator",
+          "description": "orchestrate multiple pipelines and/or components",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "machine_learning_orchestrator"
+        },
+        {
+          "id": "8.4",
+          "label": "No integration or delivery automation",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_integration_or_delivery_automation"
+        }
+      ],
+      "external_id": "automated_integration_and_delivery_decision"
+    },
+    {
+      "id": "9",
+      "name": "Delivery pipeline tasks",
+      "description": "Which tasks can be performed by a delivery pipeline or component?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "delivery tasks decision",
+          "reading": "Choices on Delivery pipeline tasks affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "9.1",
+          "label": "Packaging",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "packaging"
+        },
+        {
+          "id": "9.2",
+          "label": "Testing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "testing"
+        },
+        {
+          "id": "9.3",
+          "label": "Building",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "building"
+        },
+        {
+          "id": "9.4",
+          "label": "Deployment",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "deployment"
+        },
+        {
+          "id": "9.5",
+          "label": "Containerization",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "containerization"
+        },
+        {
+          "id": "9.6",
+          "label": "Canary testing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "canary_testing"
+        },
+        {
+          "id": "9.7",
+          "label": "A/B testing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "a_b_testing"
+        },
+        {
+          "id": "9.8",
+          "label": "Evidence based hypothesis testing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "evidence_based_hypothesis_testing"
+        },
+        {
+          "id": "9.9",
+          "label": "Version control repository",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "version_control_repository"
+        }
+      ],
+      "external_id": "delivery_tasks_decision"
+    },
+    {
+      "id": "10",
+      "name": "Model versions in production",
+      "description": "Which model versions should be deployed to production and how?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "deploying model versions in production decision",
+          "reading": "Choices on Model versions in production affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "10.1",
+          "label": "N versions in production",
+          "description": "deploy multiple model versions at the same time",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "n_versions_in_production"
+        },
+        {
+          "id": "10.2",
+          "label": "Rollback to previous model version",
+          "description": "redeploy previous model version and then switch to previous model",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "rollback_to_previous_model_version"
+        },
+        {
+          "id": "10.3",
+          "label": "Single model in production",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "single_model_in_production"
+        }
+      ],
+      "external_id": "deploying_model_versions_in_production_decision"
+    },
+    {
+      "id": "11",
+      "name": "Data versioning",
+      "description": "How to version data decision?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "how should data be versioned in MLOps?",
+          "reading": "Choices on Data versioning affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "11.1",
+          "label": "Data version repository",
+          "description": "version repository with specific technology-support for data versioning",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_version_repository"
+        },
+        {
+          "id": "11.2",
+          "label": "Data versioning in code repository",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_versioning_in_code_repository"
+        },
+        {
+          "id": "11.3",
+          "label": "No data versioning",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_data_versioning"
+        }
+      ],
+      "external_id": "deploying_how_to_version_data_decision"
+    },
+    {
+      "id": "12",
+      "name": "Pipeline and orchestrator triggering",
+      "description": "How to trigger a machine learning pipeline or orchestrator?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "trigger pipeline or orchestrator decision",
+          "reading": "Choices on Pipeline and orchestrator triggering affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "12.1",
+          "label": "On-demand trigger",
+          "description": "ad-hoc manual execution of the pipeline, or triggered by other pipeline or service",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "on_demand_trigger"
+        },
+        {
+          "id": "12.2",
+          "label": "On-commit trigger",
+          "description": "when a commit to a source or data version control repository happens",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "on_commit_trigger"
+        },
+        {
+          "id": "12.3",
+          "label": "On-schedule trigger",
+          "description": "frequent pipeline runs e.g. on a daily, weekly, or monthly basis",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "on_schedule_trigger"
+        },
+        {
+          "id": "12.4",
+          "label": "On availability of new training data trigger",
+          "description": "when new data is collected and made available in data stores",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "on_availability_of_new_training_data_trigger"
+        },
+        {
+          "id": "12.5",
+          "label": "On model performance degradation trigger",
+          "description": "when a noticeable performance degradation is observed",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "on_model_performance_degradation_trigger"
+        },
+        {
+          "id": "12.6",
+          "label": "On changes in the data distribution trigger",
+          "description": "when a significant changes in the data distributions of features is observed",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "on_changes_in_the_data_distribution_trigger"
+        }
+      ],
+      "external_id": "trigger_pipeline_or_orchestrator_decision"
+    },
+    {
+      "id": "13",
+      "name": "Automated environment provisioning",
+      "description": "How to automatically provision environments?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "provisioning decision",
+          "reading": "Choices on Automated environment provisioning affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "13.1",
+          "label": "Automated provisioning",
+          "description": "automatically provision environments",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "automated_provisioning"
+        },
+        {
+          "id": "13.2",
+          "label": "No automated provisioning",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_automated_provisioning"
+        }
+      ],
+      "external_id": "provisioning_decision"
+    },
+    {
+      "id": "14",
+      "name": "Automated data processing for model building",
+      "description": "How to automatically process the data used for model building?",
+      "relations": [
+        {
+          "target_id": "4",
+          "type": "affects",
+          "rationale": "how to store resulting features",
+          "reading": "Choices on Automated data processing for model building affect the outcomes of Feature persistence and access"
+        },
+        {
+          "target_id": "7",
+          "type": "affects",
+          "rationale": "ingest data for data processing and later model building",
+          "reading": "Choices on Automated data processing for model building affect the outcomes of Data ingestion"
+        },
+        {
+          "target_id": "17",
+          "type": "affects",
+          "rationale": "Consider If Not Decided Yet",
+          "reading": "Choices on Automated data processing for model building affect the outcomes of Data processing parallelization"
+        },
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "data processing automation decision",
+          "reading": "Choices on Automated data processing for model building affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "14.1",
+          "label": "Data pipeline",
+          "description": "process data in dedicated, flexible pipeline",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_pipeline"
+        },
+        {
+          "id": "14.2",
+          "label": "ETL pipeline",
+          "description": "process data through extract, transform, and load steps",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "etl_pipeline"
+        },
+        {
+          "id": "14.3",
+          "label": "Data processing component",
+          "description": "process data in dedicated component",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_processing_component"
+        },
+        {
+          "id": "14.4",
+          "label": "No data processing automation",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_data_processing_automation"
+        }
+      ],
+      "external_id": "data_processing_automation_decision"
+    },
+    {
+      "id": "15",
+      "name": "Batch or real-time data processing",
+      "description": "Should data be processed in batches or in realtime?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "should data be processed in batch or realtime in MLOps?",
+          "reading": "Choices on Batch or real-time data processing affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "15.1",
+          "label": "Batch-based data processing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "batch_based_data_processing"
+        },
+        {
+          "id": "15.2",
+          "label": "Real-time, stream-based data processing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "real_time_stream_based_data_processing"
+        }
+      ],
+      "external_id": "batch_or_realtime_data_processing_decision"
+    },
+    {
+      "id": "16",
+      "name": "Data processing pipeline tasks",
+      "description": "Which data processing tasks can be performed by a data processing pipeline or component?",
+      "relations": [
+        {
+          "target_id": "23",
+          "type": "affects",
+          "rationale": "should data processing tasks be automated based on AutoML?",
+          "reading": "Choices on Data processing pipeline tasks affect the outcomes of Use of AutoML"
+        },
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "data processing tasks decision",
+          "reading": "Choices on Data processing pipeline tasks affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "16.1",
+          "label": "Data extraction",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_extraction"
+        },
+        {
+          "id": "16.2",
+          "label": "Data preparation",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_preparation"
+        },
+        {
+          "id": "16.3",
+          "label": "Data validation",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_validation"
+        },
+        {
+          "id": "16.4",
+          "label": "Data transformation",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_transformation"
+        },
+        {
+          "id": "16.5",
+          "label": "Data selection",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_selection"
+        },
+        {
+          "id": "16.6",
+          "label": "Feature engineering",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "feature_engineering"
+        },
+        {
+          "id": "16.7",
+          "label": "Data processing hyperparameter tuning",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_processing_hyperparameter_tuning"
+        }
+      ],
+      "external_id": "data_processing_tasks_decision"
+    },
+    {
+      "id": "17",
+      "name": "Data processing parallelization",
+      "description": "How to parallelize data processing?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "data processing parallelization decision",
+          "reading": "Choices on Data processing parallelization affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "17.1",
+          "label": "Data pipeline per data set",
+          "description": "dedicated pipeline for each dataset",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_pipeline_per_data_set"
+        },
+        {
+          "id": "17.2",
+          "label": "Data partitioning in data pipeline",
+          "description": "within a pipeline, the data is partitioned to benefit from parallel processing",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_partitioning_in_data_pipeline"
+        },
+        {
+          "id": "17.3",
+          "label": "Hybrid data processing parallelization",
+          "description": "combining one or more of the other parallelization options",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "hybrid_data_processing_parallelization"
+        },
+        {
+          "id": "17.4",
+          "label": "No parallel data processing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_parallel_data_processing"
+        }
+      ],
+      "external_id": "data_processing_parallelization_decision"
+    },
+    {
+      "id": "18",
+      "name": "Model building approach",
+      "description": "How to perform model building in an ML project?",
+      "relations": [
+        {
+          "target_id": "14",
+          "type": "affects",
+          "rationale": "how to automate data processing tasks used by or part of model building",
+          "reading": "Choices on Model building approach affect the outcomes of Automated data processing for model building"
+        },
+        {
+          "target_id": "4",
+          "type": "affects",
+          "rationale": "how to access features for model training",
+          "reading": "Choices on Model building approach affect the outcomes of Feature persistence and access"
+        },
+        {
+          "target_id": "12",
+          "type": "affects",
+          "rationale": "Consider If Not Decided Yet",
+          "reading": "Choices on Model building approach affect the outcomes of Pipeline and orchestrator triggering"
+        },
+        {
+          "target_id": "21",
+          "type": "affects",
+          "rationale": "Consider If Not Decided Yet",
+          "reading": "Choices on Model building approach affect the outcomes of Model building parallelization"
+        },
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "How to automatically engineer a machine learning or data science model in MLOps?",
+          "reading": "Choices on Model building approach affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "18.1",
+          "label": "Model building pipeline",
+          "description": "model training, evaluation, and validation in automated pipeline",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_building_pipeline"
+        },
+        {
+          "id": "18.2",
+          "label": "Model builder component",
+          "description": "model training, evaluation, and validation in dedicated component",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_builder_component"
+        },
+        {
+          "id": "18.3",
+          "label": "Model building in development tool",
+          "description": "model building performed in development sandbox",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_building_in_development_tool"
+        }
+      ],
+      "external_id": "model_building_decision"
+    },
+    {
+      "id": "19",
+      "name": "Model training timing and mode",
+      "description": "When and how to train the model?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "when and how to train the model decision",
+          "reading": "Choices on Model training timing and mode affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "19.1",
+          "label": "Batch-based learning",
+          "description": "train the model in batches, possibly offline",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "batch_based_learning"
+        },
+        {
+          "id": "19.2",
+          "label": "Incremental learning",
+          "description": "train the model incrementally, possibly online",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "incremental_learning"
+        },
+        {
+          "id": "19.3",
+          "label": "Hybrid batch-based and incremental learning",
+          "description": "train some factors of the model in batches, possibly offline, and incrementally train other factors, possibly online",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "hybrid_batch_based_and_incremental_learning"
+        }
+      ],
+      "external_id": "when_and_how_to_train_the_model_decision"
+    },
+    {
+      "id": "20",
+      "name": "Model building pipeline tasks",
+      "description": "Which tasks can be performed by a model building pipeline or component?",
+      "relations": [
+        {
+          "target_id": "23",
+          "type": "affects",
+          "rationale": "should model building tasks be automated based on AutoML?",
+          "reading": "Choices on Model building pipeline tasks affect the outcomes of Use of AutoML"
+        },
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "model building tasks decision",
+          "reading": "Choices on Model building pipeline tasks affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "20.1",
+          "label": "Model training",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_training"
+        },
+        {
+          "id": "20.2",
+          "label": "Data splitting",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_splitting"
+        },
+        {
+          "id": "20.3",
+          "label": "Data checkpoints",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "data_checkpoints"
+        },
+        {
+          "id": "20.4",
+          "label": "Model validation",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_validation"
+        },
+        {
+          "id": "20.5",
+          "label": "Model selection",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_selection"
+        },
+        {
+          "id": "20.6",
+          "label": "Model packaging",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_packaging"
+        },
+        {
+          "id": "20.7",
+          "label": "Development tool facade",
+          "description": "use API to integrate development tool",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "development_tool_facade"
+        },
+        {
+          "id": "20.8",
+          "label": "Development tool export",
+          "description": "use exported file to work in development tool",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "development_tool_export"
+        },
+        {
+          "id": "20.9",
+          "label": "Train multiple model versions with different parameters and/or algorithms",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "train_multiple_model_versions_with_different_parameters_and_or_algorithms"
+        },
+        {
+          "id": "20.10",
+          "label": "Model hyperparameter tuning",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_hyperparameter_tuning"
+        }
+      ],
+      "external_id": "model_building_tasks_decision"
+    },
+    {
+      "id": "21",
+      "name": "Model building parallelization",
+      "description": "How to parallelize model building?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "monitoring model adjustment decision",
+          "reading": "Choices on Model building parallelization affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "21.1",
+          "label": "Model building pipeline per model",
+          "description": "all models run concurrently",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_building_pipeline_per_model"
+        },
+        {
+          "id": "21.2",
+          "label": "Training data partitioning",
+          "description": "the data is partitioned and each partition has a replica of the model",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "training_data_partitioning"
+        },
+        {
+          "id": "21.3",
+          "label": "Model partitioning",
+          "description": "the model is partitioned and each partition updates a portion of parameters",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_partitioning"
+        },
+        {
+          "id": "21.4",
+          "label": "Hybrid model building parallelization",
+          "description": "combining one or more of the other parallelization options",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "hybrid_model_building_parallelization"
+        },
+        {
+          "id": "21.5",
+          "label": "No parallel model building",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_parallel_model_building"
+        }
+      ],
+      "external_id": "model_building_parallelization_decision"
+    },
+    {
+      "id": "22",
+      "name": "Model monitoring and tracking in production",
+      "description": "How to monitor and track the model in production?",
+      "relations": [
+        {
+          "target_id": "24",
+          "type": "affects",
+          "rationale": "Consider If Not Decided Yet",
+          "reading": "Choices on Model monitoring and tracking in production affect the outcomes of Model adjustment from monitoring results"
+        },
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "monitoring and tracking in production decision",
+          "reading": "Choices on Model monitoring and tracking in production affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "22.1",
+          "label": "Model performance monitoring",
+          "description": "observe specific model performance parameters",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_performance_monitoring"
+        },
+        {
+          "id": "22.2",
+          "label": "Monitoring or logging data and predictions",
+          "description": "log and monitor system data and predictions",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "monitoring_or_logging_data_and_predictions"
+        },
+        {
+          "id": "22.3",
+          "label": "No in-production monitoring",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_in_production_monitoring"
+        },
+        {
+          "id": "22.4",
+          "label": "Model in-production tracking",
+          "description": "track model usage, inputs, outputs, interpretability, and fairness",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "model_in_production_tracking"
+        }
+      ],
+      "external_id": "monitoring_and_tracking_in_production_decision"
+    },
+    {
+      "id": "23",
+      "name": "Use of AutoML",
+      "description": "Should AutoML be used and if so where?",
+      "relations": [],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "23.1",
+          "label": "AutoML",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "auto_ml"
+        },
+        {
+          "id": "23.2",
+          "label": "No AutoML",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_automl"
+        }
+      ],
+      "external_id": "auto_ml_decision"
+    },
+    {
+      "id": "24",
+      "name": "Model adjustment from monitoring results",
+      "description": "How to adjust models based on monitoring results?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "how to adjust models based on monitoring results in MLOps?",
+          "reading": "Choices on Model adjustment from monitoring results affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "24.1",
+          "label": "Manual model adjustment",
+          "description": "humans adjust and redeploy the models",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "manual_model_adjustment"
+        },
+        {
+          "id": "24.2",
+          "label": "Automated model adjustment",
+          "description": "automated measures are triggered to adjust the models",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "automated_model_adjustment"
+        }
+      ],
+      "external_id": "monitoring_model_adjustment_decision"
+    },
+    {
+      "id": "25",
+      "name": "Scope of CI/CD automation",
+      "description": "What to build, test, and deploy automatically by CI/CD pipelines?",
+      "relations": [
+        {
+          "target_id": "8",
+          "type": "affects",
+          "rationale": "Consider If Not Decided Yet",
+          "reading": "Choices on Scope of CI/CD automation affect the outcomes of Automated integration and delivery for ML"
+        },
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "deploying what to deploy automatically decision",
+          "reading": "Choices on Scope of CI/CD automation affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "25.1",
+          "label": "Build, test, and deploy models to be served and other system components",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "build_test_and_deploy_models_to_be_served_and_other_system_components"
+        },
+        {
+          "id": "25.2",
+          "label": "Build, test, and deploy machine learning pipelines and components needed during pipeline runs",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "build_test_and_deploy_machine_learning_pipelines_and_components_needed_during_pipeline_runs"
+        },
+        {
+          "id": "25.3",
+          "label": "No automated deployment",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_automated_deployment"
+        }
+      ],
+      "external_id": "deploying_what_to_deploy_automatically_decision"
+    },
+    {
+      "id": "26",
+      "name": "Testing scope in ML pipelines",
+      "description": "What to test in a machine learning/data science pipeline?",
+      "relations": [
+        {
+          "target_id": "27",
+          "type": "affects",
+          "rationale": "what to test decision",
+          "reading": "Choices on Testing scope in ML pipelines affect the outcomes of Adoption of MLOps"
+        }
+      ],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "26.1",
+          "label": "Canary testing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "canary_testing"
+        },
+        {
+          "id": "26.2",
+          "label": "A/B testing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "a_b_testing"
+        },
+        {
+          "id": "26.3",
+          "label": "Evidence based hypothesis testing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "evidence_based_hypothesis_testing"
+        },
+        {
+          "id": "26.4",
+          "label": "Unit testing system components",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "unit_testing_system_components"
+        },
+        {
+          "id": "26.5",
+          "label": "System integration testing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "system_integration_testing"
+        },
+        {
+          "id": "26.6",
+          "label": "Unit testing feature engineering logic",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "unit_testing_feature_engineering_logic"
+        },
+        {
+          "id": "26.7",
+          "label": "Unit testing different methods implemented in a model",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "unit_testing_different_methods_implemented_in_a_model"
+        },
+        {
+          "id": "26.8",
+          "label": "Testing model training converges",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "testing_model_training_converges"
+        },
+        {
+          "id": "26.9",
+          "label": "Testing trained model quality",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "testing_trained_model_quality"
+        },
+        {
+          "id": "26.10",
+          "label": "Unit testing pipeline components",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "unit_testing_pipeline_components"
+        },
+        {
+          "id": "26.11",
+          "label": "Integration testing pipeline components",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "integration_testing_pipeline_components"
+        },
+        {
+          "id": "26.12",
+          "label": "Prediction service API testing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "prediction_service_api_testing"
+        },
+        {
+          "id": "26.13",
+          "label": "Prediction service performance testing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "prediction_service_performance_testing"
+        },
+        {
+          "id": "26.14",
+          "label": "No testing",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_testing"
+        }
+      ],
+      "external_id": "what_to_test_decision"
+    },
+    {
+      "id": "27",
+      "name": "Adoption of MLOps",
+      "description": "Should MLOps be used and if so when?",
+      "relations": [],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "27.1",
+          "label": "MLOps",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "ml_ops"
+        },
+        {
+          "id": "27.2",
+          "label": "No MLOps",
+          "description": "",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "no_mlops"
+        }
+      ],
+      "external_id": "mlops_decision"
+    },
+    {
+      "id": "28",
+      "name": "Development environment",
+      "description": "What development environment should be used?",
+      "relations": [],
+      "evidence": {
+        "codes": 0,
+        "documents": 0,
+        "sources": 0
+      },
+      "values": [
+        {
+          "id": "28.1",
+          "label": "Use computational notebooks",
+          "description": "use computational notebooks",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "use_computational_notebooks"
+        },
+        {
+          "id": "28.2",
+          "label": "Use an IDE",
+          "description": "use an IDE",
+          "status": "accepted",
+          "supporting_doc_ids": [],
+          "external_id": "use_an_ide"
+        }
+      ],
+      "external_id": "development_environment_decision"
+    }
+  ],
+  "iterations": [
+    {
+      "clusters": [
+        {
+          "id": "1",
+          "name": "ML model integration into the application",
+          "description": "How to integrate a machine learning model in an application?",
+          "relations": [
+            {
+              "target_id": "5",
+              "type": "affects",
+              "rationale": "Consider If Not Decided Yet",
+              "reading": "Choices on ML model integration into the application affect the outcomes of Model serving"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "1.1",
+              "label": "Model as a service",
+              "description": "create one service per model",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_as_a_service"
+            },
+            {
+              "id": "1.2",
+              "label": "Model in monolith",
+              "description": "embed the model in the code of the application",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_in_monolith"
+            },
+            {
+              "id": "1.3",
+              "label": "Model as module in modular monolith",
+              "description": "create a module for the model in the application",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_as_module_in_modular_monolith"
+            },
+            {
+              "id": "1.4",
+              "label": "Model in batch prediction system",
+              "description": "call an external batch prediction system",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_in_batch_prediction_system"
+            },
+            {
+              "id": "1.5",
+              "label": "Event-driven model as a service",
+              "description": "event-driven pub/sub or queueing interface for model",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "event_driven_model_as_a_service"
+            },
+            {
+              "id": "1.6",
+              "label": "Serverless model as a service",
+              "description": "serverless/function-as-a-service computing model for offering the model",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "serverless_model_as_a_service"
+            },
+            {
+              "id": "1.7",
+              "label": "No integration of the model",
+              "description": "model is not integrated, maybe results are used, e.g. as a forecast",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_integration_of_the_model"
+            }
+          ],
+          "external_id": "integrating_ml_model_decision"
+        },
+        {
+          "id": "2",
+          "name": "Data storage for ML applications",
+          "description": "How to store data used in machine learning applications?",
+          "relations": [
+            {
+              "target_id": "3",
+              "type": "affects",
+              "rationale": "offer an abstraction layer for data access",
+              "reading": "Choices on Data storage for ML applications affect the outcomes of Data access interface"
+            },
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "store data decision",
+              "reading": "Choices on Data storage for ML applications affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "2.1",
+              "label": "Shared data store",
+              "description": "store data in shared data store",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "shared_data_store"
+            },
+            {
+              "id": "2.2",
+              "label": "Data service",
+              "description": "store data in services",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_service"
+            },
+            {
+              "id": "2.3",
+              "label": "Event store",
+              "description": "store data as events being exchanged in the systems",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "event_store"
+            },
+            {
+              "id": "2.4",
+              "label": "No data store",
+              "description": "get data without storing it, e.g. manual ingested raw data or only event streaming",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_data_store"
+            }
+          ],
+          "external_id": "store_data_decision"
+        },
+        {
+          "id": "3",
+          "name": "Data access interface",
+          "description": "How to design the interface for data access?",
+          "relations": [],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "3.1",
+              "label": "Local data access API",
+              "description": "data provider encapsulated by local data access API abstraction",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "local_data_access_api"
+            },
+            {
+              "id": "3.2",
+              "label": "Service-based data access API",
+              "description": "data provider encapsulated by data access services",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "service_based_data_access_api"
+            },
+            {
+              "id": "3.3",
+              "label": "Pub/sub data access API",
+              "description": "subscription for data access; publisher notifies upon data availability",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "pub_sub_data_access_api"
+            },
+            {
+              "id": "3.4",
+              "label": "Message/event queueing-based data access API",
+              "description": "new data queued in messages/events; message/event raised upon data availability",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "message_event_queueing_based_data_access_api"
+            },
+            {
+              "id": "3.5",
+              "label": "Data provider is accessed directly",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_provider_is_accessed_directly"
+            }
+          ],
+          "external_id": "data_access_interface_decision"
+        },
+        {
+          "id": "4",
+          "name": "Feature persistence and access",
+          "description": "How to persist and provide access to features?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "feature persistence and access decision",
+              "reading": "Choices on Feature persistence and access affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "4.1",
+              "label": "Feature store",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "feature_store"
+            },
+            {
+              "id": "4.2",
+              "label": "Store features in data stores without specific support",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "store_features_in_data_stores_without_specific_support"
+            }
+          ],
+          "external_id": "feature_persistence_and_access_decision"
+        },
+        {
+          "id": "5",
+          "name": "Model serving",
+          "description": "How to serve model predictions or scores?",
+          "relations": [
+            {
+              "target_id": "4",
+              "type": "affects",
+              "rationale": "how to access features for model serving",
+              "reading": "Choices on Model serving affect the outcomes of Feature persistence and access"
+            },
+            {
+              "target_id": "6",
+              "type": "affects",
+              "rationale": "Consider If Not Decided Yet",
+              "reading": "Choices on Model serving affect the outcomes of Notification of prediction results"
+            },
+            {
+              "target_id": "7",
+              "type": "affects",
+              "rationale": "ingest data required during model serving",
+              "reading": "Choices on Model serving affect the outcomes of Data ingestion"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "5.1",
+              "label": "Microservice based model serving",
+              "description": "deliver predictions or scores in real time by distributed service",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "microservice_based_model_serving"
+            },
+            {
+              "id": "5.2",
+              "label": "Local service/API based model serving",
+              "description": "deliver predictions or scores in real time by local service",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "local_service_api_based_model_serving"
+            },
+            {
+              "id": "5.3",
+              "label": "Data batch based model serving",
+              "description": "process data in batches on-schedule and write predictions or scores to data storage",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_batch_based_model_serving"
+            },
+            {
+              "id": "5.4",
+              "label": "Precompute serving",
+              "description": "precompute models e.g. as forecasts and deliver as reports",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "precompute_serving"
+            },
+            {
+              "id": "5.5",
+              "label": "Hybrid online/offline model serving",
+              "description": "combine online computations by services with offline computations in batches",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "hybrid_online_offline_model_serving"
+            }
+          ],
+          "external_id": "model_serving_decision"
+        },
+        {
+          "id": "6",
+          "name": "Notification of prediction results",
+          "description": "How to inform clients about prediction result availability?",
+          "relations": [],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "6.1",
+              "label": "Push notification",
+              "description": "notify clients about results",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "push_notification"
+            },
+            {
+              "id": "6.2",
+              "label": "Polling",
+              "description": "clients poll for the results",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "polling"
+            },
+            {
+              "id": "6.3",
+              "label": "Block on result",
+              "description": "clients blocks until the results are available",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "block_on_result"
+            }
+          ],
+          "external_id": "result_availability_information_decision"
+        },
+        {
+          "id": "7",
+          "name": "Data ingestion",
+          "description": "How to ingest data into ML projects or applications?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "how should data be ingested in MLOps?",
+              "reading": "Choices on Data ingestion affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "7.1",
+              "label": "Streamed data ingestion",
+              "description": "receive a continuous stream of data",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "streamed_data_ingestion"
+            },
+            {
+              "id": "7.2",
+              "label": "Data ingestion by request",
+              "description": "actively get raw data from data sources",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_ingestion_by_request"
+            },
+            {
+              "id": "7.3",
+              "label": "Data ingestion in batches",
+              "description": "get data in one or more batches, possibly only in part automated",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_ingestion_in_batches"
+            },
+            {
+              "id": "7.4",
+              "label": "Manual data ingestion",
+              "description": "provide data for ingestion manually",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "manual_data_ingestion"
+            }
+          ],
+          "external_id": "data_ingestion_decision"
+        },
+        {
+          "id": "8",
+          "name": "Automated integration and delivery for ML",
+          "description": "How to perform automatic integration and delivery in a machine learning context?",
+          "relations": [
+            {
+              "target_id": "10",
+              "type": "affects",
+              "rationale": "Consider If Not Decided Yet",
+              "reading": "Choices on Automated integration and delivery for ML affect the outcomes of Model versions in production"
+            },
+            {
+              "target_id": "11",
+              "type": "affects",
+              "rationale": "Consider If Not Decided Yet",
+              "reading": "Choices on Automated integration and delivery for ML affect the outcomes of Data versioning"
+            },
+            {
+              "target_id": "12",
+              "type": "affects",
+              "rationale": "Consider If Not Decided Yet",
+              "reading": "Choices on Automated integration and delivery for ML affect the outcomes of Pipeline and orchestrator triggering"
+            },
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "automated integration and delivery decision",
+              "reading": "Choices on Automated integration and delivery for ML affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "8.1",
+              "label": "CI/CD pipeline",
+              "description": "continuously automate the deployment e.g. upon commits",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "ci_cd_pipeline"
+            },
+            {
+              "id": "8.2",
+              "label": "Build and Deployment scripts",
+              "description": "manually perform automated deployments",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "build_and_deployment_scripts"
+            },
+            {
+              "id": "8.3",
+              "label": "Machine learning orchestrator",
+              "description": "orchestrate multiple pipelines and/or components",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "machine_learning_orchestrator"
+            },
+            {
+              "id": "8.4",
+              "label": "No integration or delivery automation",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_integration_or_delivery_automation"
+            }
+          ],
+          "external_id": "automated_integration_and_delivery_decision"
+        },
+        {
+          "id": "9",
+          "name": "Delivery pipeline tasks",
+          "description": "Which tasks can be performed by a delivery pipeline or component?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "delivery tasks decision",
+              "reading": "Choices on Delivery pipeline tasks affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "9.1",
+              "label": "Packaging",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "packaging"
+            },
+            {
+              "id": "9.2",
+              "label": "Testing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "testing"
+            },
+            {
+              "id": "9.3",
+              "label": "Building",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "building"
+            },
+            {
+              "id": "9.4",
+              "label": "Deployment",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "deployment"
+            },
+            {
+              "id": "9.5",
+              "label": "Containerization",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "containerization"
+            },
+            {
+              "id": "9.6",
+              "label": "Canary testing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "canary_testing"
+            },
+            {
+              "id": "9.7",
+              "label": "A/B testing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "a_b_testing"
+            },
+            {
+              "id": "9.8",
+              "label": "Evidence based hypothesis testing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "evidence_based_hypothesis_testing"
+            },
+            {
+              "id": "9.9",
+              "label": "Version control repository",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "version_control_repository"
+            }
+          ],
+          "external_id": "delivery_tasks_decision"
+        },
+        {
+          "id": "10",
+          "name": "Model versions in production",
+          "description": "Which model versions should be deployed to production and how?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "deploying model versions in production decision",
+              "reading": "Choices on Model versions in production affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "10.1",
+              "label": "N versions in production",
+              "description": "deploy multiple model versions at the same time",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "n_versions_in_production"
+            },
+            {
+              "id": "10.2",
+              "label": "Rollback to previous model version",
+              "description": "redeploy previous model version and then switch to previous model",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "rollback_to_previous_model_version"
+            },
+            {
+              "id": "10.3",
+              "label": "Single model in production",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "single_model_in_production"
+            }
+          ],
+          "external_id": "deploying_model_versions_in_production_decision"
+        },
+        {
+          "id": "11",
+          "name": "Data versioning",
+          "description": "How to version data decision?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "how should data be versioned in MLOps?",
+              "reading": "Choices on Data versioning affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "11.1",
+              "label": "Data version repository",
+              "description": "version repository with specific technology-support for data versioning",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_version_repository"
+            },
+            {
+              "id": "11.2",
+              "label": "Data versioning in code repository",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_versioning_in_code_repository"
+            },
+            {
+              "id": "11.3",
+              "label": "No data versioning",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_data_versioning"
+            }
+          ],
+          "external_id": "deploying_how_to_version_data_decision"
+        },
+        {
+          "id": "12",
+          "name": "Pipeline and orchestrator triggering",
+          "description": "How to trigger a machine learning pipeline or orchestrator?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "trigger pipeline or orchestrator decision",
+              "reading": "Choices on Pipeline and orchestrator triggering affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "12.1",
+              "label": "On-demand trigger",
+              "description": "ad-hoc manual execution of the pipeline, or triggered by other pipeline or service",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "on_demand_trigger"
+            },
+            {
+              "id": "12.2",
+              "label": "On-commit trigger",
+              "description": "when a commit to a source or data version control repository happens",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "on_commit_trigger"
+            },
+            {
+              "id": "12.3",
+              "label": "On-schedule trigger",
+              "description": "frequent pipeline runs e.g. on a daily, weekly, or monthly basis",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "on_schedule_trigger"
+            },
+            {
+              "id": "12.4",
+              "label": "On availability of new training data trigger",
+              "description": "when new data is collected and made available in data stores",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "on_availability_of_new_training_data_trigger"
+            },
+            {
+              "id": "12.5",
+              "label": "On model performance degradation trigger",
+              "description": "when a noticeable performance degradation is observed",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "on_model_performance_degradation_trigger"
+            },
+            {
+              "id": "12.6",
+              "label": "On changes in the data distribution trigger",
+              "description": "when a significant changes in the data distributions of features is observed",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "on_changes_in_the_data_distribution_trigger"
+            }
+          ],
+          "external_id": "trigger_pipeline_or_orchestrator_decision"
+        },
+        {
+          "id": "13",
+          "name": "Automated environment provisioning",
+          "description": "How to automatically provision environments?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "provisioning decision",
+              "reading": "Choices on Automated environment provisioning affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "13.1",
+              "label": "Automated provisioning",
+              "description": "automatically provision environments",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "automated_provisioning"
+            },
+            {
+              "id": "13.2",
+              "label": "No automated provisioning",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_automated_provisioning"
+            }
+          ],
+          "external_id": "provisioning_decision"
+        },
+        {
+          "id": "14",
+          "name": "Automated data processing for model building",
+          "description": "How to automatically process the data used for model building?",
+          "relations": [
+            {
+              "target_id": "4",
+              "type": "affects",
+              "rationale": "how to store resulting features",
+              "reading": "Choices on Automated data processing for model building affect the outcomes of Feature persistence and access"
+            },
+            {
+              "target_id": "7",
+              "type": "affects",
+              "rationale": "ingest data for data processing and later model building",
+              "reading": "Choices on Automated data processing for model building affect the outcomes of Data ingestion"
+            },
+            {
+              "target_id": "17",
+              "type": "affects",
+              "rationale": "Consider If Not Decided Yet",
+              "reading": "Choices on Automated data processing for model building affect the outcomes of Data processing parallelization"
+            },
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "data processing automation decision",
+              "reading": "Choices on Automated data processing for model building affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "14.1",
+              "label": "Data pipeline",
+              "description": "process data in dedicated, flexible pipeline",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_pipeline"
+            },
+            {
+              "id": "14.2",
+              "label": "ETL pipeline",
+              "description": "process data through extract, transform, and load steps",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "etl_pipeline"
+            },
+            {
+              "id": "14.3",
+              "label": "Data processing component",
+              "description": "process data in dedicated component",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_processing_component"
+            },
+            {
+              "id": "14.4",
+              "label": "No data processing automation",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_data_processing_automation"
+            }
+          ],
+          "external_id": "data_processing_automation_decision"
+        },
+        {
+          "id": "15",
+          "name": "Batch or real-time data processing",
+          "description": "Should data be processed in batches or in realtime?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "should data be processed in batch or realtime in MLOps?",
+              "reading": "Choices on Batch or real-time data processing affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "15.1",
+              "label": "Batch-based data processing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "batch_based_data_processing"
+            },
+            {
+              "id": "15.2",
+              "label": "Real-time, stream-based data processing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "real_time_stream_based_data_processing"
+            }
+          ],
+          "external_id": "batch_or_realtime_data_processing_decision"
+        },
+        {
+          "id": "16",
+          "name": "Data processing pipeline tasks",
+          "description": "Which data processing tasks can be performed by a data processing pipeline or component?",
+          "relations": [
+            {
+              "target_id": "23",
+              "type": "affects",
+              "rationale": "should data processing tasks be automated based on AutoML?",
+              "reading": "Choices on Data processing pipeline tasks affect the outcomes of Use of AutoML"
+            },
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "data processing tasks decision",
+              "reading": "Choices on Data processing pipeline tasks affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "16.1",
+              "label": "Data extraction",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_extraction"
+            },
+            {
+              "id": "16.2",
+              "label": "Data preparation",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_preparation"
+            },
+            {
+              "id": "16.3",
+              "label": "Data validation",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_validation"
+            },
+            {
+              "id": "16.4",
+              "label": "Data transformation",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_transformation"
+            },
+            {
+              "id": "16.5",
+              "label": "Data selection",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_selection"
+            },
+            {
+              "id": "16.6",
+              "label": "Feature engineering",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "feature_engineering"
+            },
+            {
+              "id": "16.7",
+              "label": "Data processing hyperparameter tuning",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_processing_hyperparameter_tuning"
+            }
+          ],
+          "external_id": "data_processing_tasks_decision"
+        },
+        {
+          "id": "17",
+          "name": "Data processing parallelization",
+          "description": "How to parallelize data processing?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "data processing parallelization decision",
+              "reading": "Choices on Data processing parallelization affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "17.1",
+              "label": "Data pipeline per data set",
+              "description": "dedicated pipeline for each dataset",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_pipeline_per_data_set"
+            },
+            {
+              "id": "17.2",
+              "label": "Data partitioning in data pipeline",
+              "description": "within a pipeline, the data is partitioned to benefit from parallel processing",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_partitioning_in_data_pipeline"
+            },
+            {
+              "id": "17.3",
+              "label": "Hybrid data processing parallelization",
+              "description": "combining one or more of the other parallelization options",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "hybrid_data_processing_parallelization"
+            },
+            {
+              "id": "17.4",
+              "label": "No parallel data processing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_parallel_data_processing"
+            }
+          ],
+          "external_id": "data_processing_parallelization_decision"
+        },
+        {
+          "id": "18",
+          "name": "Model building approach",
+          "description": "How to perform model building in an ML project?",
+          "relations": [
+            {
+              "target_id": "14",
+              "type": "affects",
+              "rationale": "how to automate data processing tasks used by or part of model building",
+              "reading": "Choices on Model building approach affect the outcomes of Automated data processing for model building"
+            },
+            {
+              "target_id": "4",
+              "type": "affects",
+              "rationale": "how to access features for model training",
+              "reading": "Choices on Model building approach affect the outcomes of Feature persistence and access"
+            },
+            {
+              "target_id": "12",
+              "type": "affects",
+              "rationale": "Consider If Not Decided Yet",
+              "reading": "Choices on Model building approach affect the outcomes of Pipeline and orchestrator triggering"
+            },
+            {
+              "target_id": "21",
+              "type": "affects",
+              "rationale": "Consider If Not Decided Yet",
+              "reading": "Choices on Model building approach affect the outcomes of Model building parallelization"
+            },
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "How to automatically engineer a machine learning or data science model in MLOps?",
+              "reading": "Choices on Model building approach affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "18.1",
+              "label": "Model building pipeline",
+              "description": "model training, evaluation, and validation in automated pipeline",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_building_pipeline"
+            },
+            {
+              "id": "18.2",
+              "label": "Model builder component",
+              "description": "model training, evaluation, and validation in dedicated component",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_builder_component"
+            },
+            {
+              "id": "18.3",
+              "label": "Model building in development tool",
+              "description": "model building performed in development sandbox",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_building_in_development_tool"
+            }
+          ],
+          "external_id": "model_building_decision"
+        },
+        {
+          "id": "19",
+          "name": "Model training timing and mode",
+          "description": "When and how to train the model?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "when and how to train the model decision",
+              "reading": "Choices on Model training timing and mode affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "19.1",
+              "label": "Batch-based learning",
+              "description": "train the model in batches, possibly offline",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "batch_based_learning"
+            },
+            {
+              "id": "19.2",
+              "label": "Incremental learning",
+              "description": "train the model incrementally, possibly online",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "incremental_learning"
+            },
+            {
+              "id": "19.3",
+              "label": "Hybrid batch-based and incremental learning",
+              "description": "train some factors of the model in batches, possibly offline, and incrementally train other factors, possibly online",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "hybrid_batch_based_and_incremental_learning"
+            }
+          ],
+          "external_id": "when_and_how_to_train_the_model_decision"
+        },
+        {
+          "id": "20",
+          "name": "Model building pipeline tasks",
+          "description": "Which tasks can be performed by a model building pipeline or component?",
+          "relations": [
+            {
+              "target_id": "23",
+              "type": "affects",
+              "rationale": "should model building tasks be automated based on AutoML?",
+              "reading": "Choices on Model building pipeline tasks affect the outcomes of Use of AutoML"
+            },
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "model building tasks decision",
+              "reading": "Choices on Model building pipeline tasks affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "20.1",
+              "label": "Model training",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_training"
+            },
+            {
+              "id": "20.2",
+              "label": "Data splitting",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_splitting"
+            },
+            {
+              "id": "20.3",
+              "label": "Data checkpoints",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "data_checkpoints"
+            },
+            {
+              "id": "20.4",
+              "label": "Model validation",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_validation"
+            },
+            {
+              "id": "20.5",
+              "label": "Model selection",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_selection"
+            },
+            {
+              "id": "20.6",
+              "label": "Model packaging",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_packaging"
+            },
+            {
+              "id": "20.7",
+              "label": "Development tool facade",
+              "description": "use API to integrate development tool",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "development_tool_facade"
+            },
+            {
+              "id": "20.8",
+              "label": "Development tool export",
+              "description": "use exported file to work in development tool",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "development_tool_export"
+            },
+            {
+              "id": "20.9",
+              "label": "Train multiple model versions with different parameters and/or algorithms",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "train_multiple_model_versions_with_different_parameters_and_or_algorithms"
+            },
+            {
+              "id": "20.10",
+              "label": "Model hyperparameter tuning",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_hyperparameter_tuning"
+            }
+          ],
+          "external_id": "model_building_tasks_decision"
+        },
+        {
+          "id": "21",
+          "name": "Model building parallelization",
+          "description": "How to parallelize model building?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "monitoring model adjustment decision",
+              "reading": "Choices on Model building parallelization affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "21.1",
+              "label": "Model building pipeline per model",
+              "description": "all models run concurrently",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_building_pipeline_per_model"
+            },
+            {
+              "id": "21.2",
+              "label": "Training data partitioning",
+              "description": "the data is partitioned and each partition has a replica of the model",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "training_data_partitioning"
+            },
+            {
+              "id": "21.3",
+              "label": "Model partitioning",
+              "description": "the model is partitioned and each partition updates a portion of parameters",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_partitioning"
+            },
+            {
+              "id": "21.4",
+              "label": "Hybrid model building parallelization",
+              "description": "combining one or more of the other parallelization options",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "hybrid_model_building_parallelization"
+            },
+            {
+              "id": "21.5",
+              "label": "No parallel model building",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_parallel_model_building"
+            }
+          ],
+          "external_id": "model_building_parallelization_decision"
+        },
+        {
+          "id": "22",
+          "name": "Model monitoring and tracking in production",
+          "description": "How to monitor and track the model in production?",
+          "relations": [
+            {
+              "target_id": "24",
+              "type": "affects",
+              "rationale": "Consider If Not Decided Yet",
+              "reading": "Choices on Model monitoring and tracking in production affect the outcomes of Model adjustment from monitoring results"
+            },
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "monitoring and tracking in production decision",
+              "reading": "Choices on Model monitoring and tracking in production affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "22.1",
+              "label": "Model performance monitoring",
+              "description": "observe specific model performance parameters",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_performance_monitoring"
+            },
+            {
+              "id": "22.2",
+              "label": "Monitoring or logging data and predictions",
+              "description": "log and monitor system data and predictions",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "monitoring_or_logging_data_and_predictions"
+            },
+            {
+              "id": "22.3",
+              "label": "No in-production monitoring",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_in_production_monitoring"
+            },
+            {
+              "id": "22.4",
+              "label": "Model in-production tracking",
+              "description": "track model usage, inputs, outputs, interpretability, and fairness",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "model_in_production_tracking"
+            }
+          ],
+          "external_id": "monitoring_and_tracking_in_production_decision"
+        },
+        {
+          "id": "23",
+          "name": "Use of AutoML",
+          "description": "Should AutoML be used and if so where?",
+          "relations": [],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "23.1",
+              "label": "AutoML",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "auto_ml"
+            },
+            {
+              "id": "23.2",
+              "label": "No AutoML",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_automl"
+            }
+          ],
+          "external_id": "auto_ml_decision"
+        },
+        {
+          "id": "24",
+          "name": "Model adjustment from monitoring results",
+          "description": "How to adjust models based on monitoring results?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "how to adjust models based on monitoring results in MLOps?",
+              "reading": "Choices on Model adjustment from monitoring results affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "24.1",
+              "label": "Manual model adjustment",
+              "description": "humans adjust and redeploy the models",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "manual_model_adjustment"
+            },
+            {
+              "id": "24.2",
+              "label": "Automated model adjustment",
+              "description": "automated measures are triggered to adjust the models",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "automated_model_adjustment"
+            }
+          ],
+          "external_id": "monitoring_model_adjustment_decision"
+        },
+        {
+          "id": "25",
+          "name": "Scope of CI/CD automation",
+          "description": "What to build, test, and deploy automatically by CI/CD pipelines?",
+          "relations": [
+            {
+              "target_id": "8",
+              "type": "affects",
+              "rationale": "Consider If Not Decided Yet",
+              "reading": "Choices on Scope of CI/CD automation affect the outcomes of Automated integration and delivery for ML"
+            },
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "deploying what to deploy automatically decision",
+              "reading": "Choices on Scope of CI/CD automation affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "25.1",
+              "label": "Build, test, and deploy models to be served and other system components",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "build_test_and_deploy_models_to_be_served_and_other_system_components"
+            },
+            {
+              "id": "25.2",
+              "label": "Build, test, and deploy machine learning pipelines and components needed during pipeline runs",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "build_test_and_deploy_machine_learning_pipelines_and_components_needed_during_pipeline_runs"
+            },
+            {
+              "id": "25.3",
+              "label": "No automated deployment",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_automated_deployment"
+            }
+          ],
+          "external_id": "deploying_what_to_deploy_automatically_decision"
+        },
+        {
+          "id": "26",
+          "name": "Testing scope in ML pipelines",
+          "description": "What to test in a machine learning/data science pipeline?",
+          "relations": [
+            {
+              "target_id": "27",
+              "type": "affects",
+              "rationale": "what to test decision",
+              "reading": "Choices on Testing scope in ML pipelines affect the outcomes of Adoption of MLOps"
+            }
+          ],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "26.1",
+              "label": "Canary testing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "canary_testing"
+            },
+            {
+              "id": "26.2",
+              "label": "A/B testing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "a_b_testing"
+            },
+            {
+              "id": "26.3",
+              "label": "Evidence based hypothesis testing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "evidence_based_hypothesis_testing"
+            },
+            {
+              "id": "26.4",
+              "label": "Unit testing system components",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "unit_testing_system_components"
+            },
+            {
+              "id": "26.5",
+              "label": "System integration testing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "system_integration_testing"
+            },
+            {
+              "id": "26.6",
+              "label": "Unit testing feature engineering logic",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "unit_testing_feature_engineering_logic"
+            },
+            {
+              "id": "26.7",
+              "label": "Unit testing different methods implemented in a model",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "unit_testing_different_methods_implemented_in_a_model"
+            },
+            {
+              "id": "26.8",
+              "label": "Testing model training converges",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "testing_model_training_converges"
+            },
+            {
+              "id": "26.9",
+              "label": "Testing trained model quality",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "testing_trained_model_quality"
+            },
+            {
+              "id": "26.10",
+              "label": "Unit testing pipeline components",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "unit_testing_pipeline_components"
+            },
+            {
+              "id": "26.11",
+              "label": "Integration testing pipeline components",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "integration_testing_pipeline_components"
+            },
+            {
+              "id": "26.12",
+              "label": "Prediction service API testing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "prediction_service_api_testing"
+            },
+            {
+              "id": "26.13",
+              "label": "Prediction service performance testing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "prediction_service_performance_testing"
+            },
+            {
+              "id": "26.14",
+              "label": "No testing",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_testing"
+            }
+          ],
+          "external_id": "what_to_test_decision"
+        },
+        {
+          "id": "27",
+          "name": "Adoption of MLOps",
+          "description": "Should MLOps be used and if so when?",
+          "relations": [],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "27.1",
+              "label": "MLOps",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "ml_ops"
+            },
+            {
+              "id": "27.2",
+              "label": "No MLOps",
+              "description": "",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "no_mlops"
+            }
+          ],
+          "external_id": "mlops_decision"
+        },
+        {
+          "id": "28",
+          "name": "Development environment",
+          "description": "What development environment should be used?",
+          "relations": [],
+          "evidence": {
+            "codes": 0,
+            "documents": 0,
+            "sources": 0
+          },
+          "values": [
+            {
+              "id": "28.1",
+              "label": "Use computational notebooks",
+              "description": "use computational notebooks",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "use_computational_notebooks"
+            },
+            {
+              "id": "28.2",
+              "label": "Use an IDE",
+              "description": "use an IDE",
+              "status": "accepted",
+              "supporting_doc_ids": [],
+              "external_id": "use_an_ide"
+            }
+          ],
+          "external_id": "development_environment_decision"
+        }
+      ]
+    }
+  ],
+  "dropped_dimensions": [],
+  "provenance": {
+    "kind": "decision model",
+    "study": "c1-ml-workflow",
+    "relations_dropped": 0
+  }
+}

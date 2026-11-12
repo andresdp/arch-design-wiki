@@ -3,18 +3,18 @@ type: Design Alternative
 title: ETL pipeline
 description: process data through extract, transform, and load steps
 id: '14.2'
-dimension: /concepts/how-to-automatically-process-the-data-used-for-model-building.md
+dimension: /concepts/automated-data-processing-for-model-building.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- how-to-automatically-process-the-data-used-for-model-building
+- automated-data-processing-for-model-building
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # ETL pipeline

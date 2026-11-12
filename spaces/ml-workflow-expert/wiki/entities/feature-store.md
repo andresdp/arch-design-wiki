@@ -2,18 +2,18 @@
 type: Design Alternative
 title: Feature store
 id: '4.1'
-dimension: /concepts/how-to-persist-and-provide-access-to-features.md
+dimension: /concepts/feature-persistence-and-access.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- how-to-persist-and-provide-access-to-features
+- feature-persistence-and-access
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # Feature store

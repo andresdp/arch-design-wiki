@@ -2,18 +2,18 @@
 type: Design Alternative
 title: Model selection
 id: '20.5'
-dimension: /concepts/which-tasks-can-be-performed-by-a-model-building-pipeline-or-component.md
+dimension: /concepts/model-building-pipeline-tasks.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- which-tasks-can-be-performed-by-a-model-building-pipeline-or-component
+- model-building-pipeline-tasks
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # Model selection

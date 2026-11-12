@@ -1,6 +1,6 @@
 {
-  "run": "20261108_202031",
-  "built_at": "2026-11-11T16:58:35-03:00",
+  "run": "20261112_165713",
+  "built_at": "2026-11-12T16:57:17-03:00",
   "pages": 161,
   "nodes": 161,
   "treedex": "0.1.5",
@@ -36,8 +36,8 @@
       "graph_id": ""
     },
     "0006": {
-      "title": "Dimension: How to integrate a machine learning model in an application?",
-      "path": "wiki/concepts/how-to-integrate-a-machine-learning-model-in-an-application.md",
+      "title": "Dimension: ML model integration into the application",
+      "path": "wiki/concepts/ml-model-integration-into-the-application.md",
       "kind": "dimension",
       "graph_id": "d:1"
     },
@@ -84,8 +84,8 @@
       "graph_id": "v:1.7"
     },
     "0014": {
-      "title": "Dimension: How to store data used in machine learning applications?",
-      "path": "wiki/concepts/how-to-store-data-used-in-machine-learning-applications.md",
+      "title": "Dimension: Data storage for ML applications",
+      "path": "wiki/concepts/data-storage-for-ml-applications.md",
       "kind": "dimension",
       "graph_id": "d:2"
     },
@@ -114,8 +114,8 @@
       "graph_id": "v:2.4"
     },
     "0019": {
-      "title": "Dimension: How to design the interface for data access?",
-      "path": "wiki/concepts/how-to-design-the-interface-for-data-access.md",
+      "title": "Dimension: Data access interface",
+      "path": "wiki/concepts/data-access-interface.md",
       "kind": "dimension",
       "graph_id": "d:3"
     },
@@ -150,8 +150,8 @@
       "graph_id": "v:3.5"
     },
     "0025": {
-      "title": "Dimension: How to persist and provide access to features?",
-      "path": "wiki/concepts/how-to-persist-and-provide-access-to-features.md",
+      "title": "Dimension: Feature persistence and access",
+      "path": "wiki/concepts/feature-persistence-and-access.md",
       "kind": "dimension",
       "graph_id": "d:4"
     },
@@ -168,8 +168,8 @@
       "graph_id": "v:4.2"
     },
     "0028": {
-      "title": "Dimension: How to serve model predictions or scores?",
-      "path": "wiki/concepts/how-to-serve-model-predictions-or-scores.md",
+      "title": "Dimension: Model serving",
+      "path": "wiki/concepts/model-serving.md",
       "kind": "dimension",
       "graph_id": "d:5"
     },
@@ -204,8 +204,8 @@
       "graph_id": "v:5.5"
     },
     "0034": {
-      "title": "Dimension: How to inform clients about prediction result availability?",
-      "path": "wiki/concepts/how-to-inform-clients-about-prediction-result-availability.md",
+      "title": "Dimension: Notification of prediction results",
+      "path": "wiki/concepts/notification-of-prediction-results.md",
       "kind": "dimension",
       "graph_id": "d:6"
     },
@@ -228,8 +228,8 @@
       "graph_id": "v:6.3"
     },
     "0038": {
-      "title": "Dimension: How to ingest data into ML projects or applications?",
-      "path": "wiki/concepts/how-to-ingest-data-into-ml-projects-or-applications.md",
+      "title": "Dimension: Data ingestion",
+      "path": "wiki/concepts/data-ingestion.md",
       "kind": "dimension",
       "graph_id": "d:7"
     },
@@ -258,8 +258,8 @@
       "graph_id": "v:7.4"
     },
     "0043": {
-      "title": "Dimension: How to perform automatic integration and delivery in a machine learning context?",
-      "path": "wiki/concepts/how-to-perform-automatic-integration-and-delivery-in-a-machine-learning-context.md",
+      "title": "Dimension: Automated integration and delivery for ML",
+      "path": "wiki/concepts/automated-integration-and-delivery-for-ml.md",
       "kind": "dimension",
       "graph_id": "d:8"
     },
@@ -288,8 +288,8 @@
       "graph_id": "v:8.4"
     },
     "0048": {
-      "title": "Dimension: Which tasks can be performed by a delivery pipeline or component?",
-      "path": "wiki/concepts/which-tasks-can-be-performed-by-a-delivery-pipeline-or-component.md",
+      "title": "Dimension: Delivery pipeline tasks",
+      "path": "wiki/concepts/delivery-pipeline-tasks.md",
       "kind": "dimension",
       "graph_id": "d:9"
     },
@@ -325,19 +325,19 @@
     },
     "0054": {
       "title": "Value: Canary testing (accepted)",
-      "path": "wiki/entities/canary-testing-2.md",
+      "path": "wiki/entities/canary-testing.md",
       "kind": "value",
       "graph_id": "v:9.6"
     },
     "0055": {
       "title": "Value: A/B testing (accepted)",
-      "path": "wiki/entities/a-b-testing-2.md",
+      "path": "wiki/entities/a-b-testing.md",
       "kind": "value",
       "graph_id": "v:9.7"
     },
     "0056": {
       "title": "Value: Evidence based hypothesis testing (accepted)",
-      "path": "wiki/entities/evidence-based-hypothesis-testing-2.md",
+      "path": "wiki/entities/evidence-based-hypothesis-testing.md",
       "kind": "value",
       "graph_id": "v:9.8"
     },
@@ -348,8 +348,8 @@
       "graph_id": "v:9.9"
     },
     "0058": {
-      "title": "Dimension: Which model versions should be deployed to production and how?",
-      "path": "wiki/concepts/which-model-versions-should-be-deployed-to-production-and-how.md",
+      "title": "Dimension: Model versions in production",
+      "path": "wiki/concepts/model-versions-in-production.md",
       "kind": "dimension",
       "graph_id": "d:10"
     },
@@ -372,8 +372,8 @@
       "graph_id": "v:10.3"
     },
     "0062": {
-      "title": "Dimension: How to version data decision?",
-      "path": "wiki/concepts/how-to-version-data-decision.md",
+      "title": "Dimension: Data versioning",
+      "path": "wiki/concepts/data-versioning.md",
       "kind": "dimension",
       "graph_id": "d:11"
     },
@@ -396,8 +396,8 @@
       "graph_id": "v:11.3"
     },
     "0066": {
-      "title": "Dimension: How to trigger a machine learning pipeline or orchestrator?",
-      "path": "wiki/concepts/how-to-trigger-a-machine-learning-pipeline-or-orchestrator.md",
+      "title": "Dimension: Pipeline and orchestrator triggering",
+      "path": "wiki/concepts/pipeline-and-orchestrator-triggering.md",
       "kind": "dimension",
       "graph_id": "d:12"
     },
@@ -438,8 +438,8 @@
       "graph_id": "v:12.6"
     },
     "0073": {
-      "title": "Dimension: How to automatically provision environments?",
-      "path": "wiki/concepts/how-to-automatically-provision-environments.md",
+      "title": "Dimension: Automated environment provisioning",
+      "path": "wiki/concepts/automated-environment-provisioning.md",
       "kind": "dimension",
       "graph_id": "d:13"
     },
@@ -456,8 +456,8 @@
       "graph_id": "v:13.2"
     },
     "0076": {
-      "title": "Dimension: How to automatically process the data used for model building?",
-      "path": "wiki/concepts/how-to-automatically-process-the-data-used-for-model-building.md",
+      "title": "Dimension: Automated data processing for model building",
+      "path": "wiki/concepts/automated-data-processing-for-model-building.md",
       "kind": "dimension",
       "graph_id": "d:14"
     },
@@ -486,8 +486,8 @@
       "graph_id": "v:14.4"
     },
     "0081": {
-      "title": "Dimension: Should data be processed in batches or in realtime?",
-      "path": "wiki/concepts/should-data-be-processed-in-batches-or-in-realtime.md",
+      "title": "Dimension: Batch or real-time data processing",
+      "path": "wiki/concepts/batch-or-real-time-data-processing.md",
       "kind": "dimension",
       "graph_id": "d:15"
     },
@@ -504,8 +504,8 @@
       "graph_id": "v:15.2"
     },
     "0084": {
-      "title": "Dimension: Which data processing tasks can be performed by a data processing pipeline or component?",
-      "path": "wiki/concepts/which-data-processing-tasks-can-be-performed-by-a-data-processing-pipeline-or-co.md",
+      "title": "Dimension: Data processing pipeline tasks",
+      "path": "wiki/concepts/data-processing-pipeline-tasks.md",
       "kind": "dimension",
       "graph_id": "d:16"
     },
@@ -552,8 +552,8 @@
       "graph_id": "v:16.7"
     },
     "0092": {
-      "title": "Dimension: How to parallelize data processing?",
-      "path": "wiki/concepts/how-to-parallelize-data-processing.md",
+      "title": "Dimension: Data processing parallelization",
+      "path": "wiki/concepts/data-processing-parallelization.md",
       "kind": "dimension",
       "graph_id": "d:17"
     },
@@ -582,8 +582,8 @@
       "graph_id": "v:17.4"
     },
     "0097": {
-      "title": "Dimension: How to perform model building in an ML project?",
-      "path": "wiki/concepts/how-to-perform-model-building-in-an-ml-project.md",
+      "title": "Dimension: Model building approach",
+      "path": "wiki/concepts/model-building-approach.md",
       "kind": "dimension",
       "graph_id": "d:18"
     },
@@ -606,8 +606,8 @@
       "graph_id": "v:18.3"
     },
     "0101": {
-      "title": "Dimension: When and how to train the model?",
-      "path": "wiki/concepts/when-and-how-to-train-the-model.md",
+      "title": "Dimension: Model training timing and mode",
+      "path": "wiki/concepts/model-training-timing-and-mode.md",
       "kind": "dimension",
       "graph_id": "d:19"
     },
@@ -630,8 +630,8 @@
       "graph_id": "v:19.3"
     },
     "0105": {
-      "title": "Dimension: Which tasks can be performed by a model building pipeline or component?",
-      "path": "wiki/concepts/which-tasks-can-be-performed-by-a-model-building-pipeline-or-component.md",
+      "title": "Dimension: Model building pipeline tasks",
+      "path": "wiki/concepts/model-building-pipeline-tasks.md",
       "kind": "dimension",
       "graph_id": "d:20"
     },
@@ -696,8 +696,8 @@
       "graph_id": "v:20.10"
     },
     "0116": {
-      "title": "Dimension: How to parallelize model building?",
-      "path": "wiki/concepts/how-to-parallelize-model-building.md",
+      "title": "Dimension: Model building parallelization",
+      "path": "wiki/concepts/model-building-parallelization.md",
       "kind": "dimension",
       "graph_id": "d:21"
     },
@@ -732,8 +732,8 @@
       "graph_id": "v:21.5"
     },
     "0122": {
-      "title": "Dimension: How to monitor and track the model in production?",
-      "path": "wiki/concepts/how-to-monitor-and-track-the-model-in-production.md",
+      "title": "Dimension: Model monitoring and tracking in production",
+      "path": "wiki/concepts/model-monitoring-and-tracking-in-production.md",
       "kind": "dimension",
       "graph_id": "d:22"
     },
@@ -762,8 +762,8 @@
       "graph_id": "v:22.4"
     },
     "0127": {
-      "title": "Dimension: Should AutoML be used and if so where?",
-      "path": "wiki/concepts/should-automl-be-used-and-if-so-where.md",
+      "title": "Dimension: Use of AutoML",
+      "path": "wiki/concepts/use-of-automl.md",
       "kind": "dimension",
       "graph_id": "d:23"
     },
@@ -780,8 +780,8 @@
       "graph_id": "v:23.2"
     },
     "0130": {
-      "title": "Dimension: How to adjust models based on monitoring results?",
-      "path": "wiki/concepts/how-to-adjust-models-based-on-monitoring-results.md",
+      "title": "Dimension: Model adjustment from monitoring results",
+      "path": "wiki/concepts/model-adjustment-from-monitoring-results.md",
       "kind": "dimension",
       "graph_id": "d:24"
     },
@@ -798,8 +798,8 @@
       "graph_id": "v:24.2"
     },
     "0133": {
-      "title": "Dimension: What to build, test, and deploy automatically by CI/CD pipelines?",
-      "path": "wiki/concepts/what-to-build-test-and-deploy-automatically-by-ci-cd-pipelines.md",
+      "title": "Dimension: Scope of CI/CD automation",
+      "path": "wiki/concepts/scope-of-ci-cd-automation.md",
       "kind": "dimension",
       "graph_id": "d:25"
     },
@@ -822,26 +822,26 @@
       "graph_id": "v:25.3"
     },
     "0137": {
-      "title": "Dimension: What to test in a machine learning/data science pipeline?",
-      "path": "wiki/concepts/what-to-test-in-a-machine-learning-data-science-pipeline.md",
+      "title": "Dimension: Testing scope in ML pipelines",
+      "path": "wiki/concepts/testing-scope-in-ml-pipelines.md",
       "kind": "dimension",
       "graph_id": "d:26"
     },
     "0138": {
       "title": "Value: Canary testing (accepted)",
-      "path": "wiki/entities/canary-testing.md",
+      "path": "wiki/entities/canary-testing-2.md",
       "kind": "value",
       "graph_id": "v:26.1"
     },
     "0139": {
       "title": "Value: A/B testing (accepted)",
-      "path": "wiki/entities/a-b-testing.md",
+      "path": "wiki/entities/a-b-testing-2.md",
       "kind": "value",
       "graph_id": "v:26.2"
     },
     "0140": {
       "title": "Value: Evidence based hypothesis testing (accepted)",
-      "path": "wiki/entities/evidence-based-hypothesis-testing.md",
+      "path": "wiki/entities/evidence-based-hypothesis-testing-2.md",
       "kind": "value",
       "graph_id": "v:26.3"
     },
@@ -912,8 +912,8 @@
       "graph_id": "v:26.14"
     },
     "0152": {
-      "title": "Dimension: Should MLOps be used and if so when?",
-      "path": "wiki/concepts/should-mlops-be-used-and-if-so-when.md",
+      "title": "Dimension: Adoption of MLOps",
+      "path": "wiki/concepts/adoption-of-mlops.md",
       "kind": "dimension",
       "graph_id": "d:27"
     },
@@ -930,8 +930,8 @@
       "graph_id": "v:27.2"
     },
     "0155": {
-      "title": "Dimension: What development environment should be used?",
-      "path": "wiki/concepts/what-development-environment-should-be-used.md",
+      "title": "Dimension: Development environment",
+      "path": "wiki/concepts/development-environment.md",
       "kind": "dimension",
       "graph_id": "d:28"
     },

@@ -3,18 +3,18 @@ type: Design Alternative
 title: Rollback to previous model version
 description: redeploy previous model version and then switch to previous model
 id: '10.2'
-dimension: /concepts/which-model-versions-should-be-deployed-to-production-and-how.md
+dimension: /concepts/model-versions-in-production.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- which-model-versions-should-be-deployed-to-production-and-how
+- model-versions-in-production
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # Rollback to previous model version

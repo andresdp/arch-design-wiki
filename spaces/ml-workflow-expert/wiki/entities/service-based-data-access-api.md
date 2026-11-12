@@ -3,18 +3,18 @@ type: Design Alternative
 title: Service-based data access API
 description: data provider encapsulated by data access services
 id: '3.2'
-dimension: /concepts/how-to-design-the-interface-for-data-access.md
+dimension: /concepts/data-access-interface.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- how-to-design-the-interface-for-data-access
+- data-access-interface
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # Service-based data access API

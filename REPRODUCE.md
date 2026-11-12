@@ -38,9 +38,11 @@ cd ../..
 for f in study/designing2027/results-v2/rationale/*-N-r*.json; do ddspace rationale check "$f" | head -3; done
 ```
 
-Each prints `"ok": true` and the space's fingerprint (`graph_sha256`), which is the one the E files record. One file,
-`forecast-search-E-r2.json`, also carries a warning (`early_stop`: the agent stopped after one round, with 3 of its
-12 points); its session summary records the same warning.
+Each prints `"ok": true`. The E files also carry one warning, `graph_changed`: the published space names its
+dimensions as concerns ("Model serving"), while the sessions ran on the model's own names, its questions ("How to
+serve model predictions or scores?"); the ids, and so every reference in the files, are the same, and each question
+is kept as its dimension's description. One file, `forecast-search-E-r2.json`, also carries `early_stop` (the agent
+stopped after one round, with 3 of its 12 points), as its session summary records.
 
 **Rebuild an explainer.** The explainers in `spaces/` were rendered from these files; to render one again, into a
 folder of your own:
@@ -71,7 +73,7 @@ new design point). The sessions run outside this repository: the runner refuses 
 ```bash
 WORK=~/arch-design-wiki-rerun
 mkdir -p $WORK/workspaces/N $WORK/scratch
-cp -R spaces/ml-workflow-expert $WORK/workspaces/E     # the study's own E space (same fingerprint)
+python study/designing2027/build_workspace.py --out $WORK/workspaces   # writes E (the expert space) and N (empty)
 export STUDY_OPENAI_API_KEY=sk-...                     # passed to the sessions as OPENAI_API_KEY
 
 # one session first, to check the setup
@@ -85,9 +87,9 @@ python study/designing2027/run_sessions.py --workspaces $WORK/workspaces --scrat
 python study/designing2027/analyze.py --results results-rerun
 ```
 
-`study/designing2027/build_workspace.py --out $WORK/workspaces` builds the E space from the decision model in
-`study/designing2027/inputs/` instead of copying it. The ids are the same, but the space gets a new run id, so its
-fingerprint differs and `ddspace rationale check` warns `graph_changed` on the study's E files.
+`build_workspace.py` builds the E space from the decision model in `study/designing2027/inputs/`, with the
+dimension names of `inputs/dimension_names.yaml`, and copies the input manifest that the runner checks before every
+E session. A rerun therefore sees the dimensions named as concerns, where the study's sessions saw the questions.
 
 What each session gets:
 

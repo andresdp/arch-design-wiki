@@ -1,5 +1,5 @@
 # Log
 
-## 2026-11-11
+## 2026-11-12
 
-- **Rebuild** Wiki rebuilt from the same run 20261108_202031 (export options only).
+- **Creation** Wiki built from run 20261112_165713 (import-model): 28 dimensions, 124 values.

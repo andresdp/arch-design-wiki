@@ -5,7 +5,7 @@ tags:
 - reference
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # Relations between dimensions
@@ -15,7 +15,7 @@ A relation links two dimensions and reads left to right as one sentence: *source
 | Type | Reads as (A = source, B = target) | Meaning | Example in this design space |
 |---|---|---|---|
 | *requires* | A requires B to be decided first | the source only applies once a choice has been made on the target | — |
-| *affects* | Choices on A affect the outcomes of B | choices on the source change the results, costs or risks seen on the target | Choices on [How to integrate a machine learning model in an application?](/concepts/how-to-integrate-a-machine-learning-model-in-an-application.md) affect the outcomes of [How to serve model predictions or scores?](/concepts/how-to-serve-model-predictions-or-scores.md) |
+| *affects* | Choices on A affect the outcomes of B | choices on the source change the results, costs or risks seen on the target | Choices on [ML model integration into the application](/concepts/ml-model-integration-into-the-application.md) affect the outcomes of [Model serving](/concepts/model-serving.md) |
 | *constrains* | Choices on A limit the options available on B | a choice on the source rules out or restricts some choices on the target | — |
 | *co occurs with* | A and B are usually decided together | the sources decide both together, but neither causes or requires the other | — |
 

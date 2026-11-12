@@ -1,10 +1,10 @@
 {
  "schema_version": 1,
- "run": "20261108_202031",
+ "run": "20261112_165713",
  "name": "c1-e",
  "domain": "c1-e",
  "view": "selected",
- "use_case": "Identify the architectural design decisions that practitioners face when designing and implementing machine learning systems along the machine learning workflow — from data ingestion and processing, through model building and training, to putting models into production and operating them — as documented in practitioner (gray) literature. For each decision, identify the alternative decision options practitioners use or consider, the forces (quality attributes, constraints and practical concerns) that drive the choice between them, and how decisions relate to one another. Each dimension must name one architectural design decision; its values are the alternative options for that decision.",
+ "use_case": "The architectural design decisions of the machine learning workflow, from data ingestion and processing through model building and training to deployment and operation, with the options for each (Warnett and Zdun's decision model).",
  "core_rule": "≥ 0 sources",
  "id": "root",
  "kind": "root",
@@ -13,31 +13,31 @@
  "meta": "28 dimensions, 124 values, 0 sources",
  "children": [
   {
-   "id": "d:24",
+   "id": "d:27",
    "kind": "dimension",
-   "label": "How to adjust models based on monitoring results?",
-   "href": "concepts/how-to-adjust-models-based-on-monitoring-results",
+   "label": "Adoption of MLOps",
+   "href": "concepts/adoption-of-mlops",
    "core": true,
-   "description": "How to adjust models based on monitoring results?",
+   "description": "Should MLOps be used and if so when?",
    "meta": "2 values · evidence: 0 docs from 0 sources",
    "children": [
     {
-     "id": "v:24.2",
+     "id": "v:27.1",
      "kind": "value",
-     "label": "Automated model adjustment",
+     "label": "MLOps",
      "status": "accepted",
-     "href": "entities/automated-model-adjustment",
-     "description": "automated measures are triggered to adjust the models",
+     "href": "entities/mlops",
+     "description": "",
      "meta": "accepted · 0 passages",
      "children": []
     },
     {
-     "id": "v:24.1",
+     "id": "v:27.2",
      "kind": "value",
-     "label": "Manual model adjustment",
+     "label": "No MLOps",
      "status": "accepted",
-     "href": "entities/manual-model-adjustment",
-     "description": "humans adjust and redeploy the models",
+     "href": "entities/no-mlops",
+     "description": "",
      "meta": "accepted · 0 passages",
      "children": []
     }
@@ -46,8 +46,8 @@
   {
    "id": "d:14",
    "kind": "dimension",
-   "label": "How to automatically process the data used for model building?",
-   "href": "concepts/how-to-automatically-process-the-data-used-for-model-building",
+   "label": "Automated data processing for model building",
+   "href": "concepts/automated-data-processing-for-model-building",
    "core": true,
    "description": "How to automatically process the data used for model building?",
    "meta": "4 values · evidence: 0 docs from 0 sources",
@@ -97,8 +97,8 @@
   {
    "id": "d:13",
    "kind": "dimension",
-   "label": "How to automatically provision environments?",
-   "href": "concepts/how-to-automatically-provision-environments",
+   "label": "Automated environment provisioning",
+   "href": "concepts/automated-environment-provisioning",
    "core": true,
    "description": "How to automatically provision environments?",
    "meta": "2 values · evidence: 0 docs from 0 sources",
@@ -126,10 +126,92 @@
    ]
   },
   {
+   "id": "d:8",
+   "kind": "dimension",
+   "label": "Automated integration and delivery for ML",
+   "href": "concepts/automated-integration-and-delivery-for-ml",
+   "core": true,
+   "description": "How to perform automatic integration and delivery in a machine learning context?",
+   "meta": "4 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:8.2",
+     "kind": "value",
+     "label": "Build and Deployment scripts",
+     "status": "accepted",
+     "href": "entities/build-and-deployment-scripts",
+     "description": "manually perform automated deployments",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:8.1",
+     "kind": "value",
+     "label": "CI/CD pipeline",
+     "status": "accepted",
+     "href": "entities/ci-cd-pipeline",
+     "description": "continuously automate the deployment e.g. upon commits",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:8.3",
+     "kind": "value",
+     "label": "Machine learning orchestrator",
+     "status": "accepted",
+     "href": "entities/machine-learning-orchestrator",
+     "description": "orchestrate multiple pipelines and/or components",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:8.4",
+     "kind": "value",
+     "label": "No integration or delivery automation",
+     "status": "accepted",
+     "href": "entities/no-integration-or-delivery-automation",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": "d:15",
+   "kind": "dimension",
+   "label": "Batch or real-time data processing",
+   "href": "concepts/batch-or-real-time-data-processing",
+   "core": true,
+   "description": "Should data be processed in batches or in realtime?",
+   "meta": "2 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:15.1",
+     "kind": "value",
+     "label": "Batch-based data processing",
+     "status": "accepted",
+     "href": "entities/batch-based-data-processing",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:15.2",
+     "kind": "value",
+     "label": "Real-time, stream-based data processing",
+     "status": "accepted",
+     "href": "entities/real-time-stream-based-data-processing",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
    "id": "d:3",
    "kind": "dimension",
-   "label": "How to design the interface for data access?",
-   "href": "concepts/how-to-design-the-interface-for-data-access",
+   "label": "Data access interface",
+   "href": "concepts/data-access-interface",
    "core": true,
    "description": "How to design the interface for data access?",
    "meta": "5 values · evidence: 0 docs from 0 sources",
@@ -187,51 +269,10 @@
    ]
   },
   {
-   "id": "d:6",
-   "kind": "dimension",
-   "label": "How to inform clients about prediction result availability?",
-   "href": "concepts/how-to-inform-clients-about-prediction-result-availability",
-   "core": true,
-   "description": "How to inform clients about prediction result availability?",
-   "meta": "3 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:6.3",
-     "kind": "value",
-     "label": "Block on result",
-     "status": "accepted",
-     "href": "entities/block-on-result",
-     "description": "clients blocks until the results are available",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:6.2",
-     "kind": "value",
-     "label": "Polling",
-     "status": "accepted",
-     "href": "entities/polling",
-     "description": "clients poll for the results",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:6.1",
-     "kind": "value",
-     "label": "Push notification",
-     "status": "accepted",
-     "href": "entities/push-notification",
-     "description": "notify clients about results",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
    "id": "d:7",
    "kind": "dimension",
-   "label": "How to ingest data into ML projects or applications?",
-   "href": "concepts/how-to-ingest-data-into-ml-projects-or-applications",
+   "label": "Data ingestion",
+   "href": "concepts/data-ingestion",
    "core": true,
    "description": "How to ingest data into ML projects or applications?",
    "meta": "4 values · evidence: 0 docs from 0 sources",
@@ -279,10 +320,397 @@
    ]
   },
   {
+   "id": "d:17",
+   "kind": "dimension",
+   "label": "Data processing parallelization",
+   "href": "concepts/data-processing-parallelization",
+   "core": true,
+   "description": "How to parallelize data processing?",
+   "meta": "4 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:17.2",
+     "kind": "value",
+     "label": "Data partitioning in data pipeline",
+     "status": "accepted",
+     "href": "entities/data-partitioning-in-data-pipeline",
+     "description": "within a pipeline, the data is partitioned to benefit from parallel processing",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:17.1",
+     "kind": "value",
+     "label": "Data pipeline per data set",
+     "status": "accepted",
+     "href": "entities/data-pipeline-per-data-set",
+     "description": "dedicated pipeline for each dataset",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:17.3",
+     "kind": "value",
+     "label": "Hybrid data processing parallelization",
+     "status": "accepted",
+     "href": "entities/hybrid-data-processing-parallelization",
+     "description": "combining one or more of the other parallelization options",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:17.4",
+     "kind": "value",
+     "label": "No parallel data processing",
+     "status": "accepted",
+     "href": "entities/no-parallel-data-processing",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": "d:16",
+   "kind": "dimension",
+   "label": "Data processing pipeline tasks",
+   "href": "concepts/data-processing-pipeline-tasks",
+   "core": true,
+   "description": "Which data processing tasks can be performed by a data processing pipeline or component?",
+   "meta": "7 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:16.1",
+     "kind": "value",
+     "label": "Data extraction",
+     "status": "accepted",
+     "href": "entities/data-extraction",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:16.2",
+     "kind": "value",
+     "label": "Data preparation",
+     "status": "accepted",
+     "href": "entities/data-preparation",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:16.7",
+     "kind": "value",
+     "label": "Data processing hyperparameter tuning",
+     "status": "accepted",
+     "href": "entities/data-processing-hyperparameter-tuning",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:16.5",
+     "kind": "value",
+     "label": "Data selection",
+     "status": "accepted",
+     "href": "entities/data-selection",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:16.4",
+     "kind": "value",
+     "label": "Data transformation",
+     "status": "accepted",
+     "href": "entities/data-transformation",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:16.3",
+     "kind": "value",
+     "label": "Data validation",
+     "status": "accepted",
+     "href": "entities/data-validation",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:16.6",
+     "kind": "value",
+     "label": "Feature engineering",
+     "status": "accepted",
+     "href": "entities/feature-engineering",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": "d:2",
+   "kind": "dimension",
+   "label": "Data storage for ML applications",
+   "href": "concepts/data-storage-for-ml-applications",
+   "core": true,
+   "description": "How to store data used in machine learning applications?",
+   "meta": "4 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:2.2",
+     "kind": "value",
+     "label": "Data service",
+     "status": "accepted",
+     "href": "entities/data-service",
+     "description": "store data in services",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:2.3",
+     "kind": "value",
+     "label": "Event store",
+     "status": "accepted",
+     "href": "entities/event-store",
+     "description": "store data as events being exchanged in the systems",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:2.4",
+     "kind": "value",
+     "label": "No data store",
+     "status": "accepted",
+     "href": "entities/no-data-store",
+     "description": "get data without storing it, e.g. manual ingested raw data or only event streaming",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:2.1",
+     "kind": "value",
+     "label": "Shared data store",
+     "status": "accepted",
+     "href": "entities/shared-data-store",
+     "description": "store data in shared data store",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": "d:11",
+   "kind": "dimension",
+   "label": "Data versioning",
+   "href": "concepts/data-versioning",
+   "core": true,
+   "description": "How to version data decision?",
+   "meta": "3 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:11.1",
+     "kind": "value",
+     "label": "Data version repository",
+     "status": "accepted",
+     "href": "entities/data-version-repository",
+     "description": "version repository with specific technology-support for data versioning",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:11.2",
+     "kind": "value",
+     "label": "Data versioning in code repository",
+     "status": "accepted",
+     "href": "entities/data-versioning-in-code-repository",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:11.3",
+     "kind": "value",
+     "label": "No data versioning",
+     "status": "accepted",
+     "href": "entities/no-data-versioning",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": "d:9",
+   "kind": "dimension",
+   "label": "Delivery pipeline tasks",
+   "href": "concepts/delivery-pipeline-tasks",
+   "core": true,
+   "description": "Which tasks can be performed by a delivery pipeline or component?",
+   "meta": "9 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:9.7",
+     "kind": "value",
+     "label": "A/B testing",
+     "status": "accepted",
+     "href": "entities/a-b-testing",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:9.3",
+     "kind": "value",
+     "label": "Building",
+     "status": "accepted",
+     "href": "entities/building",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:9.6",
+     "kind": "value",
+     "label": "Canary testing",
+     "status": "accepted",
+     "href": "entities/canary-testing",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:9.5",
+     "kind": "value",
+     "label": "Containerization",
+     "status": "accepted",
+     "href": "entities/containerization",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:9.4",
+     "kind": "value",
+     "label": "Deployment",
+     "status": "accepted",
+     "href": "entities/deployment",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:9.8",
+     "kind": "value",
+     "label": "Evidence based hypothesis testing",
+     "status": "accepted",
+     "href": "entities/evidence-based-hypothesis-testing",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:9.1",
+     "kind": "value",
+     "label": "Packaging",
+     "status": "accepted",
+     "href": "entities/packaging",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:9.2",
+     "kind": "value",
+     "label": "Testing",
+     "status": "accepted",
+     "href": "entities/testing",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:9.9",
+     "kind": "value",
+     "label": "Version control repository",
+     "status": "accepted",
+     "href": "entities/version-control-repository",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": "d:28",
+   "kind": "dimension",
+   "label": "Development environment",
+   "href": "concepts/development-environment",
+   "core": true,
+   "description": "What development environment should be used?",
+   "meta": "2 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:28.2",
+     "kind": "value",
+     "label": "Use an IDE",
+     "status": "accepted",
+     "href": "entities/use-an-ide",
+     "description": "use an IDE",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:28.1",
+     "kind": "value",
+     "label": "Use computational notebooks",
+     "status": "accepted",
+     "href": "entities/use-computational-notebooks",
+     "description": "use computational notebooks",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": "d:4",
+   "kind": "dimension",
+   "label": "Feature persistence and access",
+   "href": "concepts/feature-persistence-and-access",
+   "core": true,
+   "description": "How to persist and provide access to features?",
+   "meta": "2 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:4.1",
+     "kind": "value",
+     "label": "Feature store",
+     "status": "accepted",
+     "href": "entities/feature-store",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:4.2",
+     "kind": "value",
+     "label": "Store features in data stores without specific support",
+     "status": "accepted",
+     "href": "entities/store-features-in-data-stores-without-specific-support",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
    "id": "d:1",
    "kind": "dimension",
-   "label": "How to integrate a machine learning model in an application?",
-   "href": "concepts/how-to-integrate-a-machine-learning-model-in-an-application",
+   "label": "ML model integration into the application",
+   "href": "concepts/ml-model-integration-into-the-application",
    "core": true,
    "description": "How to integrate a machine learning model in an application?",
    "meta": "7 values · evidence: 0 docs from 0 sources",
@@ -360,102 +788,72 @@
    ]
   },
   {
-   "id": "d:22",
+   "id": "d:24",
    "kind": "dimension",
-   "label": "How to monitor and track the model in production?",
-   "href": "concepts/how-to-monitor-and-track-the-model-in-production",
+   "label": "Model adjustment from monitoring results",
+   "href": "concepts/model-adjustment-from-monitoring-results",
    "core": true,
-   "description": "How to monitor and track the model in production?",
-   "meta": "4 values · evidence: 0 docs from 0 sources",
+   "description": "How to adjust models based on monitoring results?",
+   "meta": "2 values · evidence: 0 docs from 0 sources",
    "children": [
     {
-     "id": "v:22.4",
+     "id": "v:24.2",
      "kind": "value",
-     "label": "Model in-production tracking",
+     "label": "Automated model adjustment",
      "status": "accepted",
-     "href": "entities/model-in-production-tracking",
-     "description": "track model usage, inputs, outputs, interpretability, and fairness",
+     "href": "entities/automated-model-adjustment",
+     "description": "automated measures are triggered to adjust the models",
      "meta": "accepted · 0 passages",
      "children": []
     },
     {
-     "id": "v:22.1",
+     "id": "v:24.1",
      "kind": "value",
-     "label": "Model performance monitoring",
+     "label": "Manual model adjustment",
      "status": "accepted",
-     "href": "entities/model-performance-monitoring",
-     "description": "observe specific model performance parameters",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:22.2",
-     "kind": "value",
-     "label": "Monitoring or logging data and predictions",
-     "status": "accepted",
-     "href": "entities/monitoring-or-logging-data-and-predictions",
-     "description": "log and monitor system data and predictions",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:22.3",
-     "kind": "value",
-     "label": "No in-production monitoring",
-     "status": "accepted",
-     "href": "entities/no-in-production-monitoring",
-     "description": "",
+     "href": "entities/manual-model-adjustment",
+     "description": "humans adjust and redeploy the models",
      "meta": "accepted · 0 passages",
      "children": []
     }
    ]
   },
   {
-   "id": "d:17",
+   "id": "d:18",
    "kind": "dimension",
-   "label": "How to parallelize data processing?",
-   "href": "concepts/how-to-parallelize-data-processing",
+   "label": "Model building approach",
+   "href": "concepts/model-building-approach",
    "core": true,
-   "description": "How to parallelize data processing?",
-   "meta": "4 values · evidence: 0 docs from 0 sources",
+   "description": "How to perform model building in an ML project?",
+   "meta": "3 values · evidence: 0 docs from 0 sources",
    "children": [
     {
-     "id": "v:17.2",
+     "id": "v:18.2",
      "kind": "value",
-     "label": "Data partitioning in data pipeline",
+     "label": "Model builder component",
      "status": "accepted",
-     "href": "entities/data-partitioning-in-data-pipeline",
-     "description": "within a pipeline, the data is partitioned to benefit from parallel processing",
+     "href": "entities/model-builder-component",
+     "description": "model training, evaluation, and validation in dedicated component",
      "meta": "accepted · 0 passages",
      "children": []
     },
     {
-     "id": "v:17.1",
+     "id": "v:18.3",
      "kind": "value",
-     "label": "Data pipeline per data set",
+     "label": "Model building in development tool",
      "status": "accepted",
-     "href": "entities/data-pipeline-per-data-set",
-     "description": "dedicated pipeline for each dataset",
+     "href": "entities/model-building-in-development-tool",
+     "description": "model building performed in development sandbox",
      "meta": "accepted · 0 passages",
      "children": []
     },
     {
-     "id": "v:17.3",
+     "id": "v:18.1",
      "kind": "value",
-     "label": "Hybrid data processing parallelization",
+     "label": "Model building pipeline",
      "status": "accepted",
-     "href": "entities/hybrid-data-processing-parallelization",
-     "description": "combining one or more of the other parallelization options",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:17.4",
-     "kind": "value",
-     "label": "No parallel data processing",
-     "status": "accepted",
-     "href": "entities/no-parallel-data-processing",
-     "description": "",
+     "href": "entities/model-building-pipeline",
+     "description": "model training, evaluation, and validation in automated pipeline",
      "meta": "accepted · 0 passages",
      "children": []
     }
@@ -464,8 +862,8 @@
   {
    "id": "d:21",
    "kind": "dimension",
-   "label": "How to parallelize model building?",
-   "href": "concepts/how-to-parallelize-model-building",
+   "label": "Model building parallelization",
+   "href": "concepts/model-building-parallelization",
    "core": true,
    "description": "How to parallelize model building?",
    "meta": "5 values · evidence: 0 docs from 0 sources",
@@ -523,122 +921,161 @@
    ]
   },
   {
-   "id": "d:8",
+   "id": "d:20",
    "kind": "dimension",
-   "label": "How to perform automatic integration and delivery in a machine learning context?",
-   "href": "concepts/how-to-perform-automatic-integration-and-delivery-in-a-machine-learning-context",
+   "label": "Model building pipeline tasks",
+   "href": "concepts/model-building-pipeline-tasks",
    "core": true,
-   "description": "How to perform automatic integration and delivery in a machine learning context?",
+   "description": "Which tasks can be performed by a model building pipeline or component?",
+   "meta": "10 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:20.3",
+     "kind": "value",
+     "label": "Data checkpoints",
+     "status": "accepted",
+     "href": "entities/data-checkpoints",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:20.2",
+     "kind": "value",
+     "label": "Data splitting",
+     "status": "accepted",
+     "href": "entities/data-splitting",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:20.8",
+     "kind": "value",
+     "label": "Development tool export",
+     "status": "accepted",
+     "href": "entities/development-tool-export",
+     "description": "use exported file to work in development tool",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:20.7",
+     "kind": "value",
+     "label": "Development tool facade",
+     "status": "accepted",
+     "href": "entities/development-tool-facade",
+     "description": "use API to integrate development tool",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:20.10",
+     "kind": "value",
+     "label": "Model hyperparameter tuning",
+     "status": "accepted",
+     "href": "entities/model-hyperparameter-tuning",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:20.6",
+     "kind": "value",
+     "label": "Model packaging",
+     "status": "accepted",
+     "href": "entities/model-packaging",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:20.5",
+     "kind": "value",
+     "label": "Model selection",
+     "status": "accepted",
+     "href": "entities/model-selection",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:20.1",
+     "kind": "value",
+     "label": "Model training",
+     "status": "accepted",
+     "href": "entities/model-training",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:20.4",
+     "kind": "value",
+     "label": "Model validation",
+     "status": "accepted",
+     "href": "entities/model-validation",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:20.9",
+     "kind": "value",
+     "label": "Train multiple model versions with different parameters and/or algorithms",
+     "status": "accepted",
+     "href": "entities/train-multiple-model-versions-with-different-parameters-and-or-algorithms",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": "d:22",
+   "kind": "dimension",
+   "label": "Model monitoring and tracking in production",
+   "href": "concepts/model-monitoring-and-tracking-in-production",
+   "core": true,
+   "description": "How to monitor and track the model in production?",
    "meta": "4 values · evidence: 0 docs from 0 sources",
    "children": [
     {
-     "id": "v:8.2",
+     "id": "v:22.4",
      "kind": "value",
-     "label": "Build and Deployment scripts",
+     "label": "Model in-production tracking",
      "status": "accepted",
-     "href": "entities/build-and-deployment-scripts",
-     "description": "manually perform automated deployments",
+     "href": "entities/model-in-production-tracking",
+     "description": "track model usage, inputs, outputs, interpretability, and fairness",
      "meta": "accepted · 0 passages",
      "children": []
     },
     {
-     "id": "v:8.1",
+     "id": "v:22.1",
      "kind": "value",
-     "label": "CI/CD pipeline",
+     "label": "Model performance monitoring",
      "status": "accepted",
-     "href": "entities/ci-cd-pipeline",
-     "description": "continuously automate the deployment e.g. upon commits",
+     "href": "entities/model-performance-monitoring",
+     "description": "observe specific model performance parameters",
      "meta": "accepted · 0 passages",
      "children": []
     },
     {
-     "id": "v:8.3",
+     "id": "v:22.2",
      "kind": "value",
-     "label": "Machine learning orchestrator",
+     "label": "Monitoring or logging data and predictions",
      "status": "accepted",
-     "href": "entities/machine-learning-orchestrator",
-     "description": "orchestrate multiple pipelines and/or components",
+     "href": "entities/monitoring-or-logging-data-and-predictions",
+     "description": "log and monitor system data and predictions",
      "meta": "accepted · 0 passages",
      "children": []
     },
     {
-     "id": "v:8.4",
+     "id": "v:22.3",
      "kind": "value",
-     "label": "No integration or delivery automation",
+     "label": "No in-production monitoring",
      "status": "accepted",
-     "href": "entities/no-integration-or-delivery-automation",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
-   "id": "d:18",
-   "kind": "dimension",
-   "label": "How to perform model building in an ML project?",
-   "href": "concepts/how-to-perform-model-building-in-an-ml-project",
-   "core": true,
-   "description": "How to perform model building in an ML project?",
-   "meta": "3 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:18.2",
-     "kind": "value",
-     "label": "Model builder component",
-     "status": "accepted",
-     "href": "entities/model-builder-component",
-     "description": "model training, evaluation, and validation in dedicated component",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:18.3",
-     "kind": "value",
-     "label": "Model building in development tool",
-     "status": "accepted",
-     "href": "entities/model-building-in-development-tool",
-     "description": "model building performed in development sandbox",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:18.1",
-     "kind": "value",
-     "label": "Model building pipeline",
-     "status": "accepted",
-     "href": "entities/model-building-pipeline",
-     "description": "model training, evaluation, and validation in automated pipeline",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
-   "id": "d:4",
-   "kind": "dimension",
-   "label": "How to persist and provide access to features?",
-   "href": "concepts/how-to-persist-and-provide-access-to-features",
-   "core": true,
-   "description": "How to persist and provide access to features?",
-   "meta": "2 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:4.1",
-     "kind": "value",
-     "label": "Feature store",
-     "status": "accepted",
-     "href": "entities/feature-store",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:4.2",
-     "kind": "value",
-     "label": "Store features in data stores without specific support",
-     "status": "accepted",
-     "href": "entities/store-features-in-data-stores-without-specific-support",
+     "href": "entities/no-in-production-monitoring",
      "description": "",
      "meta": "accepted · 0 passages",
      "children": []
@@ -648,8 +1085,8 @@
   {
    "id": "d:5",
    "kind": "dimension",
-   "label": "How to serve model predictions or scores?",
-   "href": "concepts/how-to-serve-model-predictions-or-scores",
+   "label": "Model serving",
+   "href": "concepts/model-serving",
    "core": true,
    "description": "How to serve model predictions or scores?",
    "meta": "5 values · evidence: 0 docs from 0 sources",
@@ -707,51 +1144,123 @@
    ]
   },
   {
-   "id": "d:2",
+   "id": "d:19",
    "kind": "dimension",
-   "label": "How to store data used in machine learning applications?",
-   "href": "concepts/how-to-store-data-used-in-machine-learning-applications",
+   "label": "Model training timing and mode",
+   "href": "concepts/model-training-timing-and-mode",
    "core": true,
-   "description": "How to store data used in machine learning applications?",
-   "meta": "4 values · evidence: 0 docs from 0 sources",
+   "description": "When and how to train the model?",
+   "meta": "3 values · evidence: 0 docs from 0 sources",
    "children": [
     {
-     "id": "v:2.2",
+     "id": "v:19.1",
      "kind": "value",
-     "label": "Data service",
+     "label": "Batch-based learning",
      "status": "accepted",
-     "href": "entities/data-service",
-     "description": "store data in services",
+     "href": "entities/batch-based-learning",
+     "description": "train the model in batches, possibly offline",
      "meta": "accepted · 0 passages",
      "children": []
     },
     {
-     "id": "v:2.3",
+     "id": "v:19.3",
      "kind": "value",
-     "label": "Event store",
+     "label": "Hybrid batch-based and incremental learning",
      "status": "accepted",
-     "href": "entities/event-store",
-     "description": "store data as events being exchanged in the systems",
+     "href": "entities/hybrid-batch-based-and-incremental-learning",
+     "description": "train some factors of the model in batches, possibly offline, and incrementally train other factors, possibly online",
      "meta": "accepted · 0 passages",
      "children": []
     },
     {
-     "id": "v:2.4",
+     "id": "v:19.2",
      "kind": "value",
-     "label": "No data store",
+     "label": "Incremental learning",
      "status": "accepted",
-     "href": "entities/no-data-store",
-     "description": "get data without storing it, e.g. manual ingested raw data or only event streaming",
+     "href": "entities/incremental-learning",
+     "description": "train the model incrementally, possibly online",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": "d:10",
+   "kind": "dimension",
+   "label": "Model versions in production",
+   "href": "concepts/model-versions-in-production",
+   "core": true,
+   "description": "Which model versions should be deployed to production and how?",
+   "meta": "3 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:10.1",
+     "kind": "value",
+     "label": "N versions in production",
+     "status": "accepted",
+     "href": "entities/n-versions-in-production",
+     "description": "deploy multiple model versions at the same time",
      "meta": "accepted · 0 passages",
      "children": []
     },
     {
-     "id": "v:2.1",
+     "id": "v:10.2",
      "kind": "value",
-     "label": "Shared data store",
+     "label": "Rollback to previous model version",
      "status": "accepted",
-     "href": "entities/shared-data-store",
-     "description": "store data in shared data store",
+     "href": "entities/rollback-to-previous-model-version",
+     "description": "redeploy previous model version and then switch to previous model",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:10.3",
+     "kind": "value",
+     "label": "Single model in production",
+     "status": "accepted",
+     "href": "entities/single-model-in-production",
+     "description": "",
+     "meta": "accepted · 0 passages",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": "d:6",
+   "kind": "dimension",
+   "label": "Notification of prediction results",
+   "href": "concepts/notification-of-prediction-results",
+   "core": true,
+   "description": "How to inform clients about prediction result availability?",
+   "meta": "3 values · evidence: 0 docs from 0 sources",
+   "children": [
+    {
+     "id": "v:6.3",
+     "kind": "value",
+     "label": "Block on result",
+     "status": "accepted",
+     "href": "entities/block-on-result",
+     "description": "clients blocks until the results are available",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:6.2",
+     "kind": "value",
+     "label": "Polling",
+     "status": "accepted",
+     "href": "entities/polling",
+     "description": "clients poll for the results",
+     "meta": "accepted · 0 passages",
+     "children": []
+    },
+    {
+     "id": "v:6.1",
+     "kind": "value",
+     "label": "Push notification",
+     "status": "accepted",
+     "href": "entities/push-notification",
+     "description": "notify clients about results",
      "meta": "accepted · 0 passages",
      "children": []
     }
@@ -760,8 +1269,8 @@
   {
    "id": "d:12",
    "kind": "dimension",
-   "label": "How to trigger a machine learning pipeline or orchestrator?",
-   "href": "concepts/how-to-trigger-a-machine-learning-pipeline-or-orchestrator",
+   "label": "Pipeline and orchestrator triggering",
+   "href": "concepts/pipeline-and-orchestrator-triggering",
    "core": true,
    "description": "How to trigger a machine learning pipeline or orchestrator?",
    "meta": "6 values · evidence: 0 docs from 0 sources",
@@ -829,175 +1338,10 @@
    ]
   },
   {
-   "id": "d:11",
-   "kind": "dimension",
-   "label": "How to version data decision?",
-   "href": "concepts/how-to-version-data-decision",
-   "core": true,
-   "description": "How to version data decision?",
-   "meta": "3 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:11.1",
-     "kind": "value",
-     "label": "Data version repository",
-     "status": "accepted",
-     "href": "entities/data-version-repository",
-     "description": "version repository with specific technology-support for data versioning",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:11.2",
-     "kind": "value",
-     "label": "Data versioning in code repository",
-     "status": "accepted",
-     "href": "entities/data-versioning-in-code-repository",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:11.3",
-     "kind": "value",
-     "label": "No data versioning",
-     "status": "accepted",
-     "href": "entities/no-data-versioning",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
-   "id": "d:23",
-   "kind": "dimension",
-   "label": "Should AutoML be used and if so where?",
-   "href": "concepts/should-automl-be-used-and-if-so-where",
-   "core": true,
-   "description": "Should AutoML be used and if so where?",
-   "meta": "2 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:23.1",
-     "kind": "value",
-     "label": "AutoML",
-     "status": "accepted",
-     "href": "entities/automl",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:23.2",
-     "kind": "value",
-     "label": "No AutoML",
-     "status": "accepted",
-     "href": "entities/no-automl",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
-   "id": "d:27",
-   "kind": "dimension",
-   "label": "Should MLOps be used and if so when?",
-   "href": "concepts/should-mlops-be-used-and-if-so-when",
-   "core": true,
-   "description": "Should MLOps be used and if so when?",
-   "meta": "2 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:27.1",
-     "kind": "value",
-     "label": "MLOps",
-     "status": "accepted",
-     "href": "entities/mlops",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:27.2",
-     "kind": "value",
-     "label": "No MLOps",
-     "status": "accepted",
-     "href": "entities/no-mlops",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
-   "id": "d:15",
-   "kind": "dimension",
-   "label": "Should data be processed in batches or in realtime?",
-   "href": "concepts/should-data-be-processed-in-batches-or-in-realtime",
-   "core": true,
-   "description": "Should data be processed in batches or in realtime?",
-   "meta": "2 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:15.1",
-     "kind": "value",
-     "label": "Batch-based data processing",
-     "status": "accepted",
-     "href": "entities/batch-based-data-processing",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:15.2",
-     "kind": "value",
-     "label": "Real-time, stream-based data processing",
-     "status": "accepted",
-     "href": "entities/real-time-stream-based-data-processing",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
-   "id": "d:28",
-   "kind": "dimension",
-   "label": "What development environment should be used?",
-   "href": "concepts/what-development-environment-should-be-used",
-   "core": true,
-   "description": "What development environment should be used?",
-   "meta": "2 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:28.2",
-     "kind": "value",
-     "label": "Use an IDE",
-     "status": "accepted",
-     "href": "entities/use-an-ide",
-     "description": "use an IDE",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:28.1",
-     "kind": "value",
-     "label": "Use computational notebooks",
-     "status": "accepted",
-     "href": "entities/use-computational-notebooks",
-     "description": "use computational notebooks",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
    "id": "d:25",
    "kind": "dimension",
-   "label": "What to build, test, and deploy automatically by CI/CD pipelines?",
-   "href": "concepts/what-to-build-test-and-deploy-automatically-by-ci-cd-pipelines",
+   "label": "Scope of CI/CD automation",
+   "href": "concepts/scope-of-ci-cd-automation",
    "core": true,
    "description": "What to build, test, and deploy automatically by CI/CD pipelines?",
    "meta": "3 values · evidence: 0 docs from 0 sources",
@@ -1037,8 +1381,8 @@
   {
    "id": "d:26",
    "kind": "dimension",
-   "label": "What to test in a machine learning/data science pipeline?",
-   "href": "concepts/what-to-test-in-a-machine-learning-data-science-pipeline",
+   "label": "Testing scope in ML pipelines",
+   "href": "concepts/testing-scope-in-ml-pipelines",
    "core": true,
    "description": "What to test in a machine learning/data science pipeline?",
    "meta": "14 values · evidence: 0 docs from 0 sources",
@@ -1048,7 +1392,7 @@
      "kind": "value",
      "label": "A/B testing",
      "status": "accepted",
-     "href": "entities/a-b-testing",
+     "href": "entities/a-b-testing-2",
      "description": "",
      "meta": "accepted · 0 passages",
      "children": []
@@ -1058,7 +1402,7 @@
      "kind": "value",
      "label": "Canary testing",
      "status": "accepted",
-     "href": "entities/canary-testing",
+     "href": "entities/canary-testing-2",
      "description": "",
      "meta": "accepted · 0 passages",
      "children": []
@@ -1068,7 +1412,7 @@
      "kind": "value",
      "label": "Evidence based hypothesis testing",
      "status": "accepted",
-     "href": "entities/evidence-based-hypothesis-testing",
+     "href": "entities/evidence-based-hypothesis-testing-2",
      "description": "",
      "meta": "accepted · 0 passages",
      "children": []
@@ -1186,374 +1530,30 @@
    ]
   },
   {
-   "id": "d:19",
+   "id": "d:23",
    "kind": "dimension",
-   "label": "When and how to train the model?",
-   "href": "concepts/when-and-how-to-train-the-model",
+   "label": "Use of AutoML",
+   "href": "concepts/use-of-automl",
    "core": true,
-   "description": "When and how to train the model?",
-   "meta": "3 values · evidence: 0 docs from 0 sources",
+   "description": "Should AutoML be used and if so where?",
+   "meta": "2 values · evidence: 0 docs from 0 sources",
    "children": [
     {
-     "id": "v:19.1",
+     "id": "v:23.1",
      "kind": "value",
-     "label": "Batch-based learning",
+     "label": "AutoML",
      "status": "accepted",
-     "href": "entities/batch-based-learning",
-     "description": "train the model in batches, possibly offline",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:19.3",
-     "kind": "value",
-     "label": "Hybrid batch-based and incremental learning",
-     "status": "accepted",
-     "href": "entities/hybrid-batch-based-and-incremental-learning",
-     "description": "train some factors of the model in batches, possibly offline, and incrementally train other factors, possibly online",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:19.2",
-     "kind": "value",
-     "label": "Incremental learning",
-     "status": "accepted",
-     "href": "entities/incremental-learning",
-     "description": "train the model incrementally, possibly online",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
-   "id": "d:16",
-   "kind": "dimension",
-   "label": "Which data processing tasks can be performed by a data processing pipeline or component?",
-   "href": "concepts/which-data-processing-tasks-can-be-performed-by-a-data-processing-pipeline-or-co",
-   "core": true,
-   "description": "Which data processing tasks can be performed by a data processing pipeline or component?",
-   "meta": "7 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:16.1",
-     "kind": "value",
-     "label": "Data extraction",
-     "status": "accepted",
-     "href": "entities/data-extraction",
+     "href": "entities/automl",
      "description": "",
      "meta": "accepted · 0 passages",
      "children": []
     },
     {
-     "id": "v:16.2",
+     "id": "v:23.2",
      "kind": "value",
-     "label": "Data preparation",
+     "label": "No AutoML",
      "status": "accepted",
-     "href": "entities/data-preparation",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:16.7",
-     "kind": "value",
-     "label": "Data processing hyperparameter tuning",
-     "status": "accepted",
-     "href": "entities/data-processing-hyperparameter-tuning",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:16.5",
-     "kind": "value",
-     "label": "Data selection",
-     "status": "accepted",
-     "href": "entities/data-selection",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:16.4",
-     "kind": "value",
-     "label": "Data transformation",
-     "status": "accepted",
-     "href": "entities/data-transformation",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:16.3",
-     "kind": "value",
-     "label": "Data validation",
-     "status": "accepted",
-     "href": "entities/data-validation",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:16.6",
-     "kind": "value",
-     "label": "Feature engineering",
-     "status": "accepted",
-     "href": "entities/feature-engineering",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
-   "id": "d:10",
-   "kind": "dimension",
-   "label": "Which model versions should be deployed to production and how?",
-   "href": "concepts/which-model-versions-should-be-deployed-to-production-and-how",
-   "core": true,
-   "description": "Which model versions should be deployed to production and how?",
-   "meta": "3 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:10.1",
-     "kind": "value",
-     "label": "N versions in production",
-     "status": "accepted",
-     "href": "entities/n-versions-in-production",
-     "description": "deploy multiple model versions at the same time",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:10.2",
-     "kind": "value",
-     "label": "Rollback to previous model version",
-     "status": "accepted",
-     "href": "entities/rollback-to-previous-model-version",
-     "description": "redeploy previous model version and then switch to previous model",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:10.3",
-     "kind": "value",
-     "label": "Single model in production",
-     "status": "accepted",
-     "href": "entities/single-model-in-production",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
-   "id": "d:9",
-   "kind": "dimension",
-   "label": "Which tasks can be performed by a delivery pipeline or component?",
-   "href": "concepts/which-tasks-can-be-performed-by-a-delivery-pipeline-or-component",
-   "core": true,
-   "description": "Which tasks can be performed by a delivery pipeline or component?",
-   "meta": "9 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:9.7",
-     "kind": "value",
-     "label": "A/B testing",
-     "status": "accepted",
-     "href": "entities/a-b-testing-2",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:9.3",
-     "kind": "value",
-     "label": "Building",
-     "status": "accepted",
-     "href": "entities/building",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:9.6",
-     "kind": "value",
-     "label": "Canary testing",
-     "status": "accepted",
-     "href": "entities/canary-testing-2",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:9.5",
-     "kind": "value",
-     "label": "Containerization",
-     "status": "accepted",
-     "href": "entities/containerization",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:9.4",
-     "kind": "value",
-     "label": "Deployment",
-     "status": "accepted",
-     "href": "entities/deployment",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:9.8",
-     "kind": "value",
-     "label": "Evidence based hypothesis testing",
-     "status": "accepted",
-     "href": "entities/evidence-based-hypothesis-testing-2",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:9.1",
-     "kind": "value",
-     "label": "Packaging",
-     "status": "accepted",
-     "href": "entities/packaging",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:9.2",
-     "kind": "value",
-     "label": "Testing",
-     "status": "accepted",
-     "href": "entities/testing",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:9.9",
-     "kind": "value",
-     "label": "Version control repository",
-     "status": "accepted",
-     "href": "entities/version-control-repository",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    }
-   ]
-  },
-  {
-   "id": "d:20",
-   "kind": "dimension",
-   "label": "Which tasks can be performed by a model building pipeline or component?",
-   "href": "concepts/which-tasks-can-be-performed-by-a-model-building-pipeline-or-component",
-   "core": true,
-   "description": "Which tasks can be performed by a model building pipeline or component?",
-   "meta": "10 values · evidence: 0 docs from 0 sources",
-   "children": [
-    {
-     "id": "v:20.3",
-     "kind": "value",
-     "label": "Data checkpoints",
-     "status": "accepted",
-     "href": "entities/data-checkpoints",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:20.2",
-     "kind": "value",
-     "label": "Data splitting",
-     "status": "accepted",
-     "href": "entities/data-splitting",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:20.8",
-     "kind": "value",
-     "label": "Development tool export",
-     "status": "accepted",
-     "href": "entities/development-tool-export",
-     "description": "use exported file to work in development tool",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:20.7",
-     "kind": "value",
-     "label": "Development tool facade",
-     "status": "accepted",
-     "href": "entities/development-tool-facade",
-     "description": "use API to integrate development tool",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:20.10",
-     "kind": "value",
-     "label": "Model hyperparameter tuning",
-     "status": "accepted",
-     "href": "entities/model-hyperparameter-tuning",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:20.6",
-     "kind": "value",
-     "label": "Model packaging",
-     "status": "accepted",
-     "href": "entities/model-packaging",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:20.5",
-     "kind": "value",
-     "label": "Model selection",
-     "status": "accepted",
-     "href": "entities/model-selection",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:20.1",
-     "kind": "value",
-     "label": "Model training",
-     "status": "accepted",
-     "href": "entities/model-training",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:20.4",
-     "kind": "value",
-     "label": "Model validation",
-     "status": "accepted",
-     "href": "entities/model-validation",
-     "description": "",
-     "meta": "accepted · 0 passages",
-     "children": []
-    },
-    {
-     "id": "v:20.9",
-     "kind": "value",
-     "label": "Train multiple model versions with different parameters and/or algorithms",
-     "status": "accepted",
-     "href": "entities/train-multiple-model-versions-with-different-parameters-and-or-algorithms",
+     "href": "entities/no-automl",
      "description": "",
      "meta": "accepted · 0 passages",
      "children": []

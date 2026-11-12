@@ -2,18 +2,18 @@
 type: Design Alternative
 title: No parallel data processing
 id: '17.4'
-dimension: /concepts/how-to-parallelize-data-processing.md
+dimension: /concepts/data-processing-parallelization.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- how-to-parallelize-data-processing
+- data-processing-parallelization
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # No parallel data processing

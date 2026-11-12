@@ -3,18 +3,18 @@ type: Design Alternative
 title: Model in-production tracking
 description: track model usage, inputs, outputs, interpretability, and fairness
 id: '22.4'
-dimension: /concepts/how-to-monitor-and-track-the-model-in-production.md
+dimension: /concepts/model-monitoring-and-tracking-in-production.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- how-to-monitor-and-track-the-model-in-production
+- model-monitoring-and-tracking-in-production
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # Model in-production tracking

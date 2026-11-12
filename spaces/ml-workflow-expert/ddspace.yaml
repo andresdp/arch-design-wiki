@@ -7,10 +7,10 @@ models:
   embedding: "openai/text-embedding-3-small"
 taxonomy:
   name: "c1-e"
-  use_case: "Identify the architectural design decisions that practitioners face when designing and implementing machine learning systems along the machine learning workflow \u2014 from data ingestion and processing, through model building and training, to putting models into production and operating them \u2014 as documented in practitioner (gray) literature. For each decision, identify the alternative decision options practitioners use or consider, the forces (quality attributes, constraints and practical concerns) that drive the choice between them, and how decisions relate to one another. Each dimension must name one architectural design decision; its values are the alternative options for that decision."
+  use_case: "The architectural design decisions of the machine learning workflow, from data ingestion and processing through model building and training to deployment and operation, with the options for each (Warnett and Zdun's decision model)."
 workspace:
   sources_dir: "sources"
-  current_run: "runs/20261108_202031"
+  current_run: "runs/20261112_165713"
 wiki:
   quotes: false
   source_summaries: false

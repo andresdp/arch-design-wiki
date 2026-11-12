@@ -3,18 +3,18 @@ type: Design Alternative
 title: Manual data ingestion
 description: provide data for ingestion manually
 id: '7.4'
-dimension: /concepts/how-to-ingest-data-into-ml-projects-or-applications.md
+dimension: /concepts/data-ingestion.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- how-to-ingest-data-into-ml-projects-or-applications
+- data-ingestion
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # Manual data ingestion

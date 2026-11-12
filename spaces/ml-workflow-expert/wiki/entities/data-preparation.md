@@ -2,18 +2,18 @@
 type: Design Alternative
 title: Data preparation
 id: '16.2'
-dimension: /concepts/which-data-processing-tasks-can-be-performed-by-a-data-processing-pipeline-or-co.md
+dimension: /concepts/data-processing-pipeline-tasks.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- which-data-processing-tasks-can-be-performed-by-a-data-processing-pipeline-or-co
+- data-processing-pipeline-tasks
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # Data preparation

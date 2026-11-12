@@ -3,18 +3,18 @@ type: Design Alternative
 title: Data batch based model serving
 description: process data in batches on-schedule and write predictions or scores to data storage
 id: '5.3'
-dimension: /concepts/how-to-serve-model-predictions-or-scores.md
+dimension: /concepts/model-serving.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- how-to-serve-model-predictions-or-scores
+- model-serving
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # Data batch based model serving

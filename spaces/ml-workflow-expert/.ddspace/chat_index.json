@@ -6,7 +6,7 @@
       "structure": "1",
       "title": "Overview",
       "physical_index": 0,
-      "summary": "Identify the architectural design decisions that practitioners face when designing and implementing machine learning systems along the machine learning workflow \u2014 from data ingestion and processing, t",
+      "summary": "The architectural design decisions of the machine learning workflow, from data ingestion and processing through model building and training to deployment and operation, with the options for each (Warn",
       "nodes": [
         {
           "structure": "1.1",
@@ -51,7 +51,7 @@
       "nodes": [
         {
           "structure": "2.1",
-          "title": "Dimension: How to integrate a machine learning model in an application?",
+          "title": "Dimension: ML model integration into the application",
           "physical_index": 5,
           "summary": "How to integrate a machine learning model in an application? (7 values; evidence from 0 sources; core)",
           "nodes": [
@@ -132,7 +132,7 @@
         },
         {
           "structure": "2.2",
-          "title": "Dimension: How to store data used in machine learning applications?",
+          "title": "Dimension: Data storage for ML applications",
           "physical_index": 13,
           "summary": "How to store data used in machine learning applications? (4 values; evidence from 0 sources; core)",
           "nodes": [
@@ -183,7 +183,7 @@
         },
         {
           "structure": "2.3",
-          "title": "Dimension: How to design the interface for data access?",
+          "title": "Dimension: Data access interface",
           "physical_index": 18,
           "summary": "How to design the interface for data access? (5 values; evidence from 0 sources; core)",
           "nodes": [
@@ -244,7 +244,7 @@
         },
         {
           "structure": "2.4",
-          "title": "Dimension: How to persist and provide access to features?",
+          "title": "Dimension: Feature persistence and access",
           "physical_index": 24,
           "summary": "How to persist and provide access to features? (2 values; evidence from 0 sources; core)",
           "nodes": [
@@ -275,7 +275,7 @@
         },
         {
           "structure": "2.5",
-          "title": "Dimension: How to serve model predictions or scores?",
+          "title": "Dimension: Model serving",
           "physical_index": 27,
           "summary": "How to serve model predictions or scores? (5 values; evidence from 0 sources; core)",
           "nodes": [
@@ -336,7 +336,7 @@
         },
         {
           "structure": "2.6",
-          "title": "Dimension: How to inform clients about prediction result availability?",
+          "title": "Dimension: Notification of prediction results",
           "physical_index": 33,
           "summary": "How to inform clients about prediction result availability? (3 values; evidence from 0 sources; core)",
           "nodes": [
@@ -377,7 +377,7 @@
         },
         {
           "structure": "2.7",
-          "title": "Dimension: How to ingest data into ML projects or applications?",
+          "title": "Dimension: Data ingestion",
           "physical_index": 37,
           "summary": "How to ingest data into ML projects or applications? (4 values; evidence from 0 sources; core)",
           "nodes": [
@@ -428,7 +428,7 @@
         },
         {
           "structure": "2.8",
-          "title": "Dimension: How to perform automatic integration and delivery in a machine learning context?",
+          "title": "Dimension: Automated integration and delivery for ML",
           "physical_index": 42,
           "summary": "How to perform automatic integration and delivery in a machine learning context? (4 values; evidence from 0 sources; core)",
           "nodes": [
@@ -479,7 +479,7 @@
         },
         {
           "structure": "2.9",
-          "title": "Dimension: Which tasks can be performed by a delivery pipeline or component?",
+          "title": "Dimension: Delivery pipeline tasks",
           "physical_index": 47,
           "summary": "Which tasks can be performed by a delivery pipeline or component? (9 values; evidence from 0 sources; core)",
           "nodes": [
@@ -580,7 +580,7 @@
         },
         {
           "structure": "2.10",
-          "title": "Dimension: Which model versions should be deployed to production and how?",
+          "title": "Dimension: Model versions in production",
           "physical_index": 57,
           "summary": "Which model versions should be deployed to production and how? (3 values; evidence from 0 sources; core)",
           "nodes": [
@@ -621,7 +621,7 @@
         },
         {
           "structure": "2.11",
-          "title": "Dimension: How to version data decision?",
+          "title": "Dimension: Data versioning",
           "physical_index": 61,
           "summary": "How to version data decision? (3 values; evidence from 0 sources; core)",
           "nodes": [
@@ -662,7 +662,7 @@
         },
         {
           "structure": "2.12",
-          "title": "Dimension: How to trigger a machine learning pipeline or orchestrator?",
+          "title": "Dimension: Pipeline and orchestrator triggering",
           "physical_index": 65,
           "summary": "How to trigger a machine learning pipeline or orchestrator? (6 values; evidence from 0 sources; core)",
           "nodes": [
@@ -733,7 +733,7 @@
         },
         {
           "structure": "2.13",
-          "title": "Dimension: How to automatically provision environments?",
+          "title": "Dimension: Automated environment provisioning",
           "physical_index": 72,
           "summary": "How to automatically provision environments? (2 values; evidence from 0 sources; core)",
           "nodes": [
@@ -764,7 +764,7 @@
         },
         {
           "structure": "2.14",
-          "title": "Dimension: How to automatically process the data used for model building?",
+          "title": "Dimension: Automated data processing for model building",
           "physical_index": 75,
           "summary": "How to automatically process the data used for model building? (4 values; evidence from 0 sources; core)",
           "nodes": [
@@ -815,7 +815,7 @@
         },
         {
           "structure": "2.15",
-          "title": "Dimension: Should data be processed in batches or in realtime?",
+          "title": "Dimension: Batch or real-time data processing",
           "physical_index": 80,
           "summary": "Should data be processed in batches or in realtime? (2 values; evidence from 0 sources; core)",
           "nodes": [
@@ -846,7 +846,7 @@
         },
         {
           "structure": "2.16",
-          "title": "Dimension: Which data processing tasks can be performed by a data processing pipeline or component?",
+          "title": "Dimension: Data processing pipeline tasks",
           "physical_index": 83,
           "summary": "Which data processing tasks can be performed by a data processing pipeline or component? (7 values; evidence from 0 sources; core)",
           "nodes": [
@@ -927,7 +927,7 @@
         },
         {
           "structure": "2.17",
-          "title": "Dimension: How to parallelize data processing?",
+          "title": "Dimension: Data processing parallelization",
           "physical_index": 91,
           "summary": "How to parallelize data processing? (4 values; evidence from 0 sources; core)",
           "nodes": [
@@ -978,7 +978,7 @@
         },
         {
           "structure": "2.18",
-          "title": "Dimension: How to perform model building in an ML project?",
+          "title": "Dimension: Model building approach",
           "physical_index": 96,
           "summary": "How to perform model building in an ML project? (3 values; evidence from 0 sources; core)",
           "nodes": [
@@ -1019,7 +1019,7 @@
         },
         {
           "structure": "2.19",
-          "title": "Dimension: When and how to train the model?",
+          "title": "Dimension: Model training timing and mode",
           "physical_index": 100,
           "summary": "When and how to train the model? (3 values; evidence from 0 sources; core)",
           "nodes": [
@@ -1060,7 +1060,7 @@
         },
         {
           "structure": "2.20",
-          "title": "Dimension: Which tasks can be performed by a model building pipeline or component?",
+          "title": "Dimension: Model building pipeline tasks",
           "physical_index": 104,
           "summary": "Which tasks can be performed by a model building pipeline or component? (10 values; evidence from 0 sources; core)",
           "nodes": [
@@ -1171,7 +1171,7 @@
         },
         {
           "structure": "2.21",
-          "title": "Dimension: How to parallelize model building?",
+          "title": "Dimension: Model building parallelization",
           "physical_index": 115,
           "summary": "How to parallelize model building? (5 values; evidence from 0 sources; core)",
           "nodes": [
@@ -1232,7 +1232,7 @@
         },
         {
           "structure": "2.22",
-          "title": "Dimension: How to monitor and track the model in production?",
+          "title": "Dimension: Model monitoring and tracking in production",
           "physical_index": 121,
           "summary": "How to monitor and track the model in production? (4 values; evidence from 0 sources; core)",
           "nodes": [
@@ -1283,7 +1283,7 @@
         },
         {
           "structure": "2.23",
-          "title": "Dimension: Should AutoML be used and if so where?",
+          "title": "Dimension: Use of AutoML",
           "physical_index": 126,
           "summary": "Should AutoML be used and if so where? (2 values; evidence from 0 sources; core)",
           "nodes": [
@@ -1314,7 +1314,7 @@
         },
         {
           "structure": "2.24",
-          "title": "Dimension: How to adjust models based on monitoring results?",
+          "title": "Dimension: Model adjustment from monitoring results",
           "physical_index": 129,
           "summary": "How to adjust models based on monitoring results? (2 values; evidence from 0 sources; core)",
           "nodes": [
@@ -1345,7 +1345,7 @@
         },
         {
           "structure": "2.25",
-          "title": "Dimension: What to build, test, and deploy automatically by CI/CD pipelines?",
+          "title": "Dimension: Scope of CI/CD automation",
           "physical_index": 132,
           "summary": "What to build, test, and deploy automatically by CI/CD pipelines? (3 values; evidence from 0 sources; core)",
           "nodes": [
@@ -1386,7 +1386,7 @@
         },
         {
           "structure": "2.26",
-          "title": "Dimension: What to test in a machine learning/data science pipeline?",
+          "title": "Dimension: Testing scope in ML pipelines",
           "physical_index": 136,
           "summary": "What to test in a machine learning/data science pipeline? (14 values; evidence from 0 sources; core)",
           "nodes": [
@@ -1537,7 +1537,7 @@
         },
         {
           "structure": "2.27",
-          "title": "Dimension: Should MLOps be used and if so when?",
+          "title": "Dimension: Adoption of MLOps",
           "physical_index": 151,
           "summary": "Should MLOps be used and if so when? (2 values; evidence from 0 sources; core)",
           "nodes": [
@@ -1568,7 +1568,7 @@
         },
         {
           "structure": "2.28",
-          "title": "Dimension: What development environment should be used?",
+          "title": "Dimension: Development environment",
           "physical_index": 154,
           "summary": "What development environment should be used? (2 values; evidence from 0 sources; core)",
           "nodes": [
@@ -1647,8 +1647,8 @@
   "pages": [
     {
       "page_num": 0,
-      "text": "Page: c1-e (wiki/overview.md)\nType: Overview\n\n![ddspace](assets/ddspace-logo.svg)\n\n# c1-e\n\nThis wiki presents a **design space** imported from a decision model written by experts. A design space organizes the architectural design decisions of a domain: each **dimension** is one decision a designer faces, and its **values** are the alternatives for it. Every page is generated from the design space's data, without rewording. New to design spaces? Start with About this design space.\n\nRun 20261108_202031 (selected view): 28 dimensions, 124 values, 0 sources.\n\n## Use case\n\n*The question the design space answers.*\n\nIdentify the architectural design decisions that practitioners face when designing and implementing machine learning systems along the machine learning workflow \u2014 from data ingestion and processing, through model building and training, to putting models into production and operating them \u2014 as documented in practitioner (gray) literature. For each decision, identify the alternative decision options practitioners use or consider, the forces (quality attributes, constraints and practical concerns) that drive the choice between them, and how decisions relate to one another. Each dimension must name one architectural design decision; its values are the alternative options for that decision.\n\n## Dimensions\n\n*A dimension is one design decision, phrased as a question a designer must answer. Its values are the alternative answers found in the sources, each with a status: **accepted** (adopted), **rejected** (considered and discarded), **mixed** (adopted by some sources, rejected by others) or **outcome** (an effect of decisions, not a choice).*\n\n**Core dimensions** (28 of 28) have evidence from \u2265 0 sources: the axes the sources share. The others rest on a single source or system.\n\n### Core\n\n- \u2605 How to adjust models based on monitoring results?: 2 values\n- \u2605 How to automatically process the data used for model building?: 4 values\n- \u2605 How to automatically provision environments?: 2 values\n- \u2605 How to design the interface for data access?: 5 values\n- \u2605 How to inform clients about prediction result availability?: 3 values\n- \u2605 How to ingest data into ML projects or applications?: 4 values\n- \u2605 How to integrate a machine learning model in an application?: 7 values\n- \u2605 How to monitor and track the model in production?: 4 values\n- \u2605 How to parallelize data processing?: 4 values\n- \u2605 How to parallelize model building?: 5 values\n- \u2605 How to perform automatic integration and delivery in a machine learning context?: 4 values\n- \u2605 How to perform model building in an ML project?: 3 values\n- \u2605 How to persist and provide access to features?: 2 values\n- \u2605 How to serve model predictions or scores?: 5 values\n- \u2605 How to store data used in machine learning applications?: 4 values\n- \u2605 How to trigger a machine learning pipeline or orchestrator?: 6 values\n- \u2605 How to version data decision?: 3 values\n- \u2605 Should AutoML be used and if so where?: 2 values\n- \u2605 Should MLOps be used and if so when?: 2 values\n- \u2605 Should data be processed in batches or in realtime?: 2 values\n- \u2605 What development environment should be used?: 2 values\n- \u2605 What to build, test, and deploy automatically by CI/CD pipelines?: 3 values\n- \u2605 What to test in a machine learning/data science pipeline?: 14 values\n- \u2605 When and how to train the model?: 3 values\n- \u2605 Which data processing tasks can be performed by a data processing pipeline or component?: 7 values\n- \u2605 Which model versions should be deployed to production and how?: 3 values\n- \u2605 Which tasks can be performed by a delivery pipeline or component?: 9 values\n- \u2605 Which tasks can be performed by a model building pipeline or component?: 10 values\n\n## Synthesis\n\n*Pages that look at the design space as a whole.*\n\n- Overview: use case, run summary, narrative summary, and every dimension with its values by status\n- Contested decisions: values some sources adopt and others reject\n- Dropped and unsupported: dimensions removed during selection, and values without evidence\n\n## Sources\n\n*The documents the design space's evidence comes from. A source's page lists the decisions it informs and whether it adopts or rejects each value.*",
-      "token_count": 1047
+      "text": "Page: c1-e (wiki/overview.md)\nType: Overview\n\n![ddspace](assets/ddspace-logo.svg)\n\n# c1-e\n\nThis wiki presents a **design space** imported from a decision model written by experts. A design space organizes the architectural design decisions of a domain: each **dimension** is one decision a designer faces, and its **values** are the alternatives for it. Every page is generated from the design space's data, without rewording. New to design spaces? Start with About this design space.\n\nRun 20261112_165713 (selected view): 28 dimensions, 124 values, 0 sources.\n\n## Use case\n\n*The question the design space answers.*\n\nThe architectural design decisions of the machine learning workflow, from data ingestion and processing through model building and training to deployment and operation, with the options for each (Warnett and Zdun's decision model).\n\n## Dimensions\n\n*A dimension is one design decision, phrased as a question a designer must answer. Its values are the alternative answers found in the sources, each with a status: **accepted** (adopted), **rejected** (considered and discarded), **mixed** (adopted by some sources, rejected by others) or **outcome** (an effect of decisions, not a choice).*\n\n**Core dimensions** (28 of 28) have evidence from \u2265 0 sources: the axes the sources share. The others rest on a single source or system.\n\n### Core\n\n- \u2605 Adoption of MLOps: 2 values\n- \u2605 Automated data processing for model building: 4 values\n- \u2605 Automated environment provisioning: 2 values\n- \u2605 Automated integration and delivery for ML: 4 values\n- \u2605 Batch or real-time data processing: 2 values\n- \u2605 Data access interface: 5 values\n- \u2605 Data ingestion: 4 values\n- \u2605 Data processing parallelization: 4 values\n- \u2605 Data processing pipeline tasks: 7 values\n- \u2605 Data storage for ML applications: 4 values\n- \u2605 Data versioning: 3 values\n- \u2605 Delivery pipeline tasks: 9 values\n- \u2605 Development environment: 2 values\n- \u2605 Feature persistence and access: 2 values\n- \u2605 ML model integration into the application: 7 values\n- \u2605 Model adjustment from monitoring results: 2 values\n- \u2605 Model building approach: 3 values\n- \u2605 Model building parallelization: 5 values\n- \u2605 Model building pipeline tasks: 10 values\n- \u2605 Model monitoring and tracking in production: 4 values\n- \u2605 Model serving: 5 values\n- \u2605 Model training timing and mode: 3 values\n- \u2605 Model versions in production: 3 values\n- \u2605 Notification of prediction results: 3 values\n- \u2605 Pipeline and orchestrator triggering: 6 values\n- \u2605 Scope of CI/CD automation: 3 values\n- \u2605 Testing scope in ML pipelines: 14 values\n- \u2605 Use of AutoML: 2 values\n\n## Synthesis\n\n*Pages that look at the design space as a whole.*\n\n- Overview: use case, run summary, narrative summary, and every dimension with its values by status\n- Contested decisions: values some sources adopt and others reject\n- Dropped and unsupported: dimensions removed during selection, and values without evidence\n\n## Sources\n\n*The documents the design space's evidence comes from. A source's page lists the decisions it informs and whether it adopts or rejects each value.*",
+      "token_count": 768
     },
     {
       "page_num": 1,
@@ -1657,778 +1657,778 @@
     },
     {
       "page_num": 2,
-      "text": "Page: Relations between dimensions (wiki/relations.md)\nType: Reference\n\n# Relations between dimensions\n\nA relation links two dimensions and reads left to right as one sentence: *source* \u2014 verb \u2014 *target*. In the graph view the arrow goes from the source to the target; *co-occurs with* has no direction and is drawn without an arrowhead.\n\n| Type | Reads as (A = source, B = target) | Meaning | Example in this design space |\n|---|---|---|---|\n| *requires* | A requires B to be decided first | the source only applies once a choice has been made on the target | \u2014 |\n| *affects* | Choices on A affect the outcomes of B | choices on the source change the results, costs or risks seen on the target | Choices on How to integrate a machine learning model in an application? affect the outcomes of How to serve model predictions or scores? |\n| *constrains* | Choices on A limit the options available on B | a choice on the source rules out or restricts some choices on the target | \u2014 |\n| *co occurs with* | A and B are usually decided together | the sources decide both together, but neither causes or requires the other | \u2014 |\n\n## How they are made\n\n- The model proposes relations while it builds and revises the design space, judged against the use case and the topics the sources discuss. Relations are **inferred**: unlike values, they are **not checked against passages**, and no passage is cited for them.\n- Each relation is written as its sentence first; one whose sentence does not match its type and direction is rejected, as are opposite pairs (A requires B and B requires A), cycles of *requires* and relations beyond a small number per dimension.\n- Runs made before these rules may contain relations in the wrong direction; they are shown as stored.",
-      "token_count": 438
+      "text": "Page: Relations between dimensions (wiki/relations.md)\nType: Reference\n\n# Relations between dimensions\n\nA relation links two dimensions and reads left to right as one sentence: *source* \u2014 verb \u2014 *target*. In the graph view the arrow goes from the source to the target; *co-occurs with* has no direction and is drawn without an arrowhead.\n\n| Type | Reads as (A = source, B = target) | Meaning | Example in this design space |\n|---|---|---|---|\n| *requires* | A requires B to be decided first | the source only applies once a choice has been made on the target | \u2014 |\n| *affects* | Choices on A affect the outcomes of B | choices on the source change the results, costs or risks seen on the target | Choices on ML model integration into the application affect the outcomes of Model serving |\n| *constrains* | Choices on A limit the options available on B | a choice on the source rules out or restricts some choices on the target | \u2014 |\n| *co occurs with* | A and B are usually decided together | the sources decide both together, but neither causes or requires the other | \u2014 |\n\n## How they are made\n\n- The model proposes relations while it builds and revises the design space, judged against the use case and the topics the sources discuss. Relations are **inferred**: unlike values, they are **not checked against passages**, and no passage is cited for them.\n- Each relation is written as its sentence first; one whose sentence does not match its type and direction is rejected, as are opposite pairs (A requires B and B requires A), cycles of *requires* and relations beyond a small number per dimension.\n- Runs made before these rules may contain relations in the wrong direction; they are shown as stored.",
+      "token_count": 426
     },
     {
       "page_num": 3,
-      "text": "Page: log (wiki/log.md)\n\n# Log\n\n## 2026-11-11\n\n- **Rebuild** Wiki rebuilt from the same run 20261108_202031 (export options only).",
-      "token_count": 32
+      "text": "Page: log (wiki/log.md)\n\n# Log\n\n## 2026-11-12\n\n- **Creation** Wiki built from run 20261112_165713 (import-model): 28 dimensions, 124 values.",
+      "token_count": 35
     },
     {
       "page_num": 4,
-      "text": "Page: concepts/index (wiki/concepts/index.md)\n\n# Design decisions (dimensions)\n\n* How to adjust models based on monitoring results? - How to adjust models based on monitoring results?\n* How to automatically process the data used for model building? - How to automatically process the data used for model building?\n* How to automatically provision environments? - How to automatically provision environments?\n* How to design the interface for data access? - How to design the interface for data access?\n* How to inform clients about prediction result availability? - How to inform clients about prediction result availability?\n* How to ingest data into ML projects or applications? - How to ingest data into ML projects or applications?\n* How to integrate a machine learning model in an application? - How to integrate a machine learning model in an application?\n* How to monitor and track the model in production? - How to monitor and track the model in production?\n* How to parallelize data processing? - How to parallelize data processing?\n* How to parallelize model building? - How to parallelize model building?\n* How to perform automatic integration and delivery in a machine learning context? - How to perform automatic integration and delivery in a machine learning context?\n* How to perform model building in an ML project? - How to perform model building in an ML project?\n* How to persist and provide access to features? - How to persist and provide access to features?\n* How to serve model predictions or scores? - How to serve model predictions or scores?\n* How to store data used in machine learning applications? - How to store data used in machine learning applications?\n* How to trigger a machine learning pipeline or orchestrator? - How to trigger a machine learning pipeline or orchestrator?\n* How to version data decision? - How to version data decision?\n* Should AutoML be used and if so where? - Should AutoML be used and if so where?\n* Should data be processed in batches or in realtime? - Should data be processed in batches or in realtime?\n* Should MLOps be used and if so when? - Should MLOps be used and if so when?\n* What development environment should be used? - What development environment should be used?\n* What to build, test, and deploy automatically by CI/CD pipelines? - What to build, test, and deploy automatically by CI/CD pipelines?\n* What to test in a machine learning/data science pipeline? - What to test in a machine learning/data science pipeline?\n* When and how to train the model? - When and how to train the model?\n* Which data processing tasks can be performed by a data processing pipeline or component? - Which data processing tasks can be performed by a data processing pipeline or component?\n* Which model versions should be deployed to production and how? - Which model versions should be deployed to production and how?\n* Which tasks can be performed by a delivery pipeline or component? - Which tasks can be performed by a delivery pipeline or component?\n* Which tasks can be performed by a model building pipeline or component? - Which tasks can be performed by a model building pipeline or component?",
-      "token_count": 789
+      "text": "Page: concepts/index (wiki/concepts/index.md)\n\n# Design decisions (dimensions)\n\n* Adoption of MLOps - Should MLOps be used and if so when?\n* Automated data processing for model building - How to automatically process the data used for model building?\n* Automated environment provisioning - How to automatically provision environments?\n* Automated integration and delivery for ML - How to perform automatic integration and delivery in a machine learning context?\n* Batch or real-time data processing - Should data be processed in batches or in realtime?\n* Data access interface - How to design the interface for data access?\n* Data ingestion - How to ingest data into ML projects or applications?\n* Data processing parallelization - How to parallelize data processing?\n* Data processing pipeline tasks - Which data processing tasks can be performed by a data processing pipeline or component?\n* Data storage for ML applications - How to store data used in machine learning applications?\n* Data versioning - How to version data decision?\n* Delivery pipeline tasks - Which tasks can be performed by a delivery pipeline or component?\n* Development environment - What development environment should be used?\n* Feature persistence and access - How to persist and provide access to features?\n* ML model integration into the application - How to integrate a machine learning model in an application?\n* Model adjustment from monitoring results - How to adjust models based on monitoring results?\n* Model building approach - How to perform model building in an ML project?\n* Model building parallelization - How to parallelize model building?\n* Model building pipeline tasks - Which tasks can be performed by a model building pipeline or component?\n* Model monitoring and tracking in production - How to monitor and track the model in production?\n* Model serving - How to serve model predictions or scores?\n* Model training timing and mode - When and how to train the model?\n* Model versions in production - Which model versions should be deployed to production and how?\n* Notification of prediction results - How to inform clients about prediction result availability?\n* Pipeline and orchestrator triggering - How to trigger a machine learning pipeline or orchestrator?\n* Scope of CI/CD automation - What to build, test, and deploy automatically by CI/CD pipelines?\n* Testing scope in ML pipelines - What to test in a machine learning/data science pipeline?\n* Use of AutoML - Should AutoML be used and if so where?",
+      "token_count": 626
     },
     {
       "page_num": 5,
-      "text": "Page: How to integrate a machine learning model in an application? (wiki/concepts/how-to-integrate-a-machine-learning-model-in-an-application.md)\nType: Design Decision\n\n# How to integrate a machine learning model in an application?\n\nHow to integrate a machine learning model in an application?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Event-driven model as a service | accepted | 0 |\n| Model as a service | accepted | 0 |\n| Model as module in modular monolith | accepted | 0 |\n| Model in batch prediction system | accepted | 0 |\n| Model in monolith | accepted | 0 |\n| No integration of the model | accepted | 0 |\n| Serverless model as a service | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of How to serve model predictions or scores?. *Consider If Not Decided Yet*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 252
-    },
-    {
-      "page_num": 6,
-      "text": "Page: Model as a service (wiki/entities/model-as-a-service.md)\nType: Design Alternative\nStance: accepted\nDimension: how to integrate a machine learning model in an application\n\n# Model as a service\n\ncreate one service per model\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 66
-    },
-    {
-      "page_num": 7,
-      "text": "Page: Model in monolith (wiki/entities/model-in-monolith.md)\nType: Design Alternative\nStance: accepted\nDimension: how to integrate a machine learning model in an application\n\n# Model in monolith\n\nembed the model in the code of the application\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 69
-    },
-    {
-      "page_num": 8,
-      "text": "Page: Model as module in modular monolith (wiki/entities/model-as-module-in-modular-monolith.md)\nType: Design Alternative\nStance: accepted\nDimension: how to integrate a machine learning model in an application\n\n# Model as module in modular monolith\n\ncreate a module for the model in the application\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 83
-    },
-    {
-      "page_num": 9,
-      "text": "Page: Model in batch prediction system (wiki/entities/model-in-batch-prediction-system.md)\nType: Design Alternative\nStance: accepted\nDimension: how to integrate a machine learning model in an application\n\n# Model in batch prediction system\n\ncall an external batch prediction system\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 79
-    },
-    {
-      "page_num": 10,
-      "text": "Page: Event-driven model as a service (wiki/entities/event-driven-model-as-a-service.md)\nType: Design Alternative\nStance: accepted\nDimension: how to integrate a machine learning model in an application\n\n# Event-driven model as a service\n\nevent-driven pub/sub or queueing interface for model\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 81
-    },
-    {
-      "page_num": 11,
-      "text": "Page: Serverless model as a service (wiki/entities/serverless-model-as-a-service.md)\nType: Design Alternative\nStance: accepted\nDimension: how to integrate a machine learning model in an application\n\n# Serverless model as a service\n\nserverless/function-as-a-service computing model for offering the model\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 85
-    },
-    {
-      "page_num": 12,
-      "text": "Page: No integration of the model (wiki/entities/no-integration-of-the-model.md)\nType: Design Alternative\nStance: accepted\nDimension: how to integrate a machine learning model in an application\n\n# No integration of the model\n\nmodel is not integrated, maybe results are used, e.g. as a forecast\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 82
-    },
-    {
-      "page_num": 13,
-      "text": "Page: How to store data used in machine learning applications? (wiki/concepts/how-to-store-data-used-in-machine-learning-applications.md)\nType: Design Decision\n\n# How to store data used in machine learning applications?\n\nHow to store data used in machine learning applications?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data service | accepted | 0 |\n| Event store | accepted | 0 |\n| No data store | accepted | 0 |\n| Shared data store | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of How to design the interface for data access?. *offer an abstraction layer for data access*\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *store data decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "text": "Page: ML model integration into the application (wiki/concepts/ml-model-integration-into-the-application.md)\nType: Design Decision\n\n# ML model integration into the application\n\nHow to integrate a machine learning model in an application?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Event-driven model as a service | accepted | 0 |\n| Model as a service | accepted | 0 |\n| Model as module in modular monolith | accepted | 0 |\n| Model in batch prediction system | accepted | 0 |\n| Model in monolith | accepted | 0 |\n| No integration of the model | accepted | 0 |\n| Serverless model as a service | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Model serving. *Consider If Not Decided Yet*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
       "token_count": 231
     },
     {
-      "page_num": 14,
-      "text": "Page: Shared data store (wiki/entities/shared-data-store.md)\nType: Design Alternative\nStance: accepted\nDimension: how to store data used in machine learning applications\n\n# Shared data store\n\nstore data in shared data store\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 65
-    },
-    {
-      "page_num": 15,
-      "text": "Page: Data service (wiki/entities/data-service.md)\nType: Design Alternative\nStance: accepted\nDimension: how to store data used in machine learning applications\n\n# Data service\n\nstore data in services\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 59
-    },
-    {
-      "page_num": 16,
-      "text": "Page: Event store (wiki/entities/event-store.md)\nType: Design Alternative\nStance: accepted\nDimension: how to store data used in machine learning applications\n\n# Event store\n\nstore data as events being exchanged in the systems\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 65
-    },
-    {
-      "page_num": 17,
-      "text": "Page: No data store (wiki/entities/no-data-store.md)\nType: Design Alternative\nStance: accepted\nDimension: how to store data used in machine learning applications\n\n# No data store\n\nget data without storing it, e.g. manual ingested raw data or only event streaming\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 74
-    },
-    {
-      "page_num": 18,
-      "text": "Page: How to design the interface for data access? (wiki/concepts/how-to-design-the-interface-for-data-access.md)\nType: Design Decision\n\n# How to design the interface for data access?\n\nHow to design the interface for data access?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data provider is accessed directly | accepted | 0 |\n| Local data access API | accepted | 0 |\n| Message/event queueing-based data access API | accepted | 0 |\n| Pub/sub data access API | accepted | 0 |\n| Service-based data access API | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### To this dimension\n\n- Choices on How to store data used in machine learning applications? affect the outcomes of this dimension. *offer an abstraction layer for data access*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 223
-    },
-    {
-      "page_num": 19,
-      "text": "Page: Local data access API (wiki/entities/local-data-access-api.md)\nType: Design Alternative\nStance: accepted\nDimension: how to design the interface for data access\n\n# Local data access API\n\ndata provider encapsulated by local data access API abstraction\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 73
-    },
-    {
-      "page_num": 20,
-      "text": "Page: Service-based data access API (wiki/entities/service-based-data-access-api.md)\nType: Design Alternative\nStance: accepted\nDimension: how to design the interface for data access\n\n# Service-based data access API\n\ndata provider encapsulated by data access services\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 75
-    },
-    {
-      "page_num": 21,
-      "text": "Page: Pub/sub data access API (wiki/entities/pub-sub-data-access-api.md)\nType: Design Alternative\nStance: accepted\nDimension: how to design the interface for data access\n\n# Pub/sub data access API\n\nsubscription for data access; publisher notifies upon data availability\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 76
-    },
-    {
-      "page_num": 22,
-      "text": "Page: Message/event queueing-based data access API (wiki/entities/message-event-queueing-based-data-access-api.md)\nType: Design Alternative\nStance: accepted\nDimension: how to design the interface for data access\n\n# Message/event queueing-based data access API\n\nnew data queued in messages/events; message/event raised upon data availability\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 94
-    },
-    {
-      "page_num": 23,
-      "text": "Page: Data provider is accessed directly (wiki/entities/data-provider-is-accessed-directly.md)\nType: Design Alternative\nStance: accepted\nDimension: how to design the interface for data access\n\n# Data provider is accessed directly\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 67
-    },
-    {
-      "page_num": 24,
-      "text": "Page: How to persist and provide access to features? (wiki/concepts/how-to-persist-and-provide-access-to-features.md)\nType: Design Decision\n\n# How to persist and provide access to features?\n\nHow to persist and provide access to features?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Feature store | accepted | 0 |\n| Store features in data stores without specific support | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *feature persistence and access decision*\n\n### To this dimension\n\n- Choices on How to serve model predictions or scores? affect the outcomes of this dimension. *how to access features for model serving*\n- Choices on How to automatically process the data used for model building? affect the outcomes of this dimension. *how to store resulting features*\n- Choices on How to perform model building in an ML project? affect the outcomes of this dimension. *how to access features for model training*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 297
-    },
-    {
-      "page_num": 25,
-      "text": "Page: Feature store (wiki/entities/feature-store.md)\nType: Design Alternative\nStance: accepted\nDimension: how to persist and provide access to features\n\n# Feature store\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 51
-    },
-    {
-      "page_num": 26,
-      "text": "Page: Store features in data stores without specific support (wiki/entities/store-features-in-data-stores-without-specific-support.md)\nType: Design Alternative\nStance: accepted\nDimension: how to persist and provide access to features\n\n# Store features in data stores without specific support\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 82
-    },
-    {
-      "page_num": 27,
-      "text": "Page: How to serve model predictions or scores? (wiki/concepts/how-to-serve-model-predictions-or-scores.md)\nType: Design Decision\n\n# How to serve model predictions or scores?\n\nHow to serve model predictions or scores?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data batch based model serving | accepted | 0 |\n| Hybrid online/offline model serving | accepted | 0 |\n| Local service/API based model serving | accepted | 0 |\n| Microservice based model serving | accepted | 0 |\n| Precompute serving | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of How to persist and provide access to features?. *how to access features for model serving*\n- Choices on this dimension affect the outcomes of How to inform clients about prediction result availability?. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of How to ingest data into ML projects or applications?. *ingest data required during model serving*\n\n### To this dimension\n\n- Choices on How to integrate a machine learning model in an application? affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 332
-    },
-    {
-      "page_num": 28,
-      "text": "Page: Microservice based model serving (wiki/entities/microservice-based-model-serving.md)\nType: Design Alternative\nStance: accepted\nDimension: how to serve model predictions or scores\n\n# Microservice based model serving\n\ndeliver predictions or scores in real time by distributed service\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 81
-    },
-    {
-      "page_num": 29,
-      "text": "Page: Local service/API based model serving (wiki/entities/local-service-api-based-model-serving.md)\nType: Design Alternative\nStance: accepted\nDimension: how to serve model predictions or scores\n\n# Local service/API based model serving\n\ndeliver predictions or scores in real time by local service\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 83
-    },
-    {
-      "page_num": 30,
-      "text": "Page: Data batch based model serving (wiki/entities/data-batch-based-model-serving.md)\nType: Design Alternative\nStance: accepted\nDimension: how to serve model predictions or scores\n\n# Data batch based model serving\n\nprocess data in batches on-schedule and write predictions or scores to data storage\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 84
-    },
-    {
-      "page_num": 31,
-      "text": "Page: Precompute serving (wiki/entities/precompute-serving.md)\nType: Design Alternative\nStance: accepted\nDimension: how to serve model predictions or scores\n\n# Precompute serving\n\nprecompute models e.g. as forecasts and deliver as reports\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 68
-    },
-    {
-      "page_num": 32,
-      "text": "Page: Hybrid online/offline model serving (wiki/entities/hybrid-online-offline-model-serving.md)\nType: Design Alternative\nStance: accepted\nDimension: how to serve model predictions or scores\n\n# Hybrid online/offline model serving\n\ncombine online computations by services with offline computations in batches\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 86
-    },
-    {
-      "page_num": 33,
-      "text": "Page: How to inform clients about prediction result availability? (wiki/concepts/how-to-inform-clients-about-prediction-result-availability.md)\nType: Design Decision\n\n# How to inform clients about prediction result availability?\n\nHow to inform clients about prediction result availability?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Block on result | accepted | 0 |\n| Polling | accepted | 0 |\n| Push notification | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### To this dimension\n\n- Choices on How to serve model predictions or scores? affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 193
-    },
-    {
-      "page_num": 34,
-      "text": "Page: Push notification (wiki/entities/push-notification.md)\nType: Design Alternative\nStance: accepted\nDimension: how to inform clients about prediction result availability\n\n# Push notification\n\nnotify clients about results\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 65
-    },
-    {
-      "page_num": 35,
-      "text": "Page: Polling (wiki/entities/polling.md)\nType: Design Alternative\nStance: accepted\nDimension: how to inform clients about prediction result availability\n\n# Polling\n\nclients poll for the results\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 57
-    },
-    {
-      "page_num": 36,
-      "text": "Page: Block on result (wiki/entities/block-on-result.md)\nType: Design Alternative\nStance: accepted\nDimension: how to inform clients about prediction result availability\n\n# Block on result\n\nclients blocks until the results are available\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 68
-    },
-    {
-      "page_num": 37,
-      "text": "Page: How to ingest data into ML projects or applications? (wiki/concepts/how-to-ingest-data-into-ml-projects-or-applications.md)\nType: Design Decision\n\n# How to ingest data into ML projects or applications?\n\nHow to ingest data into ML projects or applications?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data ingestion by request | accepted | 0 |\n| Data ingestion in batches | accepted | 0 |\n| Manual data ingestion | accepted | 0 |\n| Streamed data ingestion | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *how should data be ingested in MLOps?*\n\n### To this dimension\n\n- Choices on How to serve model predictions or scores? affect the outcomes of this dimension. *ingest data required during model serving*\n- Choices on How to automatically process the data used for model building? affect the outcomes of this dimension. *ingest data for data processing and later model building*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 290
-    },
-    {
-      "page_num": 38,
-      "text": "Page: Streamed data ingestion (wiki/entities/streamed-data-ingestion.md)\nType: Design Alternative\nStance: accepted\nDimension: how to ingest data into ml projects or applications\n\n# Streamed data ingestion\n\nreceive a continuous stream of data\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 69
-    },
-    {
-      "page_num": 39,
-      "text": "Page: Data ingestion by request (wiki/entities/data-ingestion-by-request.md)\nType: Design Alternative\nStance: accepted\nDimension: how to ingest data into ml projects or applications\n\n# Data ingestion by request\n\nactively get raw data from data sources\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 72
-    },
-    {
-      "page_num": 40,
-      "text": "Page: Data ingestion in batches (wiki/entities/data-ingestion-in-batches.md)\nType: Design Alternative\nStance: accepted\nDimension: how to ingest data into ml projects or applications\n\n# Data ingestion in batches\n\nget data in one or more batches, possibly only in part automated\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 78
-    },
-    {
-      "page_num": 41,
-      "text": "Page: Manual data ingestion (wiki/entities/manual-data-ingestion.md)\nType: Design Alternative\nStance: accepted\nDimension: how to ingest data into ml projects or applications\n\n# Manual data ingestion\n\nprovide data for ingestion manually\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 68
-    },
-    {
-      "page_num": 42,
-      "text": "Page: How to perform automatic integration and delivery in a machine learning context? (wiki/concepts/how-to-perform-automatic-integration-and-delivery-in-a-machine-learning-context.md)\nType: Design Decision\n\n# How to perform automatic integration and delivery in a machine learning context?\n\nHow to perform automatic integration and delivery in a machine learning context?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Build and Deployment scripts | accepted | 0 |\n| CI/CD pipeline | accepted | 0 |\n| Machine learning orchestrator | accepted | 0 |\n| No integration or delivery automation | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Which model versions should be deployed to production and how?. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of How to version data decision?. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of How to trigger a machine learning pipeline or orchestrator?. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *automated integration and delivery decision*\n\n### To this dimension\n\n- Choices on What to build, test, and deploy automatically by CI/CD pipelines? affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 382
-    },
-    {
-      "page_num": 43,
-      "text": "Page: CI/CD pipeline (wiki/entities/ci-cd-pipeline.md)\nType: Design Alternative\nStance: accepted\nDimension: how to perform automatic integration and delivery in a machine learning context\n\n# CI/CD pipeline\n\ncontinuously automate the deployment e.g. upon commits\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 74
-    },
-    {
-      "page_num": 44,
-      "text": "Page: Build and Deployment scripts (wiki/entities/build-and-deployment-scripts.md)\nType: Design Alternative\nStance: accepted\nDimension: how to perform automatic integration and delivery in a machine learning context\n\n# Build and Deployment scripts\n\nmanually perform automated deployments\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 81
-    },
-    {
-      "page_num": 45,
-      "text": "Page: Machine learning orchestrator (wiki/entities/machine-learning-orchestrator.md)\nType: Design Alternative\nStance: accepted\nDimension: how to perform automatic integration and delivery in a machine learning context\n\n# Machine learning orchestrator\n\norchestrate multiple pipelines and/or components\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 84
-    },
-    {
-      "page_num": 46,
-      "text": "Page: No integration or delivery automation (wiki/entities/no-integration-or-delivery-automation.md)\nType: Design Alternative\nStance: accepted\nDimension: how to perform automatic integration and delivery in a machine learning context\n\n# No integration or delivery automation\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 78
-    },
-    {
-      "page_num": 47,
-      "text": "Page: Which tasks can be performed by a delivery pipeline or component? (wiki/concepts/which-tasks-can-be-performed-by-a-delivery-pipeline-or-component.md)\nType: Design Decision\n\n# Which tasks can be performed by a delivery pipeline or component?\n\nWhich tasks can be performed by a delivery pipeline or component?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| A/B testing | accepted | 0 |\n| Building | accepted | 0 |\n| Canary testing | accepted | 0 |\n| Containerization | accepted | 0 |\n| Deployment | accepted | 0 |\n| Evidence based hypothesis testing | accepted | 0 |\n| Packaging | accepted | 0 |\n| Testing | accepted | 0 |\n| Version control repository | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *delivery tasks decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 251
-    },
-    {
-      "page_num": 48,
-      "text": "Page: Packaging (wiki/entities/packaging.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a delivery pipeline or component\n\n# Packaging\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 53
-    },
-    {
-      "page_num": 49,
-      "text": "Page: Testing (wiki/entities/testing.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a delivery pipeline or component\n\n# Testing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 52
-    },
-    {
-      "page_num": 50,
-      "text": "Page: Building (wiki/entities/building.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a delivery pipeline or component\n\n# Building\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 52
-    },
-    {
-      "page_num": 51,
-      "text": "Page: Deployment (wiki/entities/deployment.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a delivery pipeline or component\n\n# Deployment\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 54
-    },
-    {
-      "page_num": 52,
-      "text": "Page: Containerization (wiki/entities/containerization.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a delivery pipeline or component\n\n# Containerization\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 58
-    },
-    {
-      "page_num": 53,
-      "text": "Page: Canary testing (wiki/entities/canary-testing-2.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a delivery pipeline or component\n\n# Canary testing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 57
-    },
-    {
-      "page_num": 54,
-      "text": "Page: A/B testing (wiki/entities/a-b-testing-2.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a delivery pipeline or component\n\n# A/B testing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 55
-    },
-    {
-      "page_num": 55,
-      "text": "Page: Evidence based hypothesis testing (wiki/entities/evidence-based-hypothesis-testing-2.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a delivery pipeline or component\n\n# Evidence based hypothesis testing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 72
-    },
-    {
-      "page_num": 56,
-      "text": "Page: Version control repository (wiki/entities/version-control-repository.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a delivery pipeline or component\n\n# Version control repository\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 66
-    },
-    {
-      "page_num": 57,
-      "text": "Page: Which model versions should be deployed to production and how? (wiki/concepts/which-model-versions-should-be-deployed-to-production-and-how.md)\nType: Design Decision\n\n# Which model versions should be deployed to production and how?\n\nWhich model versions should be deployed to production and how?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| N versions in production | accepted | 0 |\n| Rollback to previous model version | accepted | 0 |\n| Single model in production | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *deploying model versions in production decision*\n\n### To this dimension\n\n- Choices on How to perform automatic integration and delivery in a machine learning context? affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 258
-    },
-    {
-      "page_num": 58,
-      "text": "Page: N versions in production (wiki/entities/n-versions-in-production.md)\nType: Design Alternative\nStance: accepted\nDimension: which model versions should be deployed to production and how\n\n# N versions in production\n\ndeploy multiple model versions at the same time\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 75
-    },
-    {
-      "page_num": 59,
-      "text": "Page: Rollback to previous model version (wiki/entities/rollback-to-previous-model-version.md)\nType: Design Alternative\nStance: accepted\nDimension: which model versions should be deployed to production and how\n\n# Rollback to previous model version\n\nredeploy previous model version and then switch to previous model\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 87
-    },
-    {
-      "page_num": 60,
-      "text": "Page: Single model in production (wiki/entities/single-model-in-production.md)\nType: Design Alternative\nStance: accepted\nDimension: which model versions should be deployed to production and how\n\n# Single model in production\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 65
-    },
-    {
-      "page_num": 61,
-      "text": "Page: How to version data decision? (wiki/concepts/how-to-version-data-decision.md)\nType: Design Decision\n\n# How to version data decision?\n\nHow to version data decision?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data version repository | accepted | 0 |\n| Data versioning in code repository | accepted | 0 |\n| No data versioning | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *how should data be versioned in MLOps?*\n\n### To this dimension\n\n- Choices on How to perform automatic integration and delivery in a machine learning context? affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 220
-    },
-    {
-      "page_num": 62,
-      "text": "Page: Data version repository (wiki/entities/data-version-repository.md)\nType: Design Alternative\nStance: accepted\nDimension: how to version data decision\n\n# Data version repository\n\nversion repository with specific technology-support for data versioning\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 72
-    },
-    {
-      "page_num": 63,
-      "text": "Page: Data versioning in code repository (wiki/entities/data-versioning-in-code-repository.md)\nType: Design Alternative\nStance: accepted\nDimension: how to version data decision\n\n# Data versioning in code repository\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 63
-    },
-    {
-      "page_num": 64,
-      "text": "Page: No data versioning (wiki/entities/no-data-versioning.md)\nType: Design Alternative\nStance: accepted\nDimension: how to version data decision\n\n# No data versioning\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 51
-    },
-    {
-      "page_num": 65,
-      "text": "Page: How to trigger a machine learning pipeline or orchestrator? (wiki/concepts/how-to-trigger-a-machine-learning-pipeline-or-orchestrator.md)\nType: Design Decision\n\n# How to trigger a machine learning pipeline or orchestrator?\n\nHow to trigger a machine learning pipeline or orchestrator?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| On availability of new training data trigger | accepted | 0 |\n| On changes in the data distribution trigger | accepted | 0 |\n| On model performance degradation trigger | accepted | 0 |\n| On-commit trigger | accepted | 0 |\n| On-demand trigger | accepted | 0 |\n| On-schedule trigger | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *trigger pipeline or orchestrator decision*\n\n### To this dimension\n\n- Choices on How to perform automatic integration and delivery in a machine learning context? affect the outcomes of this dimension. *Consider If Not Decided Yet*\n- Choices on How to perform model building in an ML project? affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 325
-    },
-    {
-      "page_num": 66,
-      "text": "Page: On-demand trigger (wiki/entities/on-demand-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: how to trigger a machine learning pipeline or orchestrator\n\n# On-demand trigger\n\nad-hoc manual execution of the pipeline, or triggered by other pipeline or service\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 78
-    },
-    {
-      "page_num": 67,
-      "text": "Page: On-commit trigger (wiki/entities/on-commit-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: how to trigger a machine learning pipeline or orchestrator\n\n# On-commit trigger\n\nwhen a commit to a source or data version control repository happens\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 75
-    },
-    {
-      "page_num": 68,
-      "text": "Page: On-schedule trigger (wiki/entities/on-schedule-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: how to trigger a machine learning pipeline or orchestrator\n\n# On-schedule trigger\n\nfrequent pipeline runs e.g. on a daily, weekly, or monthly basis\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 75
-    },
-    {
-      "page_num": 69,
-      "text": "Page: On availability of new training data trigger (wiki/entities/on-availability-of-new-training-data-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: how to trigger a machine learning pipeline or orchestrator\n\n# On availability of new training data trigger\n\nwhen new data is collected and made available in data stores\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 93
-    },
-    {
-      "page_num": 70,
-      "text": "Page: On model performance degradation trigger (wiki/entities/on-model-performance-degradation-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: how to trigger a machine learning pipeline or orchestrator\n\n# On model performance degradation trigger\n\nwhen a noticeable performance degradation is observed\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 88
-    },
-    {
-      "page_num": 71,
-      "text": "Page: On changes in the data distribution trigger (wiki/entities/on-changes-in-the-data-distribution-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: how to trigger a machine learning pipeline or orchestrator\n\n# On changes in the data distribution trigger\n\nwhen a significant changes in the data distributions of features is observed\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 96
-    },
-    {
-      "page_num": 72,
-      "text": "Page: How to automatically provision environments? (wiki/concepts/how-to-automatically-provision-environments.md)\nType: Design Decision\n\n# How to automatically provision environments?\n\nHow to automatically provision environments?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Automated provisioning | accepted | 0 |\n| No automated provisioning | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *provisioning decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 173
-    },
-    {
-      "page_num": 73,
-      "text": "Page: Automated provisioning (wiki/entities/automated-provisioning.md)\nType: Design Alternative\nStance: accepted\nDimension: how to automatically provision environments\n\n# Automated provisioning\n\nautomatically provision environments\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 67
-    },
-    {
-      "page_num": 74,
-      "text": "Page: No automated provisioning (wiki/entities/no-automated-provisioning.md)\nType: Design Alternative\nStance: accepted\nDimension: how to automatically provision environments\n\n# No automated provisioning\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 60
-    },
-    {
-      "page_num": 75,
-      "text": "Page: How to automatically process the data used for model building? (wiki/concepts/how-to-automatically-process-the-data-used-for-model-building.md)\nType: Design Decision\n\n# How to automatically process the data used for model building?\n\nHow to automatically process the data used for model building?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data pipeline | accepted | 0 |\n| Data processing component | accepted | 0 |\n| ETL pipeline | accepted | 0 |\n| No data processing automation | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of How to persist and provide access to features?. *how to store resulting features*\n- Choices on this dimension affect the outcomes of How to ingest data into ML projects or applications?. *ingest data for data processing and later model building*\n- Choices on this dimension affect the outcomes of How to parallelize data processing?. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *data processing automation decision*\n\n### To this dimension\n\n- Choices on How to perform model building in an ML project? affect the outcomes of this dimension. *how to automate data processing tasks used by or part of model building*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 365
-    },
-    {
-      "page_num": 76,
-      "text": "Page: Data pipeline (wiki/entities/data-pipeline.md)\nType: Design Alternative\nStance: accepted\nDimension: how to automatically process the data used for model building\n\n# Data pipeline\n\nprocess data in dedicated, flexible pipeline\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 66
-    },
-    {
-      "page_num": 77,
-      "text": "Page: ETL pipeline (wiki/entities/etl-pipeline.md)\nType: Design Alternative\nStance: accepted\nDimension: how to automatically process the data used for model building\n\n# ETL pipeline\n\nprocess data through extract, transform, and load steps\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 68
-    },
-    {
-      "page_num": 78,
-      "text": "Page: Data processing component (wiki/entities/data-processing-component.md)\nType: Design Alternative\nStance: accepted\nDimension: how to automatically process the data used for model building\n\n# Data processing component\n\nprocess data in dedicated component\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 73
-    },
-    {
-      "page_num": 79,
-      "text": "Page: No data processing automation (wiki/entities/no-data-processing-automation.md)\nType: Design Alternative\nStance: accepted\nDimension: how to automatically process the data used for model building\n\n# No data processing automation\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 67
-    },
-    {
-      "page_num": 80,
-      "text": "Page: Should data be processed in batches or in realtime? (wiki/concepts/should-data-be-processed-in-batches-or-in-realtime.md)\nType: Design Decision\n\n# Should data be processed in batches or in realtime?\n\nShould data be processed in batches or in realtime?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Batch-based data processing | accepted | 0 |\n| Real-time, stream-based data processing | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *should data be processed in batch or realtime in MLOps?*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 193
-    },
-    {
-      "page_num": 81,
-      "text": "Page: Batch-based data processing (wiki/entities/batch-based-data-processing.md)\nType: Design Alternative\nStance: accepted\nDimension: should data be processed in batches or in realtime\n\n# Batch-based data processing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 63
-    },
-    {
-      "page_num": 82,
-      "text": "Page: Real-time, stream-based data processing (wiki/entities/real-time-stream-based-data-processing.md)\nType: Design Alternative\nStance: accepted\nDimension: should data be processed in batches or in realtime\n\n# Real-time, stream-based data processing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 72
-    },
-    {
-      "page_num": 83,
-      "text": "Page: Which data processing tasks can be performed by a data processing pipeline or component? (wiki/concepts/which-data-processing-tasks-can-be-performed-by-a-data-processing-pipeline-or-co.md)\nType: Design Decision\n\n# Which data processing tasks can be performed by a data processing pipeline or component?\n\nWhich data processing tasks can be performed by a data processing pipeline or component?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data extraction | accepted | 0 |\n| Data preparation | accepted | 0 |\n| Data processing hyperparameter tuning | accepted | 0 |\n| Data selection | accepted | 0 |\n| Data transformation | accepted | 0 |\n| Data validation | accepted | 0 |\n| Feature engineering | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should AutoML be used and if so where?. *should data processing tasks be automated based on AutoML?*\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *data processing tasks decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 302
-    },
-    {
-      "page_num": 84,
-      "text": "Page: Data extraction (wiki/entities/data-extraction.md)\nType: Design Alternative\nStance: accepted\nDimension: which data processing tasks can be performed by a data processing pipeline or co\n\n# Data extraction\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 62
-    },
-    {
-      "page_num": 85,
-      "text": "Page: Data preparation (wiki/entities/data-preparation.md)\nType: Design Alternative\nStance: accepted\nDimension: which data processing tasks can be performed by a data processing pipeline or co\n\n# Data preparation\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 62
-    },
-    {
-      "page_num": 86,
-      "text": "Page: Data validation (wiki/entities/data-validation.md)\nType: Design Alternative\nStance: accepted\nDimension: which data processing tasks can be performed by a data processing pipeline or co\n\n# Data validation\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 62
-    },
-    {
-      "page_num": 87,
-      "text": "Page: Data transformation (wiki/entities/data-transformation.md)\nType: Design Alternative\nStance: accepted\nDimension: which data processing tasks can be performed by a data processing pipeline or co\n\n# Data transformation\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 65
-    },
-    {
-      "page_num": 88,
-      "text": "Page: Data selection (wiki/entities/data-selection.md)\nType: Design Alternative\nStance: accepted\nDimension: which data processing tasks can be performed by a data processing pipeline or co\n\n# Data selection\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "page_num": 6,
+      "text": "Page: Model as a service (wiki/entities/model-as-a-service.md)\nType: Design Alternative\nStance: accepted\nDimension: ml model integration into the application\n\n# Model as a service\n\ncreate one service per model\n\n## Evidence\n\nNo supporting passage.",
       "token_count": 61
     },
     {
-      "page_num": 89,
-      "text": "Page: Feature engineering (wiki/entities/feature-engineering.md)\nType: Design Alternative\nStance: accepted\nDimension: which data processing tasks can be performed by a data processing pipeline or co\n\n# Feature engineering\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "page_num": 7,
+      "text": "Page: Model in monolith (wiki/entities/model-in-monolith.md)\nType: Design Alternative\nStance: accepted\nDimension: ml model integration into the application\n\n# Model in monolith\n\nembed the model in the code of the application\n\n## Evidence\n\nNo supporting passage.",
       "token_count": 65
     },
     {
-      "page_num": 90,
-      "text": "Page: Data processing hyperparameter tuning (wiki/entities/data-processing-hyperparameter-tuning.md)\nType: Design Alternative\nStance: accepted\nDimension: which data processing tasks can be performed by a data processing pipeline or co\n\n# Data processing hyperparameter tuning\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 78
-    },
-    {
-      "page_num": 91,
-      "text": "Page: How to parallelize data processing? (wiki/concepts/how-to-parallelize-data-processing.md)\nType: Design Decision\n\n# How to parallelize data processing?\n\nHow to parallelize data processing?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data partitioning in data pipeline | accepted | 0 |\n| Data pipeline per data set | accepted | 0 |\n| Hybrid data processing parallelization | accepted | 0 |\n| No parallel data processing | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *data processing parallelization decision*\n\n### To this dimension\n\n- Choices on How to automatically process the data used for model building? affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 240
-    },
-    {
-      "page_num": 92,
-      "text": "Page: Data pipeline per data set (wiki/entities/data-pipeline-per-data-set.md)\nType: Design Alternative\nStance: accepted\nDimension: how to parallelize data processing\n\n# Data pipeline per data set\n\ndedicated pipeline for each dataset\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 67
-    },
-    {
-      "page_num": 93,
-      "text": "Page: Data partitioning in data pipeline (wiki/entities/data-partitioning-in-data-pipeline.md)\nType: Design Alternative\nStance: accepted\nDimension: how to parallelize data processing\n\n# Data partitioning in data pipeline\n\nwithin a pipeline, the data is partitioned to benefit from parallel processing\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 84
-    },
-    {
-      "page_num": 94,
-      "text": "Page: Hybrid data processing parallelization (wiki/entities/hybrid-data-processing-parallelization.md)\nType: Design Alternative\nStance: accepted\nDimension: how to parallelize data processing\n\n# Hybrid data processing parallelization\n\ncombining one or more of the other parallelization options\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 82
-    },
-    {
-      "page_num": 95,
-      "text": "Page: No parallel data processing (wiki/entities/no-parallel-data-processing.md)\nType: Design Alternative\nStance: accepted\nDimension: how to parallelize data processing\n\n# No parallel data processing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 59
-    },
-    {
-      "page_num": 96,
-      "text": "Page: How to perform model building in an ML project? (wiki/concepts/how-to-perform-model-building-in-an-ml-project.md)\nType: Design Decision\n\n# How to perform model building in an ML project?\n\nHow to perform model building in an ML project?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Model builder component | accepted | 0 |\n| Model building in development tool | accepted | 0 |\n| Model building pipeline | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of How to automatically process the data used for model building?. *how to automate data processing tasks used by or part of model building*\n- Choices on this dimension affect the outcomes of How to persist and provide access to features?. *how to access features for model training*\n- Choices on this dimension affect the outcomes of How to trigger a machine learning pipeline or orchestrator?. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of How to parallelize model building?. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *How to automatically engineer a machine learning or data science model in MLOps?*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 351
-    },
-    {
-      "page_num": 97,
-      "text": "Page: Model building pipeline (wiki/entities/model-building-pipeline.md)\nType: Design Alternative\nStance: accepted\nDimension: how to perform model building in an ml project\n\n# Model building pipeline\n\nmodel training, evaluation, and validation in automated pipeline\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 75
-    },
-    {
-      "page_num": 98,
-      "text": "Page: Model builder component (wiki/entities/model-builder-component.md)\nType: Design Alternative\nStance: accepted\nDimension: how to perform model building in an ml project\n\n# Model builder component\n\nmodel training, evaluation, and validation in dedicated component\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 75
-    },
-    {
-      "page_num": 99,
-      "text": "Page: Model building in development tool (wiki/entities/model-building-in-development-tool.md)\nType: Design Alternative\nStance: accepted\nDimension: how to perform model building in an ml project\n\n# Model building in development tool\n\nmodel building performed in development sandbox\n\n## Evidence\n\nNo supporting passage.",
+      "page_num": 8,
+      "text": "Page: Model as module in modular monolith (wiki/entities/model-as-module-in-modular-monolith.md)\nType: Design Alternative\nStance: accepted\nDimension: ml model integration into the application\n\n# Model as module in modular monolith\n\ncreate a module for the model in the application\n\n## Evidence\n\nNo supporting passage.",
       "token_count": 79
     },
     {
+      "page_num": 9,
+      "text": "Page: Model in batch prediction system (wiki/entities/model-in-batch-prediction-system.md)\nType: Design Alternative\nStance: accepted\nDimension: ml model integration into the application\n\n# Model in batch prediction system\n\ncall an external batch prediction system\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 75
+    },
+    {
+      "page_num": 10,
+      "text": "Page: Event-driven model as a service (wiki/entities/event-driven-model-as-a-service.md)\nType: Design Alternative\nStance: accepted\nDimension: ml model integration into the application\n\n# Event-driven model as a service\n\nevent-driven pub/sub or queueing interface for model\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 77
+    },
+    {
+      "page_num": 11,
+      "text": "Page: Serverless model as a service (wiki/entities/serverless-model-as-a-service.md)\nType: Design Alternative\nStance: accepted\nDimension: ml model integration into the application\n\n# Serverless model as a service\n\nserverless/function-as-a-service computing model for offering the model\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 80
+    },
+    {
+      "page_num": 12,
+      "text": "Page: No integration of the model (wiki/entities/no-integration-of-the-model.md)\nType: Design Alternative\nStance: accepted\nDimension: ml model integration into the application\n\n# No integration of the model\n\nmodel is not integrated, maybe results are used, e.g. as a forecast\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 78
+    },
+    {
+      "page_num": 13,
+      "text": "Page: Data storage for ML applications (wiki/concepts/data-storage-for-ml-applications.md)\nType: Design Decision\n\n# Data storage for ML applications\n\nHow to store data used in machine learning applications?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data service | accepted | 0 |\n| Event store | accepted | 0 |\n| No data store | accepted | 0 |\n| Shared data store | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Data access interface. *offer an abstraction layer for data access*\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *store data decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 203
+    },
+    {
+      "page_num": 14,
+      "text": "Page: Shared data store (wiki/entities/shared-data-store.md)\nType: Design Alternative\nStance: accepted\nDimension: data storage for ml applications\n\n# Shared data store\n\nstore data in shared data store\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 59
+    },
+    {
+      "page_num": 15,
+      "text": "Page: Data service (wiki/entities/data-service.md)\nType: Design Alternative\nStance: accepted\nDimension: data storage for ml applications\n\n# Data service\n\nstore data in services\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 53
+    },
+    {
+      "page_num": 16,
+      "text": "Page: Event store (wiki/entities/event-store.md)\nType: Design Alternative\nStance: accepted\nDimension: data storage for ml applications\n\n# Event store\n\nstore data as events being exchanged in the systems\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 59
+    },
+    {
+      "page_num": 17,
+      "text": "Page: No data store (wiki/entities/no-data-store.md)\nType: Design Alternative\nStance: accepted\nDimension: data storage for ml applications\n\n# No data store\n\nget data without storing it, e.g. manual ingested raw data or only event streaming\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 69
+    },
+    {
+      "page_num": 18,
+      "text": "Page: Data access interface (wiki/concepts/data-access-interface.md)\nType: Design Decision\n\n# Data access interface\n\nHow to design the interface for data access?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data provider is accessed directly | accepted | 0 |\n| Local data access API | accepted | 0 |\n| Message/event queueing-based data access API | accepted | 0 |\n| Pub/sub data access API | accepted | 0 |\n| Service-based data access API | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### To this dimension\n\n- Choices on Data storage for ML applications affect the outcomes of this dimension. *offer an abstraction layer for data access*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 200
+    },
+    {
+      "page_num": 19,
+      "text": "Page: Local data access API (wiki/entities/local-data-access-api.md)\nType: Design Alternative\nStance: accepted\nDimension: data access interface\n\n# Local data access API\n\ndata provider encapsulated by local data access API abstraction\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 67
+    },
+    {
+      "page_num": 20,
+      "text": "Page: Service-based data access API (wiki/entities/service-based-data-access-api.md)\nType: Design Alternative\nStance: accepted\nDimension: data access interface\n\n# Service-based data access API\n\ndata provider encapsulated by data access services\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 70
+    },
+    {
+      "page_num": 21,
+      "text": "Page: Pub/sub data access API (wiki/entities/pub-sub-data-access-api.md)\nType: Design Alternative\nStance: accepted\nDimension: data access interface\n\n# Pub/sub data access API\n\nsubscription for data access; publisher notifies upon data availability\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 71
+    },
+    {
+      "page_num": 22,
+      "text": "Page: Message/event queueing-based data access API (wiki/entities/message-event-queueing-based-data-access-api.md)\nType: Design Alternative\nStance: accepted\nDimension: data access interface\n\n# Message/event queueing-based data access API\n\nnew data queued in messages/events; message/event raised upon data availability\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 88
+    },
+    {
+      "page_num": 23,
+      "text": "Page: Data provider is accessed directly (wiki/entities/data-provider-is-accessed-directly.md)\nType: Design Alternative\nStance: accepted\nDimension: data access interface\n\n# Data provider is accessed directly\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 61
+    },
+    {
+      "page_num": 24,
+      "text": "Page: Feature persistence and access (wiki/concepts/feature-persistence-and-access.md)\nType: Design Decision\n\n# Feature persistence and access\n\nHow to persist and provide access to features?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Feature store | accepted | 0 |\n| Store features in data stores without specific support | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *feature persistence and access decision*\n\n### To this dimension\n\n- Choices on Model serving affect the outcomes of this dimension. *how to access features for model serving*\n- Choices on Automated data processing for model building affect the outcomes of this dimension. *how to store resulting features*\n- Choices on Model building approach affect the outcomes of this dimension. *how to access features for model training*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 263
+    },
+    {
+      "page_num": 25,
+      "text": "Page: Feature store (wiki/entities/feature-store.md)\nType: Design Alternative\nStance: accepted\nDimension: feature persistence and access\n\n# Feature store\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 48
+    },
+    {
+      "page_num": 26,
+      "text": "Page: Store features in data stores without specific support (wiki/entities/store-features-in-data-stores-without-specific-support.md)\nType: Design Alternative\nStance: accepted\nDimension: feature persistence and access\n\n# Store features in data stores without specific support\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 78
+    },
+    {
+      "page_num": 27,
+      "text": "Page: Model serving (wiki/concepts/model-serving.md)\nType: Design Decision\n\n# Model serving\n\nHow to serve model predictions or scores?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data batch based model serving | accepted | 0 |\n| Hybrid online/offline model serving | accepted | 0 |\n| Local service/API based model serving | accepted | 0 |\n| Microservice based model serving | accepted | 0 |\n| Precompute serving | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Feature persistence and access. *how to access features for model serving*\n- Choices on this dimension affect the outcomes of Notification of prediction results. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Data ingestion. *ingest data required during model serving*\n\n### To this dimension\n\n- Choices on ML model integration into the application affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 287
+    },
+    {
+      "page_num": 28,
+      "text": "Page: Microservice based model serving (wiki/entities/microservice-based-model-serving.md)\nType: Design Alternative\nStance: accepted\nDimension: model serving\n\n# Microservice based model serving\n\ndeliver predictions or scores in real time by distributed service\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 74
+    },
+    {
+      "page_num": 29,
+      "text": "Page: Local service/API based model serving (wiki/entities/local-service-api-based-model-serving.md)\nType: Design Alternative\nStance: accepted\nDimension: model serving\n\n# Local service/API based model serving\n\ndeliver predictions or scores in real time by local service\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 76
+    },
+    {
+      "page_num": 30,
+      "text": "Page: Data batch based model serving (wiki/entities/data-batch-based-model-serving.md)\nType: Design Alternative\nStance: accepted\nDimension: model serving\n\n# Data batch based model serving\n\nprocess data in batches on-schedule and write predictions or scores to data storage\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 77
+    },
+    {
+      "page_num": 31,
+      "text": "Page: Precompute serving (wiki/entities/precompute-serving.md)\nType: Design Alternative\nStance: accepted\nDimension: model serving\n\n# Precompute serving\n\nprecompute models e.g. as forecasts and deliver as reports\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 62
+    },
+    {
+      "page_num": 32,
+      "text": "Page: Hybrid online/offline model serving (wiki/entities/hybrid-online-offline-model-serving.md)\nType: Design Alternative\nStance: accepted\nDimension: model serving\n\n# Hybrid online/offline model serving\n\ncombine online computations by services with offline computations in batches\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 79
+    },
+    {
+      "page_num": 33,
+      "text": "Page: Notification of prediction results (wiki/concepts/notification-of-prediction-results.md)\nType: Design Decision\n\n# Notification of prediction results\n\nHow to inform clients about prediction result availability?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Block on result | accepted | 0 |\n| Polling | accepted | 0 |\n| Push notification | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### To this dimension\n\n- Choices on Model serving affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 167
+    },
+    {
+      "page_num": 34,
+      "text": "Page: Push notification (wiki/entities/push-notification.md)\nType: Design Alternative\nStance: accepted\nDimension: notification of prediction results\n\n# Push notification\n\nnotify clients about results\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 59
+    },
+    {
+      "page_num": 35,
+      "text": "Page: Polling (wiki/entities/polling.md)\nType: Design Alternative\nStance: accepted\nDimension: notification of prediction results\n\n# Polling\n\nclients poll for the results\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 51
+    },
+    {
+      "page_num": 36,
+      "text": "Page: Block on result (wiki/entities/block-on-result.md)\nType: Design Alternative\nStance: accepted\nDimension: notification of prediction results\n\n# Block on result\n\nclients blocks until the results are available\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 62
+    },
+    {
+      "page_num": 37,
+      "text": "Page: Data ingestion (wiki/concepts/data-ingestion.md)\nType: Design Decision\n\n# Data ingestion\n\nHow to ingest data into ML projects or applications?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data ingestion by request | accepted | 0 |\n| Data ingestion in batches | accepted | 0 |\n| Manual data ingestion | accepted | 0 |\n| Streamed data ingestion | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *how should data be ingested in MLOps?*\n\n### To this dimension\n\n- Choices on Model serving affect the outcomes of this dimension. *ingest data required during model serving*\n- Choices on Automated data processing for model building affect the outcomes of this dimension. *ingest data for data processing and later model building*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 246
+    },
+    {
+      "page_num": 38,
+      "text": "Page: Streamed data ingestion (wiki/entities/streamed-data-ingestion.md)\nType: Design Alternative\nStance: accepted\nDimension: data ingestion\n\n# Streamed data ingestion\n\nreceive a continuous stream of data\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 60
+    },
+    {
+      "page_num": 39,
+      "text": "Page: Data ingestion by request (wiki/entities/data-ingestion-by-request.md)\nType: Design Alternative\nStance: accepted\nDimension: data ingestion\n\n# Data ingestion by request\n\nactively get raw data from data sources\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 62
+    },
+    {
+      "page_num": 40,
+      "text": "Page: Data ingestion in batches (wiki/entities/data-ingestion-in-batches.md)\nType: Design Alternative\nStance: accepted\nDimension: data ingestion\n\n# Data ingestion in batches\n\nget data in one or more batches, possibly only in part automated\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 69
+    },
+    {
+      "page_num": 41,
+      "text": "Page: Manual data ingestion (wiki/entities/manual-data-ingestion.md)\nType: Design Alternative\nStance: accepted\nDimension: data ingestion\n\n# Manual data ingestion\n\nprovide data for ingestion manually\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 58
+    },
+    {
+      "page_num": 42,
+      "text": "Page: Automated integration and delivery for ML (wiki/concepts/automated-integration-and-delivery-for-ml.md)\nType: Design Decision\n\n# Automated integration and delivery for ML\n\nHow to perform automatic integration and delivery in a machine learning context?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Build and Deployment scripts | accepted | 0 |\n| CI/CD pipeline | accepted | 0 |\n| Machine learning orchestrator | accepted | 0 |\n| No integration or delivery automation | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Model versions in production. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Data versioning. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Pipeline and orchestrator triggering. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *automated integration and delivery decision*\n\n### To this dimension\n\n- Choices on Scope of CI/CD automation affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 320
+    },
+    {
+      "page_num": 43,
+      "text": "Page: CI/CD pipeline (wiki/entities/ci-cd-pipeline.md)\nType: Design Alternative\nStance: accepted\nDimension: automated integration and delivery for ml\n\n# CI/CD pipeline\n\ncontinuously automate the deployment e.g. upon commits\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 65
+    },
+    {
+      "page_num": 44,
+      "text": "Page: Build and Deployment scripts (wiki/entities/build-and-deployment-scripts.md)\nType: Design Alternative\nStance: accepted\nDimension: automated integration and delivery for ml\n\n# Build and Deployment scripts\n\nmanually perform automated deployments\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 71
+    },
+    {
+      "page_num": 45,
+      "text": "Page: Machine learning orchestrator (wiki/entities/machine-learning-orchestrator.md)\nType: Design Alternative\nStance: accepted\nDimension: automated integration and delivery for ml\n\n# Machine learning orchestrator\n\norchestrate multiple pipelines and/or components\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 74
+    },
+    {
+      "page_num": 46,
+      "text": "Page: No integration or delivery automation (wiki/entities/no-integration-or-delivery-automation.md)\nType: Design Alternative\nStance: accepted\nDimension: automated integration and delivery for ml\n\n# No integration or delivery automation\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 68
+    },
+    {
+      "page_num": 47,
+      "text": "Page: Delivery pipeline tasks (wiki/concepts/delivery-pipeline-tasks.md)\nType: Design Decision\n\n# Delivery pipeline tasks\n\nWhich tasks can be performed by a delivery pipeline or component?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| A/B testing | accepted | 0 |\n| Building | accepted | 0 |\n| Canary testing | accepted | 0 |\n| Containerization | accepted | 0 |\n| Deployment | accepted | 0 |\n| Evidence based hypothesis testing | accepted | 0 |\n| Packaging | accepted | 0 |\n| Testing | accepted | 0 |\n| Version control repository | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *delivery tasks decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 215
+    },
+    {
+      "page_num": 48,
+      "text": "Page: Packaging (wiki/entities/packaging.md)\nType: Design Alternative\nStance: accepted\nDimension: delivery pipeline tasks\n\n# Packaging\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 43
+    },
+    {
+      "page_num": 49,
+      "text": "Page: Testing (wiki/entities/testing.md)\nType: Design Alternative\nStance: accepted\nDimension: delivery pipeline tasks\n\n# Testing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 41
+    },
+    {
+      "page_num": 50,
+      "text": "Page: Building (wiki/entities/building.md)\nType: Design Alternative\nStance: accepted\nDimension: delivery pipeline tasks\n\n# Building\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 42
+    },
+    {
+      "page_num": 51,
+      "text": "Page: Deployment (wiki/entities/deployment.md)\nType: Design Alternative\nStance: accepted\nDimension: delivery pipeline tasks\n\n# Deployment\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 44
+    },
+    {
+      "page_num": 52,
+      "text": "Page: Containerization (wiki/entities/containerization.md)\nType: Design Alternative\nStance: accepted\nDimension: delivery pipeline tasks\n\n# Containerization\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 48
+    },
+    {
+      "page_num": 53,
+      "text": "Page: Canary testing (wiki/entities/canary-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: delivery pipeline tasks\n\n# Canary testing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 47
+    },
+    {
+      "page_num": 54,
+      "text": "Page: A/B testing (wiki/entities/a-b-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: delivery pipeline tasks\n\n# A/B testing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 44
+    },
+    {
+      "page_num": 55,
+      "text": "Page: Evidence based hypothesis testing (wiki/entities/evidence-based-hypothesis-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: delivery pipeline tasks\n\n# Evidence based hypothesis testing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 61
+    },
+    {
+      "page_num": 56,
+      "text": "Page: Version control repository (wiki/entities/version-control-repository.md)\nType: Design Alternative\nStance: accepted\nDimension: delivery pipeline tasks\n\n# Version control repository\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 56
+    },
+    {
+      "page_num": 57,
+      "text": "Page: Model versions in production (wiki/concepts/model-versions-in-production.md)\nType: Design Decision\n\n# Model versions in production\n\nWhich model versions should be deployed to production and how?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| N versions in production | accepted | 0 |\n| Rollback to previous model version | accepted | 0 |\n| Single model in production | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *deploying model versions in production decision*\n\n### To this dimension\n\n- Choices on Automated integration and delivery for ML affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 218
+    },
+    {
+      "page_num": 58,
+      "text": "Page: N versions in production (wiki/entities/n-versions-in-production.md)\nType: Design Alternative\nStance: accepted\nDimension: model versions in production\n\n# N versions in production\n\ndeploy multiple model versions at the same time\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 67
+    },
+    {
+      "page_num": 59,
+      "text": "Page: Rollback to previous model version (wiki/entities/rollback-to-previous-model-version.md)\nType: Design Alternative\nStance: accepted\nDimension: model versions in production\n\n# Rollback to previous model version\n\nredeploy previous model version and then switch to previous model\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 79
+    },
+    {
+      "page_num": 60,
+      "text": "Page: Single model in production (wiki/entities/single-model-in-production.md)\nType: Design Alternative\nStance: accepted\nDimension: model versions in production\n\n# Single model in production\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 57
+    },
+    {
+      "page_num": 61,
+      "text": "Page: Data versioning (wiki/concepts/data-versioning.md)\nType: Design Decision\n\n# Data versioning\n\nHow to version data decision?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data version repository | accepted | 0 |\n| Data versioning in code repository | accepted | 0 |\n| No data versioning | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *how should data be versioned in MLOps?*\n\n### To this dimension\n\n- Choices on Automated integration and delivery for ML affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 196
+    },
+    {
+      "page_num": 62,
+      "text": "Page: Data version repository (wiki/entities/data-version-repository.md)\nType: Design Alternative\nStance: accepted\nDimension: data versioning\n\n# Data version repository\n\nversion repository with specific technology-support for data versioning\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 69
+    },
+    {
+      "page_num": 63,
+      "text": "Page: Data versioning in code repository (wiki/entities/data-versioning-in-code-repository.md)\nType: Design Alternative\nStance: accepted\nDimension: data versioning\n\n# Data versioning in code repository\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 60
+    },
+    {
+      "page_num": 64,
+      "text": "Page: No data versioning (wiki/entities/no-data-versioning.md)\nType: Design Alternative\nStance: accepted\nDimension: data versioning\n\n# No data versioning\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 48
+    },
+    {
+      "page_num": 65,
+      "text": "Page: Pipeline and orchestrator triggering (wiki/concepts/pipeline-and-orchestrator-triggering.md)\nType: Design Decision\n\n# Pipeline and orchestrator triggering\n\nHow to trigger a machine learning pipeline or orchestrator?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| On availability of new training data trigger | accepted | 0 |\n| On changes in the data distribution trigger | accepted | 0 |\n| On model performance degradation trigger | accepted | 0 |\n| On-commit trigger | accepted | 0 |\n| On-demand trigger | accepted | 0 |\n| On-schedule trigger | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *trigger pipeline or orchestrator decision*\n\n### To this dimension\n\n- Choices on Automated integration and delivery for ML affect the outcomes of this dimension. *Consider If Not Decided Yet*\n- Choices on Model building approach affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 287
+    },
+    {
+      "page_num": 66,
+      "text": "Page: On-demand trigger (wiki/entities/on-demand-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: pipeline and orchestrator triggering\n\n# On-demand trigger\n\nad-hoc manual execution of the pipeline, or triggered by other pipeline or service\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 73
+    },
+    {
+      "page_num": 67,
+      "text": "Page: On-commit trigger (wiki/entities/on-commit-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: pipeline and orchestrator triggering\n\n# On-commit trigger\n\nwhen a commit to a source or data version control repository happens\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 69
+    },
+    {
+      "page_num": 68,
+      "text": "Page: On-schedule trigger (wiki/entities/on-schedule-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: pipeline and orchestrator triggering\n\n# On-schedule trigger\n\nfrequent pipeline runs e.g. on a daily, weekly, or monthly basis\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 70
+    },
+    {
+      "page_num": 69,
+      "text": "Page: On availability of new training data trigger (wiki/entities/on-availability-of-new-training-data-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: pipeline and orchestrator triggering\n\n# On availability of new training data trigger\n\nwhen new data is collected and made available in data stores\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 87
+    },
+    {
+      "page_num": 70,
+      "text": "Page: On model performance degradation trigger (wiki/entities/on-model-performance-degradation-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: pipeline and orchestrator triggering\n\n# On model performance degradation trigger\n\nwhen a noticeable performance degradation is observed\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 83
+    },
+    {
+      "page_num": 71,
+      "text": "Page: On changes in the data distribution trigger (wiki/entities/on-changes-in-the-data-distribution-trigger.md)\nType: Design Alternative\nStance: accepted\nDimension: pipeline and orchestrator triggering\n\n# On changes in the data distribution trigger\n\nwhen a significant changes in the data distributions of features is observed\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 91
+    },
+    {
+      "page_num": 72,
+      "text": "Page: Automated environment provisioning (wiki/concepts/automated-environment-provisioning.md)\nType: Design Decision\n\n# Automated environment provisioning\n\nHow to automatically provision environments?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Automated provisioning | accepted | 0 |\n| No automated provisioning | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *provisioning decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 161
+    },
+    {
+      "page_num": 73,
+      "text": "Page: Automated provisioning (wiki/entities/automated-provisioning.md)\nType: Design Alternative\nStance: accepted\nDimension: automated environment provisioning\n\n# Automated provisioning\n\nautomatically provision environments\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 64
+    },
+    {
+      "page_num": 74,
+      "text": "Page: No automated provisioning (wiki/entities/no-automated-provisioning.md)\nType: Design Alternative\nStance: accepted\nDimension: automated environment provisioning\n\n# No automated provisioning\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 58
+    },
+    {
+      "page_num": 75,
+      "text": "Page: Automated data processing for model building (wiki/concepts/automated-data-processing-for-model-building.md)\nType: Design Decision\n\n# Automated data processing for model building\n\nHow to automatically process the data used for model building?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data pipeline | accepted | 0 |\n| Data processing component | accepted | 0 |\n| ETL pipeline | accepted | 0 |\n| No data processing automation | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Feature persistence and access. *how to store resulting features*\n- Choices on this dimension affect the outcomes of Data ingestion. *ingest data for data processing and later model building*\n- Choices on this dimension affect the outcomes of Data processing parallelization. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *data processing automation decision*\n\n### To this dimension\n\n- Choices on Model building approach affect the outcomes of this dimension. *how to automate data processing tasks used by or part of model building*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 327
+    },
+    {
+      "page_num": 76,
+      "text": "Page: Data pipeline (wiki/entities/data-pipeline.md)\nType: Design Alternative\nStance: accepted\nDimension: automated data processing for model building\n\n# Data pipeline\n\nprocess data in dedicated, flexible pipeline\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 62
+    },
+    {
+      "page_num": 77,
+      "text": "Page: ETL pipeline (wiki/entities/etl-pipeline.md)\nType: Design Alternative\nStance: accepted\nDimension: automated data processing for model building\n\n# ETL pipeline\n\nprocess data through extract, transform, and load steps\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 64
+    },
+    {
+      "page_num": 78,
+      "text": "Page: Data processing component (wiki/entities/data-processing-component.md)\nType: Design Alternative\nStance: accepted\nDimension: automated data processing for model building\n\n# Data processing component\n\nprocess data in dedicated component\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 69
+    },
+    {
+      "page_num": 79,
+      "text": "Page: No data processing automation (wiki/entities/no-data-processing-automation.md)\nType: Design Alternative\nStance: accepted\nDimension: automated data processing for model building\n\n# No data processing automation\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 63
+    },
+    {
+      "page_num": 80,
+      "text": "Page: Batch or real-time data processing (wiki/concepts/batch-or-real-time-data-processing.md)\nType: Design Decision\n\n# Batch or real-time data processing\n\nShould data be processed in batches or in realtime?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Batch-based data processing | accepted | 0 |\n| Real-time, stream-based data processing | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *should data be processed in batch or realtime in MLOps?*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 176
+    },
+    {
+      "page_num": 81,
+      "text": "Page: Batch-based data processing (wiki/entities/batch-based-data-processing.md)\nType: Design Alternative\nStance: accepted\nDimension: batch or real time data processing\n\n# Batch-based data processing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 59
+    },
+    {
+      "page_num": 82,
+      "text": "Page: Real-time, stream-based data processing (wiki/entities/real-time-stream-based-data-processing.md)\nType: Design Alternative\nStance: accepted\nDimension: batch or real time data processing\n\n# Real-time, stream-based data processing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 68
+    },
+    {
+      "page_num": 83,
+      "text": "Page: Data processing pipeline tasks (wiki/concepts/data-processing-pipeline-tasks.md)\nType: Design Decision\n\n# Data processing pipeline tasks\n\nWhich data processing tasks can be performed by a data processing pipeline or component?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data extraction | accepted | 0 |\n| Data preparation | accepted | 0 |\n| Data processing hyperparameter tuning | accepted | 0 |\n| Data selection | accepted | 0 |\n| Data transformation | accepted | 0 |\n| Data validation | accepted | 0 |\n| Feature engineering | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Use of AutoML. *should data processing tasks be automated based on AutoML?*\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *data processing tasks decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 250
+    },
+    {
+      "page_num": 84,
+      "text": "Page: Data extraction (wiki/entities/data-extraction.md)\nType: Design Alternative\nStance: accepted\nDimension: data processing pipeline tasks\n\n# Data extraction\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 49
+    },
+    {
+      "page_num": 85,
+      "text": "Page: Data preparation (wiki/entities/data-preparation.md)\nType: Design Alternative\nStance: accepted\nDimension: data processing pipeline tasks\n\n# Data preparation\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 50
+    },
+    {
+      "page_num": 86,
+      "text": "Page: Data validation (wiki/entities/data-validation.md)\nType: Design Alternative\nStance: accepted\nDimension: data processing pipeline tasks\n\n# Data validation\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 49
+    },
+    {
+      "page_num": 87,
+      "text": "Page: Data transformation (wiki/entities/data-transformation.md)\nType: Design Alternative\nStance: accepted\nDimension: data processing pipeline tasks\n\n# Data transformation\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 52
+    },
+    {
+      "page_num": 88,
+      "text": "Page: Data selection (wiki/entities/data-selection.md)\nType: Design Alternative\nStance: accepted\nDimension: data processing pipeline tasks\n\n# Data selection\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 48
+    },
+    {
+      "page_num": 89,
+      "text": "Page: Feature engineering (wiki/entities/feature-engineering.md)\nType: Design Alternative\nStance: accepted\nDimension: data processing pipeline tasks\n\n# Feature engineering\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 52
+    },
+    {
+      "page_num": 90,
+      "text": "Page: Data processing hyperparameter tuning (wiki/entities/data-processing-hyperparameter-tuning.md)\nType: Design Alternative\nStance: accepted\nDimension: data processing pipeline tasks\n\n# Data processing hyperparameter tuning\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 66
+    },
+    {
+      "page_num": 91,
+      "text": "Page: Data processing parallelization (wiki/concepts/data-processing-parallelization.md)\nType: Design Decision\n\n# Data processing parallelization\n\nHow to parallelize data processing?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data partitioning in data pipeline | accepted | 0 |\n| Data pipeline per data set | accepted | 0 |\n| Hybrid data processing parallelization | accepted | 0 |\n| No parallel data processing | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *data processing parallelization decision*\n\n### To this dimension\n\n- Choices on Automated data processing for model building affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 228
+    },
+    {
+      "page_num": 92,
+      "text": "Page: Data pipeline per data set (wiki/entities/data-pipeline-per-data-set.md)\nType: Design Alternative\nStance: accepted\nDimension: data processing parallelization\n\n# Data pipeline per data set\n\ndedicated pipeline for each dataset\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 66
+    },
+    {
+      "page_num": 93,
+      "text": "Page: Data partitioning in data pipeline (wiki/entities/data-partitioning-in-data-pipeline.md)\nType: Design Alternative\nStance: accepted\nDimension: data processing parallelization\n\n# Data partitioning in data pipeline\n\nwithin a pipeline, the data is partitioned to benefit from parallel processing\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 83
+    },
+    {
+      "page_num": 94,
+      "text": "Page: Hybrid data processing parallelization (wiki/entities/hybrid-data-processing-parallelization.md)\nType: Design Alternative\nStance: accepted\nDimension: data processing parallelization\n\n# Hybrid data processing parallelization\n\ncombining one or more of the other parallelization options\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 81
+    },
+    {
+      "page_num": 95,
+      "text": "Page: No parallel data processing (wiki/entities/no-parallel-data-processing.md)\nType: Design Alternative\nStance: accepted\nDimension: data processing parallelization\n\n# No parallel data processing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 58
+    },
+    {
+      "page_num": 96,
+      "text": "Page: Model building approach (wiki/concepts/model-building-approach.md)\nType: Design Decision\n\n# Model building approach\n\nHow to perform model building in an ML project?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Model builder component | accepted | 0 |\n| Model building in development tool | accepted | 0 |\n| Model building pipeline | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Automated data processing for model building. *how to automate data processing tasks used by or part of model building*\n- Choices on this dimension affect the outcomes of Feature persistence and access. *how to access features for model training*\n- Choices on this dimension affect the outcomes of Pipeline and orchestrator triggering. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Model building parallelization. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *How to automatically engineer a machine learning or data science model in MLOps?*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 314
+    },
+    {
+      "page_num": 97,
+      "text": "Page: Model building pipeline (wiki/entities/model-building-pipeline.md)\nType: Design Alternative\nStance: accepted\nDimension: model building approach\n\n# Model building pipeline\n\nmodel training, evaluation, and validation in automated pipeline\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 69
+    },
+    {
+      "page_num": 98,
+      "text": "Page: Model builder component (wiki/entities/model-builder-component.md)\nType: Design Alternative\nStance: accepted\nDimension: model building approach\n\n# Model builder component\n\nmodel training, evaluation, and validation in dedicated component\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 70
+    },
+    {
+      "page_num": 99,
+      "text": "Page: Model building in development tool (wiki/entities/model-building-in-development-tool.md)\nType: Design Alternative\nStance: accepted\nDimension: model building approach\n\n# Model building in development tool\n\nmodel building performed in development sandbox\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 73
+    },
+    {
       "page_num": 100,
-      "text": "Page: When and how to train the model? (wiki/concepts/when-and-how-to-train-the-model.md)\nType: Design Decision\n\n# When and how to train the model?\n\nWhen and how to train the model?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Batch-based learning | accepted | 0 |\n| Hybrid batch-based and incremental learning | accepted | 0 |\n| Incremental learning | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *when and how to train the model decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 179
+      "text": "Page: Model training timing and mode (wiki/concepts/model-training-timing-and-mode.md)\nType: Design Decision\n\n# Model training timing and mode\n\nWhen and how to train the model?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Batch-based learning | accepted | 0 |\n| Hybrid batch-based and incremental learning | accepted | 0 |\n| Incremental learning | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *when and how to train the model decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 173
     },
     {
       "page_num": 101,
-      "text": "Page: Batch-based learning (wiki/entities/batch-based-learning.md)\nType: Design Alternative\nStance: accepted\nDimension: when and how to train the model\n\n# Batch-based learning\n\ntrain the model in batches, possibly offline\n\n## Evidence\n\nNo supporting passage.",
+      "text": "Page: Batch-based learning (wiki/entities/batch-based-learning.md)\nType: Design Alternative\nStance: accepted\nDimension: model training timing and mode\n\n# Batch-based learning\n\ntrain the model in batches, possibly offline\n\n## Evidence\n\nNo supporting passage.",
       "token_count": 64
     },
     {
       "page_num": 102,
-      "text": "Page: Incremental learning (wiki/entities/incremental-learning.md)\nType: Design Alternative\nStance: accepted\nDimension: when and how to train the model\n\n# Incremental learning\n\ntrain the model incrementally, possibly online\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 65
+      "text": "Page: Incremental learning (wiki/entities/incremental-learning.md)\nType: Design Alternative\nStance: accepted\nDimension: model training timing and mode\n\n# Incremental learning\n\ntrain the model incrementally, possibly online\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 64
     },
     {
       "page_num": 103,
-      "text": "Page: Hybrid batch-based and incremental learning (wiki/entities/hybrid-batch-based-and-incremental-learning.md)\nType: Design Alternative\nStance: accepted\nDimension: when and how to train the model\n\n# Hybrid batch-based and incremental learning\n\ntrain some factors of the model in batches, possibly offline, and incrementally train other factors, possibly online\n\n## Evidence\n\nNo supporting passage.",
+      "text": "Page: Hybrid batch-based and incremental learning (wiki/entities/hybrid-batch-based-and-incremental-learning.md)\nType: Design Alternative\nStance: accepted\nDimension: model training timing and mode\n\n# Hybrid batch-based and incremental learning\n\ntrain some factors of the model in batches, possibly offline, and incrementally train other factors, possibly online\n\n## Evidence\n\nNo supporting passage.",
       "token_count": 99
     },
     {
       "page_num": 104,
-      "text": "Page: Which tasks can be performed by a model building pipeline or component? (wiki/concepts/which-tasks-can-be-performed-by-a-model-building-pipeline-or-component.md)\nType: Design Decision\n\n# Which tasks can be performed by a model building pipeline or component?\n\nWhich tasks can be performed by a model building pipeline or component?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data checkpoints | accepted | 0 |\n| Data splitting | accepted | 0 |\n| Development tool export | accepted | 0 |\n| Development tool facade | accepted | 0 |\n| Model hyperparameter tuning | accepted | 0 |\n| Model packaging | accepted | 0 |\n| Model selection | accepted | 0 |\n| Model training | accepted | 0 |\n| Model validation | accepted | 0 |\n| Train multiple model versions with different parameters and/or algorithms | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should AutoML be used and if so where?. *should model building tasks be automated based on AutoML?*\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *model building tasks decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 327
+      "text": "Page: Model building pipeline tasks (wiki/concepts/model-building-pipeline-tasks.md)\nType: Design Decision\n\n# Model building pipeline tasks\n\nWhich tasks can be performed by a model building pipeline or component?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Data checkpoints | accepted | 0 |\n| Data splitting | accepted | 0 |\n| Development tool export | accepted | 0 |\n| Development tool facade | accepted | 0 |\n| Model hyperparameter tuning | accepted | 0 |\n| Model packaging | accepted | 0 |\n| Model selection | accepted | 0 |\n| Model training | accepted | 0 |\n| Model validation | accepted | 0 |\n| Train multiple model versions with different parameters and/or algorithms | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Use of AutoML. *should model building tasks be automated based on AutoML?*\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *model building tasks decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 284
     },
     {
       "page_num": 105,
-      "text": "Page: Model training (wiki/entities/model-training.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a model building pipeline or component\n\n# Model training\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 58
+      "text": "Page: Model training (wiki/entities/model-training.md)\nType: Design Alternative\nStance: accepted\nDimension: model building pipeline tasks\n\n# Model training\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 48
     },
     {
       "page_num": 106,
-      "text": "Page: Data splitting (wiki/entities/data-splitting.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a model building pipeline or component\n\n# Data splitting\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 58
+      "text": "Page: Data splitting (wiki/entities/data-splitting.md)\nType: Design Alternative\nStance: accepted\nDimension: model building pipeline tasks\n\n# Data splitting\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 48
     },
     {
       "page_num": 107,
-      "text": "Page: Data checkpoints (wiki/entities/data-checkpoints.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a model building pipeline or component\n\n# Data checkpoints\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 60
+      "text": "Page: Data checkpoints (wiki/entities/data-checkpoints.md)\nType: Design Alternative\nStance: accepted\nDimension: model building pipeline tasks\n\n# Data checkpoints\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 50
     },
     {
       "page_num": 108,
-      "text": "Page: Model validation (wiki/entities/model-validation.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a model building pipeline or component\n\n# Model validation\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 60
+      "text": "Page: Model validation (wiki/entities/model-validation.md)\nType: Design Alternative\nStance: accepted\nDimension: model building pipeline tasks\n\n# Model validation\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 50
     },
     {
       "page_num": 109,
-      "text": "Page: Model selection (wiki/entities/model-selection.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a model building pipeline or component\n\n# Model selection\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 59
+      "text": "Page: Model selection (wiki/entities/model-selection.md)\nType: Design Alternative\nStance: accepted\nDimension: model building pipeline tasks\n\n# Model selection\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 49
     },
     {
       "page_num": 110,
-      "text": "Page: Model packaging (wiki/entities/model-packaging.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a model building pipeline or component\n\n# Model packaging\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 59
+      "text": "Page: Model packaging (wiki/entities/model-packaging.md)\nType: Design Alternative\nStance: accepted\nDimension: model building pipeline tasks\n\n# Model packaging\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 49
     },
     {
       "page_num": 111,
-      "text": "Page: Development tool facade (wiki/entities/development-tool-facade.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a model building pipeline or component\n\n# Development tool facade\n\nuse API to integrate development tool\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 74
+      "text": "Page: Development tool facade (wiki/entities/development-tool-facade.md)\nType: Design Alternative\nStance: accepted\nDimension: model building pipeline tasks\n\n# Development tool facade\n\nuse API to integrate development tool\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 64
     },
     {
       "page_num": 112,
-      "text": "Page: Development tool export (wiki/entities/development-tool-export.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a model building pipeline or component\n\n# Development tool export\n\nuse exported file to work in development tool\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 76
+      "text": "Page: Development tool export (wiki/entities/development-tool-export.md)\nType: Design Alternative\nStance: accepted\nDimension: model building pipeline tasks\n\n# Development tool export\n\nuse exported file to work in development tool\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 66
     },
     {
       "page_num": 113,
-      "text": "Page: Train multiple model versions with different parameters and/or algorithms (wiki/entities/train-multiple-model-versions-with-different-parameters-and-or-algorithms.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a model building pipeline or component\n\n# Train multiple model versions with different parameters and/or algorithms\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 103
+      "text": "Page: Train multiple model versions with different parameters and/or algorithms (wiki/entities/train-multiple-model-versions-with-different-parameters-and-or-algorithms.md)\nType: Design Alternative\nStance: accepted\nDimension: model building pipeline tasks\n\n# Train multiple model versions with different parameters and/or algorithms\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 92
     },
     {
       "page_num": 114,
-      "text": "Page: Model hyperparameter tuning (wiki/entities/model-hyperparameter-tuning.md)\nType: Design Alternative\nStance: accepted\nDimension: which tasks can be performed by a model building pipeline or component\n\n# Model hyperparameter tuning\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 68
+      "text": "Page: Model hyperparameter tuning (wiki/entities/model-hyperparameter-tuning.md)\nType: Design Alternative\nStance: accepted\nDimension: model building pipeline tasks\n\n# Model hyperparameter tuning\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 58
     },
     {
       "page_num": 115,
-      "text": "Page: How to parallelize model building? (wiki/concepts/how-to-parallelize-model-building.md)\nType: Design Decision\n\n# How to parallelize model building?\n\nHow to parallelize model building?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Hybrid model building parallelization | accepted | 0 |\n| Model building pipeline per model | accepted | 0 |\n| Model partitioning | accepted | 0 |\n| No parallel model building | accepted | 0 |\n| Training data partitioning | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *monitoring model adjustment decision*\n\n### To this dimension\n\n- Choices on How to perform model building in an ML project? affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 243
+      "text": "Page: Model building parallelization (wiki/concepts/model-building-parallelization.md)\nType: Design Decision\n\n# Model building parallelization\n\nHow to parallelize model building?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Hybrid model building parallelization | accepted | 0 |\n| Model building pipeline per model | accepted | 0 |\n| Model partitioning | accepted | 0 |\n| No parallel model building | accepted | 0 |\n| Training data partitioning | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *monitoring model adjustment decision*\n\n### To this dimension\n\n- Choices on Model building approach affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 229
     },
     {
       "page_num": 116,
-      "text": "Page: Model building pipeline per model (wiki/entities/model-building-pipeline-per-model.md)\nType: Design Alternative\nStance: accepted\nDimension: how to parallelize model building\n\n# Model building pipeline per model\n\nall models run concurrently\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 70
+      "text": "Page: Model building pipeline per model (wiki/entities/model-building-pipeline-per-model.md)\nType: Design Alternative\nStance: accepted\nDimension: model building parallelization\n\n# Model building pipeline per model\n\nall models run concurrently\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 69
     },
     {
       "page_num": 117,
-      "text": "Page: Training data partitioning (wiki/entities/training-data-partitioning.md)\nType: Design Alternative\nStance: accepted\nDimension: how to parallelize model building\n\n# Training data partitioning\n\nthe data is partitioned and each partition has a replica of the model\n\n## Evidence\n\nNo supporting passage.",
+      "text": "Page: Training data partitioning (wiki/entities/training-data-partitioning.md)\nType: Design Alternative\nStance: accepted\nDimension: model building parallelization\n\n# Training data partitioning\n\nthe data is partitioned and each partition has a replica of the model\n\n## Evidence\n\nNo supporting passage.",
       "token_count": 75
     },
     {
       "page_num": 118,
-      "text": "Page: Model partitioning (wiki/entities/model-partitioning.md)\nType: Design Alternative\nStance: accepted\nDimension: how to parallelize model building\n\n# Model partitioning\n\nthe model is partitioned and each partition updates a portion of parameters\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 71
+      "text": "Page: Model partitioning (wiki/entities/model-partitioning.md)\nType: Design Alternative\nStance: accepted\nDimension: model building parallelization\n\n# Model partitioning\n\nthe model is partitioned and each partition updates a portion of parameters\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 70
     },
     {
       "page_num": 119,
-      "text": "Page: Hybrid model building parallelization (wiki/entities/hybrid-model-building-parallelization.md)\nType: Design Alternative\nStance: accepted\nDimension: how to parallelize model building\n\n# Hybrid model building parallelization\n\ncombining one or more of the other parallelization options\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 81
-    },
-    {
-      "page_num": 120,
-      "text": "Page: No parallel model building (wiki/entities/no-parallel-model-building.md)\nType: Design Alternative\nStance: accepted\nDimension: how to parallelize model building\n\n# No parallel model building\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 58
-    },
-    {
-      "page_num": 121,
-      "text": "Page: How to monitor and track the model in production? (wiki/concepts/how-to-monitor-and-track-the-model-in-production.md)\nType: Design Decision\n\n# How to monitor and track the model in production?\n\nHow to monitor and track the model in production?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Model in-production tracking | accepted | 0 |\n| Model performance monitoring | accepted | 0 |\n| Monitoring or logging data and predictions | accepted | 0 |\n| No in-production monitoring | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of How to adjust models based on monitoring results?. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *monitoring and tracking in production decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 246
-    },
-    {
-      "page_num": 122,
-      "text": "Page: Model performance monitoring (wiki/entities/model-performance-monitoring.md)\nType: Design Alternative\nStance: accepted\nDimension: how to monitor and track the model in production\n\n# Model performance monitoring\n\nobserve specific model performance parameters\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 75
-    },
-    {
-      "page_num": 123,
-      "text": "Page: Monitoring or logging data and predictions (wiki/entities/monitoring-or-logging-data-and-predictions.md)\nType: Design Alternative\nStance: accepted\nDimension: how to monitor and track the model in production\n\n# Monitoring or logging data and predictions\n\nlog and monitor system data and predictions\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 85
-    },
-    {
-      "page_num": 124,
-      "text": "Page: No in-production monitoring (wiki/entities/no-in-production-monitoring.md)\nType: Design Alternative\nStance: accepted\nDimension: how to monitor and track the model in production\n\n# No in-production monitoring\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 63
-    },
-    {
-      "page_num": 125,
-      "text": "Page: Model in-production tracking (wiki/entities/model-in-production-tracking.md)\nType: Design Alternative\nStance: accepted\nDimension: how to monitor and track the model in production\n\n# Model in-production tracking\n\ntrack model usage, inputs, outputs, interpretability, and fairness\n\n## Evidence\n\nNo supporting passage.",
+      "text": "Page: Hybrid model building parallelization (wiki/entities/hybrid-model-building-parallelization.md)\nType: Design Alternative\nStance: accepted\nDimension: model building parallelization\n\n# Hybrid model building parallelization\n\ncombining one or more of the other parallelization options\n\n## Evidence\n\nNo supporting passage.",
       "token_count": 80
     },
     {
+      "page_num": 120,
+      "text": "Page: No parallel model building (wiki/entities/no-parallel-model-building.md)\nType: Design Alternative\nStance: accepted\nDimension: model building parallelization\n\n# No parallel model building\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 57
+    },
+    {
+      "page_num": 121,
+      "text": "Page: Model monitoring and tracking in production (wiki/concepts/model-monitoring-and-tracking-in-production.md)\nType: Design Decision\n\n# Model monitoring and tracking in production\n\nHow to monitor and track the model in production?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Model in-production tracking | accepted | 0 |\n| Model performance monitoring | accepted | 0 |\n| Monitoring or logging data and predictions | accepted | 0 |\n| No in-production monitoring | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Model adjustment from monitoring results. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *monitoring and tracking in production decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 235
+    },
+    {
+      "page_num": 122,
+      "text": "Page: Model performance monitoring (wiki/entities/model-performance-monitoring.md)\nType: Design Alternative\nStance: accepted\nDimension: model monitoring and tracking in production\n\n# Model performance monitoring\n\nobserve specific model performance parameters\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 73
+    },
+    {
+      "page_num": 123,
+      "text": "Page: Monitoring or logging data and predictions (wiki/entities/monitoring-or-logging-data-and-predictions.md)\nType: Design Alternative\nStance: accepted\nDimension: model monitoring and tracking in production\n\n# Monitoring or logging data and predictions\n\nlog and monitor system data and predictions\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 83
+    },
+    {
+      "page_num": 124,
+      "text": "Page: No in-production monitoring (wiki/entities/no-in-production-monitoring.md)\nType: Design Alternative\nStance: accepted\nDimension: model monitoring and tracking in production\n\n# No in-production monitoring\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 61
+    },
+    {
+      "page_num": 125,
+      "text": "Page: Model in-production tracking (wiki/entities/model-in-production-tracking.md)\nType: Design Alternative\nStance: accepted\nDimension: model monitoring and tracking in production\n\n# Model in-production tracking\n\ntrack model usage, inputs, outputs, interpretability, and fairness\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 79
+    },
+    {
       "page_num": 126,
-      "text": "Page: Should AutoML be used and if so where? (wiki/concepts/should-automl-be-used-and-if-so-where.md)\nType: Design Decision\n\n# Should AutoML be used and if so where?\n\nShould AutoML be used and if so where?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| AutoML | accepted | 0 |\n| No AutoML | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### To this dimension\n\n- Choices on Which data processing tasks can be performed by a data processing pipeline or component? affect the outcomes of this dimension. *should data processing tasks be automated based on AutoML?*\n- Choices on Which tasks can be performed by a model building pipeline or component? affect the outcomes of this dimension. *should model building tasks be automated based on AutoML?*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 226
+      "text": "Page: Use of AutoML (wiki/concepts/use-of-automl.md)\nType: Design Decision\n\n# Use of AutoML\n\nShould AutoML be used and if so where?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| AutoML | accepted | 0 |\n| No AutoML | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### To this dimension\n\n- Choices on Data processing pipeline tasks affect the outcomes of this dimension. *should data processing tasks be automated based on AutoML?*\n- Choices on Model building pipeline tasks affect the outcomes of this dimension. *should model building tasks be automated based on AutoML?*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 183
     },
     {
       "page_num": 127,
-      "text": "Page: AutoML (wiki/entities/automl.md)\nType: Design Alternative\nStance: accepted\nDimension: should automl be used and if so where\n\n# AutoML\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 44
+      "text": "Page: AutoML (wiki/entities/automl.md)\nType: Design Alternative\nStance: accepted\nDimension: use of automl\n\n# AutoML\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 38
     },
     {
       "page_num": 128,
-      "text": "Page: No AutoML (wiki/entities/no-automl.md)\nType: Design Alternative\nStance: accepted\nDimension: should automl be used and if so where\n\n# No AutoML\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 46
+      "text": "Page: No AutoML (wiki/entities/no-automl.md)\nType: Design Alternative\nStance: accepted\nDimension: use of automl\n\n# No AutoML\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 40
     },
     {
       "page_num": 129,
-      "text": "Page: How to adjust models based on monitoring results? (wiki/concepts/how-to-adjust-models-based-on-monitoring-results.md)\nType: Design Decision\n\n# How to adjust models based on monitoring results?\n\nHow to adjust models based on monitoring results?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Automated model adjustment | accepted | 0 |\n| Manual model adjustment | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *how to adjust models based on monitoring results in MLOps?*\n\n### To this dimension\n\n- Choices on How to monitor and track the model in production? affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 226
+      "text": "Page: Model adjustment from monitoring results (wiki/concepts/model-adjustment-from-monitoring-results.md)\nType: Design Decision\n\n# Model adjustment from monitoring results\n\nHow to adjust models based on monitoring results?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Automated model adjustment | accepted | 0 |\n| Manual model adjustment | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *how to adjust models based on monitoring results in MLOps?*\n\n### To this dimension\n\n- Choices on Model monitoring and tracking in production affect the outcomes of this dimension. *Consider If Not Decided Yet*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 213
     },
     {
       "page_num": 130,
-      "text": "Page: Manual model adjustment (wiki/entities/manual-model-adjustment.md)\nType: Design Alternative\nStance: accepted\nDimension: how to adjust models based on monitoring results\n\n# Manual model adjustment\n\nhumans adjust and redeploy the models\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 69
+      "text": "Page: Manual model adjustment (wiki/entities/manual-model-adjustment.md)\nType: Design Alternative\nStance: accepted\nDimension: model adjustment from monitoring results\n\n# Manual model adjustment\n\nhumans adjust and redeploy the models\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 67
     },
     {
       "page_num": 131,
-      "text": "Page: Automated model adjustment (wiki/entities/automated-model-adjustment.md)\nType: Design Alternative\nStance: accepted\nDimension: how to adjust models based on monitoring results\n\n# Automated model adjustment\n\nautomated measures are triggered to adjust the models\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 75
+      "text": "Page: Automated model adjustment (wiki/entities/automated-model-adjustment.md)\nType: Design Alternative\nStance: accepted\nDimension: model adjustment from monitoring results\n\n# Automated model adjustment\n\nautomated measures are triggered to adjust the models\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 73
     },
     {
       "page_num": 132,
-      "text": "Page: What to build, test, and deploy automatically by CI/CD pipelines? (wiki/concepts/what-to-build-test-and-deploy-automatically-by-ci-cd-pipelines.md)\nType: Design Decision\n\n# What to build, test, and deploy automatically by CI/CD pipelines?\n\nWhat to build, test, and deploy automatically by CI/CD pipelines?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Build, test, and deploy machine learning pipelines and components needed during pipeline runs | accepted | 0 |\n| Build, test, and deploy models to be served and other system components | accepted | 0 |\n| No automated deployment | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of How to perform automatic integration and delivery in a machine learning context?. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *deploying what to deploy automatically decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 280
+      "text": "Page: Scope of CI/CD automation (wiki/concepts/scope-of-ci-cd-automation.md)\nType: Design Decision\n\n# Scope of CI/CD automation\n\nWhat to build, test, and deploy automatically by CI/CD pipelines?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Build, test, and deploy machine learning pipelines and components needed during pipeline runs | accepted | 0 |\n| Build, test, and deploy models to be served and other system components | accepted | 0 |\n| No automated deployment | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Automated integration and delivery for ML. *Consider If Not Decided Yet*\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *deploying what to deploy automatically decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 237
     },
     {
       "page_num": 133,
-      "text": "Page: Build, test, and deploy models to be served and other system components (wiki/entities/build-test-and-deploy-models-to-be-served-and-other-system-components.md)\nType: Design Alternative\nStance: accepted\nDimension: what to build test and deploy automatically by ci cd pipelines\n\n# Build, test, and deploy models to be served and other system components\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 99
+      "text": "Page: Build, test, and deploy models to be served and other system components (wiki/entities/build-test-and-deploy-models-to-be-served-and-other-system-components.md)\nType: Design Alternative\nStance: accepted\nDimension: scope of ci cd automation\n\n# Build, test, and deploy models to be served and other system components\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 89
     },
     {
       "page_num": 134,
-      "text": "Page: Build, test, and deploy machine learning pipelines and components needed during pipeline runs (wiki/entities/build-test-and-deploy-machine-learning-pipelines-and-components-needed-during-pi.md)\nType: Design Alternative\nStance: accepted\nDimension: what to build test and deploy automatically by ci cd pipelines\n\n# Build, test, and deploy machine learning pipelines and components needed during pipeline runs\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 112
+      "text": "Page: Build, test, and deploy machine learning pipelines and components needed during pipeline runs (wiki/entities/build-test-and-deploy-machine-learning-pipelines-and-components-needed-during-pi.md)\nType: Design Alternative\nStance: accepted\nDimension: scope of ci cd automation\n\n# Build, test, and deploy machine learning pipelines and components needed during pipeline runs\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 103
     },
     {
       "page_num": 135,
-      "text": "Page: No automated deployment (wiki/entities/no-automated-deployment.md)\nType: Design Alternative\nStance: accepted\nDimension: what to build test and deploy automatically by ci cd pipelines\n\n# No automated deployment\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 63
+      "text": "Page: No automated deployment (wiki/entities/no-automated-deployment.md)\nType: Design Alternative\nStance: accepted\nDimension: scope of ci cd automation\n\n# No automated deployment\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 54
     },
     {
       "page_num": 136,
-      "text": "Page: What to test in a machine learning/data science pipeline? (wiki/concepts/what-to-test-in-a-machine-learning-data-science-pipeline.md)\nType: Design Decision\n\n# What to test in a machine learning/data science pipeline?\n\nWhat to test in a machine learning/data science pipeline?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| A/B testing | accepted | 0 |\n| Canary testing | accepted | 0 |\n| Evidence based hypothesis testing | accepted | 0 |\n| Integration testing pipeline components | accepted | 0 |\n| No testing | accepted | 0 |\n| Prediction service API testing | accepted | 0 |\n| Prediction service performance testing | accepted | 0 |\n| System integration testing | accepted | 0 |\n| Testing model training converges | accepted | 0 |\n| Testing trained model quality | accepted | 0 |\n| Unit testing different methods implemented in a model | accepted | 0 |\n| Unit testing feature engineering logic | accepted | 0 |\n| Unit testing pipeline components | accepted | 0 |\n| Unit testing system components | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Should MLOps be used and if so when?. *what to test decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 338
+      "text": "Page: Testing scope in ML pipelines (wiki/concepts/testing-scope-in-ml-pipelines.md)\nType: Design Decision\n\n# Testing scope in ML pipelines\n\nWhat to test in a machine learning/data science pipeline?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| A/B testing | accepted | 0 |\n| Canary testing | accepted | 0 |\n| Evidence based hypothesis testing | accepted | 0 |\n| Integration testing pipeline components | accepted | 0 |\n| No testing | accepted | 0 |\n| Prediction service API testing | accepted | 0 |\n| Prediction service performance testing | accepted | 0 |\n| System integration testing | accepted | 0 |\n| Testing model training converges | accepted | 0 |\n| Testing trained model quality | accepted | 0 |\n| Unit testing different methods implemented in a model | accepted | 0 |\n| Unit testing feature engineering logic | accepted | 0 |\n| Unit testing pipeline components | accepted | 0 |\n| Unit testing system components | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### From this dimension\n\n- Choices on this dimension affect the outcomes of Adoption of MLOps. *what to test decision*\n\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 312
     },
     {
       "page_num": 137,
-      "text": "Page: Canary testing (wiki/entities/canary-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# Canary testing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 55
+      "text": "Page: Canary testing (wiki/entities/canary-testing-2.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# Canary testing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 49
     },
     {
       "page_num": 138,
-      "text": "Page: A/B testing (wiki/entities/a-b-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# A/B testing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 53
+      "text": "Page: A/B testing (wiki/entities/a-b-testing-2.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# A/B testing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 46
     },
     {
       "page_num": 139,
-      "text": "Page: Evidence based hypothesis testing (wiki/entities/evidence-based-hypothesis-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# Evidence based hypothesis testing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 69
+      "text": "Page: Evidence based hypothesis testing (wiki/entities/evidence-based-hypothesis-testing-2.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# Evidence based hypothesis testing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 63
     },
     {
       "page_num": 140,
-      "text": "Page: Unit testing system components (wiki/entities/unit-testing-system-components.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# Unit testing system components\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 67
+      "text": "Page: Unit testing system components (wiki/entities/unit-testing-system-components.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# Unit testing system components\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 60
     },
     {
       "page_num": 141,
-      "text": "Page: System integration testing (wiki/entities/system-integration-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# System integration testing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 64
+      "text": "Page: System integration testing (wiki/entities/system-integration-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# System integration testing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 57
     },
     {
       "page_num": 142,
-      "text": "Page: Unit testing feature engineering logic (wiki/entities/unit-testing-feature-engineering-logic.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# Unit testing feature engineering logic\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 73
-    },
-    {
-      "page_num": 143,
-      "text": "Page: Unit testing different methods implemented in a model (wiki/entities/unit-testing-different-methods-implemented-in-a-model.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# Unit testing different methods implemented in a model\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 84
-    },
-    {
-      "page_num": 144,
-      "text": "Page: Testing model training converges (wiki/entities/testing-model-training-converges.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# Testing model training converges\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 68
-    },
-    {
-      "page_num": 145,
-      "text": "Page: Testing trained model quality (wiki/entities/testing-trained-model-quality.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# Testing trained model quality\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "text": "Page: Unit testing feature engineering logic (wiki/entities/unit-testing-feature-engineering-logic.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# Unit testing feature engineering logic\n\n\n\n## Evidence\n\nNo supporting passage.",
       "token_count": 66
     },
     {
+      "page_num": 143,
+      "text": "Page: Unit testing different methods implemented in a model (wiki/entities/unit-testing-different-methods-implemented-in-a-model.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# Unit testing different methods implemented in a model\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 77
+    },
+    {
+      "page_num": 144,
+      "text": "Page: Testing model training converges (wiki/entities/testing-model-training-converges.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# Testing model training converges\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 62
+    },
+    {
+      "page_num": 145,
+      "text": "Page: Testing trained model quality (wiki/entities/testing-trained-model-quality.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# Testing trained model quality\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 59
+    },
+    {
       "page_num": 146,
-      "text": "Page: Unit testing pipeline components (wiki/entities/unit-testing-pipeline-components.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# Unit testing pipeline components\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 68
+      "text": "Page: Unit testing pipeline components (wiki/entities/unit-testing-pipeline-components.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# Unit testing pipeline components\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 62
     },
     {
       "page_num": 147,
-      "text": "Page: Integration testing pipeline components (wiki/entities/integration-testing-pipeline-components.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# Integration testing pipeline components\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 74
-    },
-    {
-      "page_num": 148,
-      "text": "Page: Prediction service API testing (wiki/entities/prediction-service-api-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# Prediction service API testing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "text": "Page: Integration testing pipeline components (wiki/entities/integration-testing-pipeline-components.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# Integration testing pipeline components\n\n\n\n## Evidence\n\nNo supporting passage.",
       "token_count": 67
     },
     {
+      "page_num": 148,
+      "text": "Page: Prediction service API testing (wiki/entities/prediction-service-api-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# Prediction service API testing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 60
+    },
+    {
       "page_num": 149,
-      "text": "Page: Prediction service performance testing (wiki/entities/prediction-service-performance-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# Prediction service performance testing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 73
+      "text": "Page: Prediction service performance testing (wiki/entities/prediction-service-performance-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# Prediction service performance testing\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 66
     },
     {
       "page_num": 150,
-      "text": "Page: No testing (wiki/entities/no-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: what to test in a machine learning data science pipeline\n\n# No testing\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 52
-    },
-    {
-      "page_num": 151,
-      "text": "Page: Should MLOps be used and if so when? (wiki/concepts/should-mlops-be-used-and-if-so-when.md)\nType: Design Decision\n\n# Should MLOps be used and if so when?\n\nShould MLOps be used and if so when?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| MLOps | accepted | 0 |\n| No MLOps | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### To this dimension\n\n- Choices on How to store data used in machine learning applications? affect the outcomes of this dimension. *store data decision*\n- Choices on How to persist and provide access to features? affect the outcomes of this dimension. *feature persistence and access decision*\n- Choices on How to ingest data into ML projects or applications? affect the outcomes of this dimension. *how should data be ingested in MLOps?*\n- Choices on How to perform automatic integration and delivery in a machine learning context? affect the outcomes of this dimension. *automated integration and delivery decision*\n- Choices on Which tasks can be performed by a delivery pipeline or component? affect the outcomes of this dimension. *delivery tasks decision*\n- Choices on Which model versions should be deployed to production and how? affect the outcomes of this dimension. *deploying model versions in production decision*\n- Choices on How to version data decision? affect the outcomes of this dimension. *how should data be versioned in MLOps?*\n- Choices on How to trigger a machine learning pipeline or orchestrator? affect the outcomes of this dimension. *trigger pipeline or orchestrator decision*\n- Choices on How to automatically provision environments? affect the outcomes of this dimension. *provisioning decision*\n- Choices on How to automatically process the data used for model building? affect the outcomes of this dimension. *data processing automation decision*\n- Choices on Should data be processed in batches or in realtime? affect the outcomes of this dimension. *should data be processed in batch or realtime in MLOps?*\n- Choices on Which data processing tasks can be performed by a data processing pipeline or component? affect the outcomes of this dimension. *data processing tasks decision*\n- Choices on How to parallelize data processing? affect the outcomes of this dimension. *data processing parallelization decision*\n- Choices on How to perform model building in an ML project? affect the outcomes of this dimension. *How to automatically engineer a machine learning or data science model in MLOps?*\n- Choices on When and how to train the model? affect the outcomes of this dimension. *when and how to train the model decision*\n- Choices on Which tasks can be performed by a model building pipeline or component? affect the outcomes of this dimension. *model building tasks decision*\n- Choices on How to parallelize model building? affect the outcomes of this dimension. *monitoring model adjustment decision*\n- Choices on How to monitor and track the model in production? affect the outcomes of this dimension. *monitoring and tracking in production decision*\n- Choices on How to adjust models based on monitoring results? affect the outcomes of this dimension. *how to adjust models based on monitoring results in MLOps?*\n- Choices on What to build, test, and deploy automatically by CI/CD pipelines? affect the outcomes of this dimension. *deploying what to deploy automatically decision*\n- Choices on What to test in a machine learning/data science pipeline? affect the outcomes of this dimension. *what to test decision*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 911
-    },
-    {
-      "page_num": 152,
-      "text": "Page: MLOps (wiki/entities/mlops.md)\nType: Design Alternative\nStance: accepted\nDimension: should mlops be used and if so when\n\n# MLOps\n\n\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 43
-    },
-    {
-      "page_num": 153,
-      "text": "Page: No MLOps (wiki/entities/no-mlops.md)\nType: Design Alternative\nStance: accepted\nDimension: should mlops be used and if so when\n\n# No MLOps\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "text": "Page: No testing (wiki/entities/no-testing.md)\nType: Design Alternative\nStance: accepted\nDimension: testing scope in ml pipelines\n\n# No testing\n\n\n\n## Evidence\n\nNo supporting passage.",
       "token_count": 45
     },
     {
+      "page_num": 151,
+      "text": "Page: Adoption of MLOps (wiki/concepts/adoption-of-mlops.md)\nType: Design Decision\n\n# Adoption of MLOps\n\nShould MLOps be used and if so when?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| MLOps | accepted | 0 |\n| No MLOps | accepted | 0 |\n\n## Relations\n\nHow to read them: Relations between dimensions.\n\n### To this dimension\n\n- Choices on Data storage for ML applications affect the outcomes of this dimension. *store data decision*\n- Choices on Feature persistence and access affect the outcomes of this dimension. *feature persistence and access decision*\n- Choices on Data ingestion affect the outcomes of this dimension. *how should data be ingested in MLOps?*\n- Choices on Automated integration and delivery for ML affect the outcomes of this dimension. *automated integration and delivery decision*\n- Choices on Delivery pipeline tasks affect the outcomes of this dimension. *delivery tasks decision*\n- Choices on Model versions in production affect the outcomes of this dimension. *deploying model versions in production decision*\n- Choices on Data versioning affect the outcomes of this dimension. *how should data be versioned in MLOps?*\n- Choices on Pipeline and orchestrator triggering affect the outcomes of this dimension. *trigger pipeline or orchestrator decision*\n- Choices on Automated environment provisioning affect the outcomes of this dimension. *provisioning decision*\n- Choices on Automated data processing for model building affect the outcomes of this dimension. *data processing automation decision*\n- Choices on Batch or real-time data processing affect the outcomes of this dimension. *should data be processed in batch or realtime in MLOps?*\n- Choices on Data processing pipeline tasks affect the outcomes of this dimension. *data processing tasks decision*\n- Choices on Data processing parallelization affect the outcomes of this dimension. *data processing parallelization decision*\n- Choices on Model building approach affect the outcomes of this dimension. *How to automatically engineer a machine learning or data science model in MLOps?*\n- Choices on Model training timing and mode affect the outcomes of this dimension. *when and how to train the model decision*\n- Choices on Model building pipeline tasks affect the outcomes of this dimension. *model building tasks decision*\n- Choices on Model building parallelization affect the outcomes of this dimension. *monitoring model adjustment decision*\n- Choices on Model monitoring and tracking in production affect the outcomes of this dimension. *monitoring and tracking in production decision*\n- Choices on Model adjustment from monitoring results affect the outcomes of this dimension. *how to adjust models based on monitoring results in MLOps?*\n- Choices on Scope of CI/CD automation affect the outcomes of this dimension. *deploying what to deploy automatically decision*\n- Choices on Testing scope in ML pipelines affect the outcomes of this dimension. *what to test decision*\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 774
+    },
+    {
+      "page_num": 152,
+      "text": "Page: MLOps (wiki/entities/mlops.md)\nType: Design Alternative\nStance: accepted\nDimension: adoption of mlops\n\n# MLOps\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 38
+    },
+    {
+      "page_num": 153,
+      "text": "Page: No MLOps (wiki/entities/no-mlops.md)\nType: Design Alternative\nStance: accepted\nDimension: adoption of mlops\n\n# No MLOps\n\n\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 41
+    },
+    {
       "page_num": 154,
-      "text": "Page: What development environment should be used? (wiki/concepts/what-development-environment-should-be-used.md)\nType: Design Decision\n\n# What development environment should be used?\n\nWhat development environment should be used?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Use an IDE | accepted | 0 |\n| Use computational notebooks | accepted | 0 |\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
-      "token_count": 119
+      "text": "Page: Development environment (wiki/concepts/development-environment.md)\nType: Design Decision\n\n# Development environment\n\nWhat development environment should be used?\n\n## Values\n\n| Value | Status | Passages |\n|---|---|---|\n| Use an IDE | accepted | 0 |\n| Use computational notebooks | accepted | 0 |\n\n## Evidence\n\n0 open codes from 0 passages in 0 sources.\n\n**Core dimension:** yes \u2605 (0 sources; core = \u2265 0 sources).",
+      "token_count": 104
     },
     {
       "page_num": 155,
-      "text": "Page: Use computational notebooks (wiki/entities/use-computational-notebooks.md)\nType: Design Alternative\nStance: accepted\nDimension: what development environment should be used\n\n# Use computational notebooks\n\nuse computational notebooks\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 68
+      "text": "Page: Use computational notebooks (wiki/entities/use-computational-notebooks.md)\nType: Design Alternative\nStance: accepted\nDimension: development environment\n\n# Use computational notebooks\n\nuse computational notebooks\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 63
     },
     {
       "page_num": 156,
-      "text": "Page: Use an IDE (wiki/entities/use-an-ide.md)\nType: Design Alternative\nStance: accepted\nDimension: what development environment should be used\n\n# Use an IDE\n\nuse an IDE\n\n## Evidence\n\nNo supporting passage.",
-      "token_count": 51
+      "text": "Page: Use an IDE (wiki/entities/use-an-ide.md)\nType: Design Alternative\nStance: accepted\nDimension: development environment\n\n# Use an IDE\n\nuse an IDE\n\n## Evidence\n\nNo supporting passage.",
+      "token_count": 46
     },
     {
       "page_num": 157,
@@ -2437,8 +2437,8 @@
     },
     {
       "page_num": 158,
-      "text": "Page: Overview (wiki/synthesis/overview.md)\nType: Synthesis\n\n# Overview\n\n## Use case\n\nIdentify the architectural design decisions that practitioners face when designing and implementing machine learning systems along the machine learning workflow \u2014 from data ingestion and processing, through model building and training, to putting models into production and operating them \u2014 as documented in practitioner (gray) literature. For each decision, identify the alternative decision options practitioners use or consider, the forces (quality attributes, constraints and practical concerns) that drive the choice between them, and how decisions relate to one another. Each dimension must name one architectural design decision; its values are the alternative options for that decision.\n\n## Run\n\n| Item | Value |\n|---|---|\n| Run | 20261108_202031 (selected view) |\n| Dimensions | 28 |\n| Values | 124: 124 accepted, 0 mixed, 0 rejected, 0 outcome |\n| Sources | 0 |\n| Iterations | 1 |\n| Dropped dimensions | 0 |\n| Generation LLM | `openai/gpt-5.6-luna` |\n| Evaluation LLM (judge) | `openai/gpt-5.6-luna` |\n| Embedding model | `openai/text-embedding-3-small` |\n\n## Dimensions and values\n\nCore dimensions (\u2605) have evidence from \u2265 0 sources; they are listed first. Relations between dimensions are explained in Relations between dimensions.\n\n| Dimension | Core | Accepted | Mixed | Rejected | Outcomes |\n|---|---|---|---|---|---|\n| How to adjust models based on monitoring results? | \u2605 | \u2022 Manual model adjustment<br>\u2022 Automated model adjustment |  |  |  |\n| How to automatically process the data used for model building? | \u2605 | \u2022 Data pipeline<br>\u2022 ETL pipeline<br>\u2022 Data processing component<br>\u2022 No data processing automation |  |  |  |\n| How to automatically provision environments? | \u2605 | \u2022 Automated provisioning<br>\u2022 No automated provisioning |  |  |  |\n| How to design the interface for data access? | \u2605 | \u2022 Local data access API<br>\u2022 Service-based data access API<br>\u2022 Pub/sub data access API<br>\u2022 Message/event queueing-based data access API<br>\u2022 Data provider is accessed directly |  |  |  |\n| How to inform clients about prediction result availability? | \u2605 | \u2022 Push notification<br>\u2022 Polling<br>\u2022 Block on result |  |  |  |\n| How to ingest data into ML projects or applications? | \u2605 | \u2022 Streamed data ingestion<br>\u2022 Data ingestion by request<br>\u2022 Data ingestion in batches<br>\u2022 Manual data ingestion |  |  |  |\n| How to integrate a machine learning model in an application? | \u2605 | \u2022 Model as a service<br>\u2022 Model in monolith<br>\u2022 Model as module in modular monolith<br>\u2022 Model in batch prediction system<br>\u2022 Event-driven model as a service<br>\u2022 Serverless model as a service<br>\u2022 No integration of the model |  |  |  |\n| How to monitor and track the model in production? | \u2605 | \u2022 Model performance monitoring<br>\u2022 Monitoring or logging data and predictions<br>\u2022 No in-production monitoring<br>\u2022 Model in-production tracking |  |  |  |\n| How to parallelize data processing? | \u2605 | \u2022 Data pipeline per data set<br>\u2022 Data partitioning in data pipeline<br>\u2022 Hybrid data processing parallelization<br>\u2022 No parallel data processing |  |  |  |\n| How to parallelize model building? | \u2605 | \u2022 Model building pipeline per model<br>\u2022 Training data partitioning<br>\u2022 Model partitioning<br>\u2022 Hybrid model building parallelization<br>\u2022 No parallel model building |  |  |  |\n| How to perform automatic integration and delivery in a machine learning context? | \u2605 | \u2022 CI/CD pipeline<br>\u2022 Build and Deployment scripts<br>\u2022 Machine learning orchestrator<br>\u2022 No integration or delivery automation |  |  |  |\n| How to perform model building in an ML project? | \u2605 | \u2022 Model building pipeline<br>\u2022 Model builder component<br>\u2022 Model building in development tool |  |  |  |\n| How to persist and provide access to features? | \u2605 | \u2022 Feature store<br>\u2022 Store features in data stores without specific support |  |  |  |\n| How to serve model predictions or scores? | \u2605 | \u2022 Microservice based model serving<br>\u2022 Local service/API based model serving<br>\u2022 Data batch based model serving<br>\u2022 Precompute serving<br>\u2022 Hybrid online/offline model serving |  |  |  |\n| How to store data used in machine learning applications? | \u2605 | \u2022 Shared data store<br>\u2022 Data service<br>\u2022 Event store<br>\u2022 No data store |  |  |  |\n| How to trigger a machine learning pipeline or orchestrator? | \u2605 | \u2022 On-demand trigger<br>\u2022 On-commit trigger<br>\u2022 On-schedule trigger<br>\u2022 On availability of new training data trigger<br>\u2022 On model performance degradation trigger<br>\u2022 On changes in the data distribution trigger |  |  |  |\n| How to version data decision? | \u2605 | \u2022 Data version repository<br>\u2022 Data versioning in code repository<br>\u2022 No data versioning |  |  |  |\n| Should AutoML be used and if so where? | \u2605 | \u2022 AutoML<br>\u2022 No AutoML |  |  |  |\n| Should MLOps be used and if so when? | \u2605 | \u2022 MLOps<br>\u2022 No MLOps |  |  |  |\n| Should data be processed in batches or in realtime? | \u2605 | \u2022 Batch-based data processing<br>\u2022 Real-time, stream-based data processing |  |  |  |\n| What development environment should be used? | \u2605 | \u2022 Use computational notebooks<br>\u2022 Use an IDE |  |  |  |\n| What to build, test, and deploy automatically by CI/CD pipelines? | \u2605 | \u2022 Build, test, and deploy models to be served and other system components<br>\u2022 Build, test, and deploy machine learning pipelines and components needed during pipeline runs<br>\u2022 No automated deployment |  |  |  |\n| What to test in a machine learning/data science pipeline? | \u2605 | \u2022 Canary testing<br>\u2022 A/B testing<br>\u2022 Evidence based hypothesis testing<br>\u2022 Unit testing system components<br>\u2022 System integration testing<br>\u2022 Unit testing feature engineering logic<br>\u2022 Unit testing different methods implemented in a model<br>\u2022 Testing model training converges<br>\u2022 Testing trained model quality<br>\u2022 Unit testing pipeline components<br>\u2022 Integration testing pipeline components<br>\u2022 Prediction service API testing<br>\u2022 Prediction service performance testing<br>\u2022 No testing |  |  |  |\n| When and how to train the model? | \u2605 | \u2022 Batch-based learning<br>\u2022 Incremental learning<br>\u2022 Hybrid batch-based and incremental learning |  |  |  |\n| Which data processing tasks can be performed by a data processing pipeline or component? | \u2605 | \u2022 Data extraction<br>\u2022 Data preparation<br>\u2022 Data validation<br>\u2022 Data transformation<br>\u2022 Data selection<br>\u2022 Feature engineering<br>\u2022 Data processing hyperparameter tuning |  |  |  |\n| Which model versions should be deployed to production and how? | \u2605 | \u2022 N versions in production<br>\u2022 Rollback to previous model version<br>\u2022 Single model in production |  |  |  |\n| Which tasks can be performed by a delivery pipeline or component? | \u2605 | \u2022 Packaging<br>\u2022 Testing<br>\u2022 Building<br>\u2022 Deployment<br>\u2022 Containerization<br>\u2022 Canary testing<br>\u2022 A/B testing<br>\u2022 Evidence based hypothesis testing<br>\u2022 Version control repository |  |  |  |\n| Which tasks can be performed by a model building pipeline or component? | \u2605 | \u2022 Model training<br>\u2022 Data splitting<br>\u2022 Data checkpoints<br>\u2022 Model validation<br>\u2022 Model selection<br>\u2022 Model packaging<br>\u2022 Development tool facade<br>\u2022 Development tool export<br>\u2022 Train multiple model versions with different parameters and/or algorithms<br>\u2022 Model hyperparameter tuning |  |  |  |",
-      "token_count": 1812
+      "text": "Page: Overview (wiki/synthesis/overview.md)\nType: Synthesis\n\n# Overview\n\n## Use case\n\nThe architectural design decisions of the machine learning workflow, from data ingestion and processing through model building and training to deployment and operation, with the options for each (Warnett and Zdun's decision model).\n\n## Run\n\n| Item | Value |\n|---|---|\n| Run | 20261112_165713 (selected view) |\n| Dimensions | 28 |\n| Values | 124: 124 accepted, 0 mixed, 0 rejected, 0 outcome |\n| Sources | 0 |\n| Iterations | 1 |\n| Dropped dimensions | 0 |\n| Generation LLM | `openai/gpt-5.6-luna` |\n| Evaluation LLM (judge) | `openai/gpt-5.6-luna` |\n| Embedding model | `openai/text-embedding-3-small` |\n\n## Dimensions and values\n\nCore dimensions (\u2605) have evidence from \u2265 0 sources; they are listed first. Relations between dimensions are explained in Relations between dimensions.\n\n| Dimension | Core | Accepted | Mixed | Rejected | Outcomes |\n|---|---|---|---|---|---|\n| Adoption of MLOps | \u2605 | \u2022 MLOps<br>\u2022 No MLOps |  |  |  |\n| Automated data processing for model building | \u2605 | \u2022 Data pipeline<br>\u2022 ETL pipeline<br>\u2022 Data processing component<br>\u2022 No data processing automation |  |  |  |\n| Automated environment provisioning | \u2605 | \u2022 Automated provisioning<br>\u2022 No automated provisioning |  |  |  |\n| Automated integration and delivery for ML | \u2605 | \u2022 CI/CD pipeline<br>\u2022 Build and Deployment scripts<br>\u2022 Machine learning orchestrator<br>\u2022 No integration or delivery automation |  |  |  |\n| Batch or real-time data processing | \u2605 | \u2022 Batch-based data processing<br>\u2022 Real-time, stream-based data processing |  |  |  |\n| Data access interface | \u2605 | \u2022 Local data access API<br>\u2022 Service-based data access API<br>\u2022 Pub/sub data access API<br>\u2022 Message/event queueing-based data access API<br>\u2022 Data provider is accessed directly |  |  |  |\n| Data ingestion | \u2605 | \u2022 Streamed data ingestion<br>\u2022 Data ingestion by request<br>\u2022 Data ingestion in batches<br>\u2022 Manual data ingestion |  |  |  |\n| Data processing parallelization | \u2605 | \u2022 Data pipeline per data set<br>\u2022 Data partitioning in data pipeline<br>\u2022 Hybrid data processing parallelization<br>\u2022 No parallel data processing |  |  |  |\n| Data processing pipeline tasks | \u2605 | \u2022 Data extraction<br>\u2022 Data preparation<br>\u2022 Data validation<br>\u2022 Data transformation<br>\u2022 Data selection<br>\u2022 Feature engineering<br>\u2022 Data processing hyperparameter tuning |  |  |  |\n| Data storage for ML applications | \u2605 | \u2022 Shared data store<br>\u2022 Data service<br>\u2022 Event store<br>\u2022 No data store |  |  |  |\n| Data versioning | \u2605 | \u2022 Data version repository<br>\u2022 Data versioning in code repository<br>\u2022 No data versioning |  |  |  |\n| Delivery pipeline tasks | \u2605 | \u2022 Packaging<br>\u2022 Testing<br>\u2022 Building<br>\u2022 Deployment<br>\u2022 Containerization<br>\u2022 Canary testing<br>\u2022 A/B testing<br>\u2022 Evidence based hypothesis testing<br>\u2022 Version control repository |  |  |  |\n| Development environment | \u2605 | \u2022 Use computational notebooks<br>\u2022 Use an IDE |  |  |  |\n| Feature persistence and access | \u2605 | \u2022 Feature store<br>\u2022 Store features in data stores without specific support |  |  |  |\n| ML model integration into the application | \u2605 | \u2022 Model as a service<br>\u2022 Model in monolith<br>\u2022 Model as module in modular monolith<br>\u2022 Model in batch prediction system<br>\u2022 Event-driven model as a service<br>\u2022 Serverless model as a service<br>\u2022 No integration of the model |  |  |  |\n| Model adjustment from monitoring results | \u2605 | \u2022 Manual model adjustment<br>\u2022 Automated model adjustment |  |  |  |\n| Model building approach | \u2605 | \u2022 Model building pipeline<br>\u2022 Model builder component<br>\u2022 Model building in development tool |  |  |  |\n| Model building parallelization | \u2605 | \u2022 Model building pipeline per model<br>\u2022 Training data partitioning<br>\u2022 Model partitioning<br>\u2022 Hybrid model building parallelization<br>\u2022 No parallel model building |  |  |  |\n| Model building pipeline tasks | \u2605 | \u2022 Model training<br>\u2022 Data splitting<br>\u2022 Data checkpoints<br>\u2022 Model validation<br>\u2022 Model selection<br>\u2022 Model packaging<br>\u2022 Development tool facade<br>\u2022 Development tool export<br>\u2022 Train multiple model versions with different parameters and/or algorithms<br>\u2022 Model hyperparameter tuning |  |  |  |\n| Model monitoring and tracking in production | \u2605 | \u2022 Model performance monitoring<br>\u2022 Monitoring or logging data and predictions<br>\u2022 No in-production monitoring<br>\u2022 Model in-production tracking |  |  |  |\n| Model serving | \u2605 | \u2022 Microservice based model serving<br>\u2022 Local service/API based model serving<br>\u2022 Data batch based model serving<br>\u2022 Precompute serving<br>\u2022 Hybrid online/offline model serving |  |  |  |\n| Model training timing and mode | \u2605 | \u2022 Batch-based learning<br>\u2022 Incremental learning<br>\u2022 Hybrid batch-based and incremental learning |  |  |  |\n| Model versions in production | \u2605 | \u2022 N versions in production<br>\u2022 Rollback to previous model version<br>\u2022 Single model in production |  |  |  |\n| Notification of prediction results | \u2605 | \u2022 Push notification<br>\u2022 Polling<br>\u2022 Block on result |  |  |  |\n| Pipeline and orchestrator triggering | \u2605 | \u2022 On-demand trigger<br>\u2022 On-commit trigger<br>\u2022 On-schedule trigger<br>\u2022 On availability of new training data trigger<br>\u2022 On model performance degradation trigger<br>\u2022 On changes in the data distribution trigger |  |  |  |\n| Scope of CI/CD automation | \u2605 | \u2022 Build, test, and deploy models to be served and other system components<br>\u2022 Build, test, and deploy machine learning pipelines and components needed during pipeline runs<br>\u2022 No automated deployment |  |  |  |\n| Testing scope in ML pipelines | \u2605 | \u2022 Canary testing<br>\u2022 A/B testing<br>\u2022 Evidence based hypothesis testing<br>\u2022 Unit testing system components<br>\u2022 System integration testing<br>\u2022 Unit testing feature engineering logic<br>\u2022 Unit testing different methods implemented in a model<br>\u2022 Testing model training converges<br>\u2022 Testing trained model quality<br>\u2022 Unit testing pipeline components<br>\u2022 Integration testing pipeline components<br>\u2022 Prediction service API testing<br>\u2022 Prediction service performance testing<br>\u2022 No testing |  |  |  |\n| Use of AutoML | \u2605 | \u2022 AutoML<br>\u2022 No AutoML |  |  |  |",
+      "token_count": 1534
     },
     {
       "page_num": 159,

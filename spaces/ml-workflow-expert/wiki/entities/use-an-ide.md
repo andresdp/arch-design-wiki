@@ -3,18 +3,18 @@ type: Design Alternative
 title: Use an IDE
 description: use an IDE
 id: '28.2'
-dimension: /concepts/what-development-environment-should-be-used.md
+dimension: /concepts/development-environment.md
 accepted_by: []
 rejected_by: []
 passages: 0
 tags:
 - value
 - accepted
-- what-development-environment-should-be-used
+- development-environment
 stance: accepted
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-08T20:20:31-03:00'
+  at: '2026-11-12T16:57:13-03:00'
 ---
 
 # Use an IDE

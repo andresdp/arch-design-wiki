@@ -1,11 +1,11 @@
 <!-- ddspace:start -->
 # Design space: ML workflow (expert)
 
-`./` is a ddspace workspace: a design space imported from an expert decision model (run 20261108_202031): decisions and alternatives written by researchers, without source passages. Use it to answer design questions and sketch designs, and cite the dimension and value ids you use.
+`./` is a ddspace workspace: a design space imported from an expert decision model (run 20261112_165713): decisions and alternatives written by researchers, without source passages. Use it to answer design questions and sketch designs, and cite the dimension and value ids you use.
 
 ## What is in it
 
-- **Dimensions** are design decisions (one question each, e.g. "What to test in a machine learning/data science pipeline?").
+- **Dimensions** are design decisions (one question each, e.g. "Testing scope in ML pipelines").
 - **Values** are the alternatives for a decision, or outcomes (effects of decisions). Each value has a status:
   `accepted`, `rejected`, `mixed` (sources disagree) or `outcome`.
 - **Exclusivity**: the alternatives of a decision are meant to exclude each other (a system takes one).
@@ -42,9 +42,9 @@ Do not install ddspace or change environments yourself beyond this; ask the user
 ```bash
 ddspace query info                              # run, use case, counts
 ddspace query dimensions                        # dimensions (decisions): core flag, support, exclusivity
-ddspace query values "What to test in a machine learning/data science pipeline?"          # alternatives and outcomes of one decision, with includes
+ddspace query values "Testing scope in ML pipelines"          # alternatives and outcomes of one decision, with includes
 ddspace query relations                         # relations between decisions, as sentences
-ddspace query show "What to test in a machine learning/data science pipeline?"            # one node and its neighbors
+ddspace query show "Testing scope in ML pipelines"            # one node and its neighbors
 ddspace query search "testing"              # find nodes by keyword
 ```
 
@@ -69,7 +69,7 @@ change the design space; like other generated text it is not evidence. Add `--no
 When asked to design a system (a brief with requirements):
 
 1. Find the dimensions relevant to the brief (`ddspace query dimensions`, `ddspace query search`).
-2. For each, compare at least two alternatives: `ddspace query values "What to test in a machine learning/data science pipeline?"` lists them. Note outcomes and rejected values.
+2. For each, compare at least two alternatives: `ddspace query values "Testing scope in ML pipelines"` lists them. Note outcomes and rejected values.
 3. Check your design as a design point. This step is required: do not write the ADRs before it.
    - Run `ddspace point "Canary testing" "<another value>" ...` with the values you intend to choose, one per
      dimension you decide.
