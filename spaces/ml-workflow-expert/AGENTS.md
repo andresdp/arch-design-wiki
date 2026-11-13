@@ -1,7 +1,7 @@
 <!-- ddspace:start -->
 # Design space: ML workflow (expert)
 
-`./` is a ddspace workspace: a design space imported from an expert decision model (run 20261112_165713): decisions and alternatives written by researchers, without source passages. Use it to answer design questions and sketch designs, and cite the dimension and value ids you use.
+`./` is a ddspace workspace: a design space imported from an expert decision model (run 20261112_223700): decisions and alternatives written by researchers, without source passages. Use it to answer design questions and sketch designs, and cite the dimension and value ids you use.
 
 ## What is in it
 

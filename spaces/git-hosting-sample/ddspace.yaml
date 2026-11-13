@@ -10,7 +10,7 @@ taxonomy:
   use_case: "Identify the design decisions practitioners face, the alternatives they consider for each, and the outcomes they report."
 workspace:
   sources_dir: "sources"
-  current_run: "runs/20261112_165741"
+  current_run: "runs/20261112_223726"
 wiki:
   quotes: false
   source_summaries: false

@@ -1,14 +1,14 @@
 {
-  "id": "20261112_165713",
+  "id": "20261112_223700",
   "kind": "import-model",
-  "started_at": "2026-11-12T16:57:13",
+  "started_at": "2026-11-12T22:37:00",
   "status": "ok",
-  "finished_at": "2026-11-12T16:57:13",
+  "finished_at": "2026-11-12T22:37:00",
   "seed_run": null,
   "feedback": null,
   "source_ids": [],
   "new_source_ids": [],
   "passages": 0,
-  "taxonomy": "gt_model_taxonomy_20261112_165713.json",
+  "taxonomy": "gt_model_taxonomy_20261112_223700.json",
   "argv": []
 }

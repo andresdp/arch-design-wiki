@@ -1,7 +1,7 @@
 ---
 type: Overview
 title: ML workflow (expert)
-run: '20261112_165713'
+run: '20261112_223700'
 view: selected
 dimensions: 28
 values: 124
@@ -13,7 +13,7 @@ tags:
 source_count: 0
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-12T16:57:13-03:00'
+  at: '2026-11-12T22:37:00-03:00'
 ---
 
 ![ddspace](assets/ddspace-logo.svg)
@@ -22,7 +22,7 @@ generated:
 
 This wiki presents a **design space** imported from a decision model written by experts. A design space organizes the architectural design decisions of a domain: each **dimension** is one decision a designer faces, and its **values** are the alternatives for it. Every page is generated from the design space's data, without rewording. New to design spaces? Start with [About this design space](/approach.md).
 
-Run 20261112_165713 (selected view): 28 dimensions, 124 values, 0 sources.
+Run 20261112_223700 (selected view): 28 dimensions, 124 values, 0 sources.
 
 ## Use case
 
