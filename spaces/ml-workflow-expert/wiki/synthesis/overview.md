@@ -5,7 +5,7 @@ tags:
 - synthesis
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-12T22:37:00-03:00'
+  at: '2026-11-13T18:52:21-03:00'
 ---
 
 # Overview
@@ -18,7 +18,7 @@ The architectural design decisions of the machine learning workflow, from data i
 
 | Item | Value |
 |---|---|
-| Run | 20261112_223700 (selected view) |
+| Run | 20261113_185221 (selected view) |
 | Dimensions | 28 |
 | Values | 124: 124 accepted, 0 mixed, 0 rejected, 0 outcome |
 | Sources | 0 |

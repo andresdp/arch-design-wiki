@@ -10,7 +10,7 @@ taxonomy:
   use_case: "The architectural design decisions of the machine learning workflow, from data ingestion and processing through model building and training to deployment and operation, with the options for each (Warnett and Zdun's decision model)."
 workspace:
   sources_dir: "sources"
-  current_run: "runs/20261112_223700"
+  current_run: "runs/20261113_185221"
 wiki:
   quotes: false
   source_summaries: false

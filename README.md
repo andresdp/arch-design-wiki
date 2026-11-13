@@ -17,7 +17,8 @@ space's wiki. The initial implementation gives a coding agent two skills over `d
 design space to agents (query its dimensions and values, check and describe design points).
 
 **Browse the design spaces and the explainers online: <https://andresdp.github.io/arch-design-wiki/>**. This
-repository holds everything else: the study, the code, and how to reproduce it.
+repository holds everything else: the study, the code, and how to reproduce it. [EXPLAINERS.md](EXPLAINERS.md)
+explains how to read an explainer, how search and explain differ, and how the pages are built.
 
 ## The study
 
@@ -49,6 +50,7 @@ the expert ML-workflow space (**E**) and without a space (**N**), two repetition
 | `examples/your-own/` | Templates for your own `PROBLEM.md` and `SOLUTION.md`, and a design space written by hand (`design-space.yaml`) |
 | `examples/toy-git-hosting/` | The running example's run file, cases and recorded rationale files |
 | `src/`, `pyproject.toml` | `ddspace`, with the search and explain skills (`src/delvedspace/templates/skills/`) |
+| `EXPLAINERS.md` | How to read an explainer: search and explain, each part of the page, how it is built |
 | `USAGE.md` | Every `ddspace` command |
 
 ## Use the skills with your own coding agent

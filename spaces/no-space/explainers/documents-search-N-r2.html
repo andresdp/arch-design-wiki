@@ -181,6 +181,11 @@
   .opt-solution { border-left: 4px solid var(--accent); } .opt-contrast { border-left: 4px solid var(--novel); }
   .crit { border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; margin: 6px 0; cursor: pointer; background: var(--panel); position: relative; z-index: 1; }
   svg.qoc-links path.traced { stroke-opacity: 1; stroke-width: 3px; }
+  details.howto { border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; margin: 4px 0 16px; font-size: 14px; }
+  details.howto summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+  details.howto[open] summary { margin-bottom: 6px; }
+  details.howto p, details.howto ul { margin: 6px 0; }
+  details.howto li { margin: 3px 0; }
   details.grid-details { margin-top: 22px; } details.grid-details summary { cursor: pointer; color: var(--muted); font-weight: 600; }
   .solution, .option { border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 8px 0; cursor: pointer; }
   .solution.sel, .option.sel { box-shadow: 0 0 0 2px var(--accent); }
@@ -219,7 +224,26 @@
 <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>  </div>
   <div class="kind">Search · design rationale · no design space</div>
   <h1>Large-scale document classification</h1>
-<p>An insurer receives between two and eight million documents a day (scanned forms, e-mails, PDFs) and classifies each one into one of 60 claim types with an LLM-based classifier. Volume varies strongly over the year: storm season brings four times the usual load. Three teams use the results: claims handling, fraud investigation and analytics. The documents contain personal data.</p>
+<p>An insurer receives between two and eight million documents a day (scanned forms, e-mails, PDFs) and classifies each one into one of 60 claim types with an LLM-based classifier. Volume varies strongly over the year: storm season brings four times the usual load. Three teams use the results: claims handling, fraud investigation and analytics. The documents contain personal data.</p>  <details class="howto"><summary>How to read this page</summary>
+    <p>A coding agent <b>searched</b> for designs that solve this problem. It combined decisions (dimensions) and
+      their options (values) into design points, and judged each point against every requirement: meets, partly
+      or misses. It proposes 4 alternatives.
+      Every judgement here is the agent's; the page lays out its rationale file.</p>
+    <ul>
+      <li><b>Decisions (ADRs)</b> lists the alternatives, then one record per decision: the requirements that drive
+        it, and every option weighed, with its pros and cons, chosen by an alternative or discarded.</li>
+<li><b>Comparison</b> puts the alternatives side by side, with the rows
+        where they differ first.</li><li><b>Trajectory</b> shows how the agent got there:
+        <ul>
+          <li>the lanes show each approach round by round, with every point coloured strong, mixed or weak;</li>
+          <li>a strip shows how each point met each requirement;</li>
+          <li>the story gives each point's thought, change, observation and trade-offs.</li>
+        </ul></li>    </ul>
+<p>No design space was used. The agent named the decisions and options itself, so nothing was checked
+      against a space and there are no gaps in one.</p>    <p>The graph on the right shows the decisions involved, the design points and the requirements. Select
+      anything, in the text or the graph, to see it in both.</p>
+  </details>
+
   <h2 class="sec">Requirements</h2>
   <ul class="chips" id="requirements">
     <li><button class="chip" type="button" data-requirement="R1" data-node="r:R1"><strong>R1</strong> Classify every incoming document into a claim type, with a confidence. <span class="muted">functional</span></button></li>
