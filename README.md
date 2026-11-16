@@ -36,19 +36,20 @@ the expert ML-workflow space (**E**) and without a space (**N**), two repetition
 | The 24 rationale files and session summaries | [`study/designing2027/results-v2/`](study/designing2027/results-v2/) |
 | The session runner and its controls | [`run_sessions.py`](study/designing2027/run_sessions.py), [`controls.py`](study/designing2027/controls.py) |
 | The paper's table, recomputed | [`analyze.py`](study/designing2027/analyze.py) |
+| Two short cases (five requirements each), run after the study with a later version of the skills | [`cases-short/`](study/designing2027/cases-short/), [`results-short/`](study/designing2027/results-short/) |
 | The search and explain skills | [`src/delvedspace/templates/skills/`](src/delvedspace/templates/skills/) |
 
 ## Contents
 
 | Path | What |
 |---|---|
-| `spaces/ml-workflow-expert/` | The expert ML-workflow design space (28 dimensions, 124 values) as a workspace and wiki, with the 12 explainers of the sessions that used it |
+| `spaces/ml-workflow-expert/` | The expert ML-workflow design space (28 dimensions, 124 values) as a workspace and wiki, with the 12 explainers of the study sessions that used it and 4 of the short cases |
 | `spaces/git-hosting-sample/` | The running example: a small Git-hosting space written by hand, with its explainers |
-| `spaces/no-space/` | The explainers of the 12 sessions without a space, and of the running example without a space |
+| `spaces/no-space/` | The explainers of the 12 study sessions without a space, the 4 short-case sessions without a space, and the running example without a space |
 | `study/designing2027/` | The cases, the prompt, the session runner, the 24 rationale files and summaries, and `analyze.py`, which recomputes the paper's table |
 | `skills/` | The search and explain skills, ready to copy into your agent's skills folder |
 | `examples/your-own/` | Templates for your own `PROBLEM.md` and `SOLUTION.md`, and a design space written by hand (`design-space.yaml`) |
-| `examples/toy-git-hosting/` | The running example's run file, cases and recorded rationale files |
+| `examples/toy-git-hosting/` | The running example's run file, cases and recorded rationale files, with two short cases (`cases-short/`, `runs-short/`) |
 | `src/`, `pyproject.toml` | `ddspace`, with the search and explain skills (`src/delvedspace/templates/skills/`) |
 | `EXPLAINERS.md` | How to read an explainer: search and explain, each part of the page, how it is built |
 | `USAGE.md` | Every `ddspace` command |

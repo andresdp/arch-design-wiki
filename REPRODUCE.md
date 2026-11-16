@@ -44,6 +44,19 @@ serve model predictions or scores?"); the ids, and so every reference in the fil
 is kept as its dimension's description. One file, `forecast-search-E-r2.json`, also carries `early_stop` (the agent
 stopped after one round, with 3 of its 12 points), as its session summary records.
 
+**The short cases.** Two further cases with five requirements each (`study/designing2027/cases-short/`: pump failure
+prediction, search; support-ticket routing, explain) ran after the study, in the same way (E and N, two repetitions)
+but with a later version of the skills. Their eight rationale files and summaries are in `results-short/`, outside
+the paper's table:
+
+```bash
+python study/designing2027/analyze.py --results results-short
+```
+
+The running example has two short cases too (`examples/toy-git-hosting/cases-short/`, a search and an explain on
+one problem), run with and without the sample space, two repetitions each; their rationale files are in
+`examples/toy-git-hosting/runs-short/`.
+
 **Rebuild an explainer.** The explainers in `spaces/` were rendered from these files; to render one again, into a
 folder of your own:
 
@@ -85,6 +98,10 @@ python study/designing2027/run_sessions.py --workspaces $WORK/workspaces --scrat
   --model gpt-6-luna --effort high --timeout 3600 --results results-rerun
 
 python study/designing2027/analyze.py --results results-rerun
+
+# the 8 short-case sessions
+python study/designing2027/run_sessions.py --workspaces $WORK/workspaces --scratch $WORK/scratch \
+  --model gpt-6-luna --effort high --timeout 3600 --cases-dir study/designing2027/cases-short --results results-short-rerun
 ```
 
 `build_workspace.py` builds the E space from the decision model in `study/designing2027/inputs/`, with the
@@ -109,9 +126,10 @@ The runner keeps, under `study/designing2027/<results>/`, each session's rationa
 | `study/designing2027/cases/` | The six cases: `problem.md` (context, requirements R/Q/C), `solution.md` for explain |
 | `study/designing2027/prompt.md` | The session prompt (a search and an explain section; one sentence differs between E and N) |
 | `study/designing2027/results-v2/` | The 24 rationale files and session summaries the paper reports |
+| `study/designing2027/cases-short/`, `results-short/` | The two short cases (five requirements each) and their 8 sessions, run after the study |
 | `study/designing2027/inputs/` | The expert decision model the E space is built from, and its manifest |
 | `src/delvedspace/templates/skills/` | The search and explain skills |
 | `spaces/ml-workflow-expert/` | The E workspace: `site/` (the wiki, with the E explainers), `raw/graph.json`, `AGENTS.md` |
 | `spaces/git-hosting-sample/` | The running example's workspace and its explainers |
 | `spaces/no-space/explainers/` | The N explainers and the running example's runs without a space |
-| `examples/toy-git-hosting/` | The running example's run file, cases and recorded rationale files |
+| `examples/toy-git-hosting/` | The running example's run file, cases and recorded rationale files (`runs/`), and its short cases (`cases-short/`, `runs-short/`) |

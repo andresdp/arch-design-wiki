@@ -1,0 +1,1226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support-ticket routing · Explainer</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="../assets/ddspace-icon.svg" type="image/svg+xml">
+<script>
+  // Theme: the reader's choice (kept in this browser) or the system setting.
+  (function () { try { var t = localStorage.getItem("ddspace-wiki-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {} })();
+</script>
+<style>
+  body { background: var(--bg); }
+  .ex-wrap { display: grid; grid-template-columns: minmax(0, var(--split-left, 1fr)) 8px minmax(0, 1fr); gap: 0; min-height: calc(100vh - 50px); }
+  .ex-text { padding: 22px 28px 60px; overflow-wrap: anywhere; }
+  .ex-side { background: var(--panel); display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh; }
+  #canvas { position: relative; flex: 0 0 var(--split-canvas, 60%); min-height: 160px; overflow: hidden; }
+  .splitter-v { position: sticky; top: 0; height: 100vh; cursor: col-resize; background: var(--border);
+    border-left: 3px solid var(--bg); border-right: 3px solid var(--panel); touch-action: none; }
+  .splitter-h { flex: none; height: 8px; cursor: row-resize; background: var(--border);
+    border-top: 3px solid var(--panel); border-bottom: 3px solid var(--panel); touch-action: none; }
+  .splitter-v:hover, .splitter-h:hover, .splitter-v:focus-visible, .splitter-h:focus-visible, .splitter-v.dragging,
+  .splitter-h.dragging { background: var(--accent); outline: none; }
+  body.resizing { user-select: none; }
+  body.resizing.col { cursor: col-resize; } body.resizing.row { cursor: row-resize; }
+  #svg { width: 100%; height: 100%; display: block; cursor: grab; }
+  #info { flex: 1 1 0; min-height: 80px; overflow-y: auto; padding: 12px 16px; border-top: 1px solid var(--border); font-size: 13.5px; }
+  #info h2 { margin: 4px 0; font-size: 17px; border: none; }
+  #info ul { padding-left: 16px; margin: 4px 0 10px; }
+  #info .info-h { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 14px 0 4px; font-weight: 600; }
+  #info .info-sub { color: var(--muted); margin: 2px 0 8px; line-height: 1.45; }
+  #info p { margin: 4px 0; line-height: 1.45; }
+  #info .info-link { margin-top: 14px; }
+  #info .node-chip { padding: 1px 7px; font-size: 11px; margin: 1px 3px 1px 0; }
+  #info .pair-chip { display: inline-block; margin: 0 8px 4px 0; white-space: nowrap; }
+  .muted, .hint { color: var(--muted); font-size: 12.5px; }
+  h1 { margin: 6px 0 4px; font-size: 24px; }
+  h2.sec { font-size: 16px; margin: 22px 0 8px; border: none; }
+  .banner { background: var(--mixed); color: #fff; padding: 9px 14px; border-radius: 8px; margin: 0 0 14px; font-size: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 6px 0; list-style: none; }
+  .chip { display: inline-flex; gap: 6px; align-items: baseline; border: 1px solid var(--border); background: var(--panel);
+    color: var(--fg); border-radius: 999px; padding: 4px 11px; font: inherit; font-size: 13px; cursor: pointer; text-align: left; }
+  .chip strong { color: var(--accent); }
+  /* in a flex chip, the id and the kind keep their width; only the text wraps */
+  .chip > strong, .chip > .muted { flex: none; white-space: nowrap; }
+  .chip { text-align: left; }
+  .chip.small { padding: 0 7px; font-size: 11.5px; margin-right: 3px; }
+  .chip:hover, .chip.sel { border-color: var(--accent); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--border); margin: 18px 0 0; }
+  .tab { font: inherit; font-size: 14px; padding: 7px 14px; border: 1px solid transparent; border-bottom: none;
+    border-radius: 8px 8px 0 0; background: none; color: var(--muted); cursor: pointer; }
+  .tab[aria-selected="true"] { background: var(--panel); border-color: var(--border); color: var(--fg); font-weight: 600;
+    margin-bottom: -1px; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-top: none; padding: 12px 16px 16px;
+    border-radius: 0 0 8px 8px; }
+  .panel[hidden] { display: none; }
+  .choice { border-top: 1px solid var(--border); padding: 9px 0; }
+  .choice:first-of-type { border-top: none; }
+  .choice .head { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+  .choice .arrow { color: var(--muted); }
+  .choice p { margin: 4px 0; line-height: 1.45; font-size: 14px; }
+  .quote { border-left: 3px solid var(--accent); padding: 2px 10px; margin: 6px 0; font-style: italic; }
+  .ev { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .vref, .dref { cursor: pointer; display: inline-flex; gap: 5px; align-items: center; }
+  .others { font-size: 12.5px; color: var(--muted); }
+  .scroll { overflow-x: auto; }
+  table.compare td.open { color: var(--muted); font-style: italic; }
+  tr.differs th { border-left: 3px solid var(--accent); }
+  .node text { font-size: 15px; fill: var(--fg); paint-order: stroke; stroke: var(--panel); stroke-width: 3px; pointer-events: none; }
+  .node.greyed path.shape { opacity: .35; }
+  .node.greyed text { opacity: .5; }
+  .node.in-point text { font-weight: 600; }
+  .link.explored { stroke: var(--accent); stroke-opacity: .7; stroke-width: 3px; }
+  .link.on-path { stroke-opacity: 1; stroke-width: 4px; }
+  .link.on-path.tree { stroke: var(--accent); }
+  .link.on-path:not(.tree) { stroke-width: 1.8px; stroke-opacity: .85; }
+  .zoom-ctl { position: absolute; top: 8px; right: 10px; display: flex; gap: 4px; z-index: 2; }
+  .zoom-ctl button { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel);
+    color: var(--fg); font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
+  .zoom-ctl button:hover { border-color: var(--accent); }
+  .link.shown { stroke-opacity: .95; stroke-width: 2.4px; }
+  .graph-toggle { position: absolute; top: 8px; left: 10px; font-size: 12px; color: var(--muted); background: var(--panel);
+    padding: 2px 6px; border-radius: 6px; display: flex; gap: 5px; align-items: center; cursor: pointer; }
+  .node.dim-out, .link.dim-out { opacity: .1; }
+  .graph-key { font-size: 11.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 12px; padding: 6px 12px;
+    border-top: 1px solid var(--border); }
+  .graph-key b { color: var(--fg); font-weight: 600; }
+  .traj-wrap { position: relative; }
+  svg.lineage { display: block; width: 100%; height: 46px; overflow: visible; }
+  table.traj { border-collapse: separate; border-spacing: 0; font-size: 12.5px; overflow-wrap: normal; word-break: normal; hyphens: none; }
+  table.traj th, table.traj td { padding: 4px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.traj thead th { position: sticky; top: 0; background: var(--panel); }
+  table.traj th.row-h { text-align: left; font-weight: 500; min-width: 140px; max-width: 220px; }
+  table.traj .step-h { cursor: pointer; text-align: center; min-width: 112px; border-top: 3px solid var(--muted); }
+  table.traj .step-h b { display: block; font-size: 14px; }
+  table.traj .step-h .mv, table.traj .step-h .vd, table.traj .step-h .alt { display: block; font-size: 11px; }
+  .mv-seed, .mv-solution { border-top-color: var(--dimension) !important; } .mv-seed .mv, .mv-solution .mv { color: var(--dimension); }
+  .mv-exploit, .mv-region { border-top-color: var(--accent) !important; } .mv-exploit .mv, .mv-region .mv { color: var(--accent); }
+  .mv-explore, .mv-contrast { border-top-color: var(--novel) !important; } .mv-explore .mv, .mv-contrast .mv { color: var(--novel); }
+  .vd-strong, .vd-grounded { color: var(--accepted); } .vd-mixed, .vd-partial { color: var(--mixed); }
+  .vd-weak, .vd-ungrounded { color: var(--rejected); }
+  table.traj .alt { font-weight: 700; color: var(--fg); }
+  table.traj td.c { text-align: left; min-width: 112px; max-width: 150px; }
+  table.traj td.changed { box-shadow: inset 0 0 0 2px var(--accent); border-radius: 4px; }
+  table.traj td.novel .cell-v { font-weight: 700; }
+  table.traj td.contrast { box-shadow: inset 0 0 0 2px var(--novel); border-radius: 4px; }
+  table.traj td.dropped { opacity: .55; }
+  table.traj .sel { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  table.traj .band-h { text-align: center; font-size: 12px; min-width: 40px; }
+  table.traj td.band span { display: block; height: 18px; border-radius: 3px; background: var(--accepted); opacity: .75; }
+  .cell-v { font-size: 12px; }
+  .legend { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0; }
+  .region { border: 1px solid var(--border); border-left: 4px solid var(--accepted); border-radius: 6px; padding: 8px 12px; margin: 8px 0; }
+  .link.off { display: none; }
+  .mode-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px;
+    margin-bottom: 6px; color: #fff; }
+  .mode-icon.mode-search { background: var(--accent); } .mode-icon.mode-explain { background: var(--mixed); }
+  .lanes-wrap, .qoc-wrap { position: relative; }
+  svg.lane-arrows, svg.qoc-links { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+  table.lanes { border-collapse: separate; border-spacing: 0; font-size: 13px; width: 100%; }
+  table.lanes th, table.lanes td { border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: middle; }
+  table.lanes thead th { font-size: 12px; color: var(--muted); font-weight: 600; }
+  table.lanes tbody th { min-width: 160px; max-width: 240px; font-weight: 400; }
+  table.lanes .idea { display: block; color: var(--muted); font-size: 12px; }
+  table.lanes tr.dropped th, table.lanes tr.dropped td:not(.outcome) { opacity: .7; }
+  table.lanes td.outcome { font-size: 12px; max-width: 220px; }
+  .node-chip { font: inherit; font-size: 12px; border-radius: 12px; padding: 3px 9px; margin: 2px 6px 2px 0; cursor: pointer;
+    border: 2px solid var(--border); background: var(--panel); color: var(--fg); position: relative; z-index: 1; white-space: nowrap; }
+  .node-chip small { color: var(--muted); }
+  .vb-strong, .vb-grounded { border-color: var(--accepted) !important; } .vb-mixed, .vb-partial { border-color: var(--mixed) !important; }
+  .vb-weak, .vb-ungrounded { border-color: var(--rejected) !important; }
+  .node-chip.sel, .story-step.sel, .opt.sel { box-shadow: 0 0 0 3px var(--accent); }
+  table.heat td.h.sel, table.heat th.sel { outline: 2px solid var(--fg); }
+  .alt-chip { font-size: 12px; font-weight: 600; color: var(--accepted); }
+  .dropped-mark { color: var(--rejected); font-weight: 600; }
+  table.heat { border-collapse: separate; border-spacing: 2px; font-size: 11px; width: auto; }
+  table.heat th, table.heat td { white-space: nowrap; }
+  table.heat th { color: var(--muted); font-weight: 600; padding: 0 3px; }
+  table.heat th.heat-r { text-align: left; border-bottom: 1px solid var(--border); }
+  table.heat td.h { width: 26px; height: 18px; border-radius: 3px; cursor: pointer; }
+  table.heat .rb { border-left: 6px solid var(--panel); }
+  .h-meets { background: var(--accepted); } .h-partly { background: var(--mixed); } .h-misses { background: var(--rejected); }
+  .h-none { background: var(--border); opacity: .5; }
+  .sw { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 3px; }
+  .chip-sm { cursor: pointer; }
+  .gaps { margin-top: 28px; border-top: 2px solid var(--border); padding-top: 6px; }
+  .gap-summary { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  .gap-count strong { color: var(--accent); font-size: 1.1em; }
+  .gap-h { font-size: 14px; margin: 16px 0 6px; }
+  .choice.gap .head .chip { margin: 0; }
+  .choice.fit { cursor: pointer; }
+  .choice.fit:hover, .choice.fit:focus { border-color: var(--accent); }
+  .badge.neutral { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .fit-note { font-size: 13px; color: var(--muted); }
+  .tradeoffs { margin: 4px 0; padding-left: 18px; font-size: 13px; }
+  .t-gain, .t-cost { font-size: 11px; border-radius: 9px; padding: 0 6px; border: 1px solid; }
+  .t-gain { color: var(--accepted); } .t-cost { color: var(--rejected); }
+  .own-tradeoff { font-size: 13px; border-left: 3px solid var(--mixed); padding-left: 8px; }
+  .round-head { margin: 18px 0 6px; font-size: 14px; border-bottom: 2px solid var(--border); padding-bottom: 4px; }
+  .round-end { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .story-step { border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 8px 0; cursor: pointer; }
+  .story-step.mv-explore, .story-step.mv-contrast { border-left-color: var(--novel); }
+  .story-step.mv-exploit, .story-step.mv-region { border-left-color: var(--accent); }
+  .story-step.mv-ablate { border-left-style: dotted; border-left-color: var(--accent); }
+  .story-step.mv-seed, .story-step.mv-solution { border-left-color: var(--dimension); }
+  .story-head { font-size: 14px; margin-bottom: 4px; }
+  .story-step p { margin: 4px 0; line-height: 1.45; font-size: 13.5px; }
+  .lbl { display: inline-block; min-width: 68px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+  .lbl-row { display: flex; gap: 0; font-size: 13px; } .lbl-row .lbl { padding-top: 2px; }
+  ul.moves { margin: 0; padding-left: 16px; } ul.moves li { margin: 1px 0; }
+  .vd-chip { font-size: 11px; border: 2px solid var(--border); border-radius: 10px; padding: 0 7px; margin-left: 4px; }
+  .judged { margin: 4px 0; } .j { font-size: 11px; border-radius: 9px; padding: 1px 7px; margin: 2px 4px 2px 0; display: inline-block; color: #fff; cursor: pointer; }
+  .j-meets { background: var(--accepted); } .j-partly { background: var(--mixed); } .j-misses { background: var(--rejected); }
+  .qoc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); column-gap: 90px; font-size: 13px; }
+  .qoc-hdr { display: grid; grid-template-columns: 1fr 1fr; color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+  .qoc-crit .qoc-hdr { grid-template-columns: 1fr; }
+  .qoc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid var(--border); padding: 6px 0; align-items: center; }
+  .opt { border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px; margin: 3px 0; cursor: pointer; background: var(--panel); position: relative; z-index: 1; }
+  .opt-solution { border-left: 4px solid var(--accent); } .opt-contrast { border-left: 4px solid var(--novel); }
+  .crit { border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; margin: 6px 0; cursor: pointer; background: var(--panel); position: relative; z-index: 1; }
+  svg.qoc-links path.traced { stroke-opacity: 1; stroke-width: 3px; }
+  details.howto { border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; margin: 4px 0 16px; font-size: 14px; }
+  details.howto summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+  details.howto[open] summary { margin-bottom: 6px; }
+  details.howto p, details.howto ul { margin: 6px 0; }
+  details.howto li { margin: 3px 0; }
+  details.grid-details { margin-top: 22px; } details.grid-details summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+  .solution, .option { border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 8px 0; cursor: pointer; }
+  .solution.sel, .option.sel { box-shadow: 0 0 0 2px var(--accent); }
+  .adr { border-top: 1px solid var(--border); margin-top: 18px; padding-top: 8px; }
+  .adr h3 { margin: 6px 0; font-size: 16px; }
+  .option.chosen { border-left: 4px solid var(--accepted); }
+  .option.discarded { border-left: 4px solid var(--rejected); opacity: .9; }
+  .option .values { font-size: 13px; margin: 4px 0; }
+  ul.pc { list-style: none; padding: 0; margin: 4px 0; font-size: 13px; }
+  ul.pc li::before { font-weight: 700; margin-right: 6px; }
+  ul.pc li.pro::before { content: "+"; color: var(--accepted); }
+  ul.pc li.con::before { content: "−"; color: var(--rejected); }
+  ul.parts { margin: 4px 0 6px; padding-left: 18px; font-size: 13px; }
+  ul.parts li { margin: 4px 0; }
+  .pairs { display: block; margin: 2px 0; }
+  .pairs .pair { display: block; padding-left: 10px; font-size: 13px; }
+  .node.unjudged path.shape { fill: var(--panel); stroke: var(--rejected); stroke-dasharray: 2,2; stroke-width: 1.5px; }
+  @media (max-width: 900px) {
+    .ex-wrap { grid-template-columns: 1fr; }
+    .splitter-v, .splitter-h { display: none; }
+    .ex-text { padding: 16px 16px 30px; }
+    .ex-side { position: static; height: auto; border-left: none; border-top: 1px solid var(--border); }
+    #canvas { height: 420px; flex: none; }
+    #info { flex: none; }
+  }
+</style>
+</head>
+<body class="page-explainer">
+<header class="top">
+<span class="brand"><img src="../assets/ddspace-icon.svg" alt="" class="brand-icon" width="32" height="32">Design rationale</span>  <nav></nav>
+  <button class="theme-btn" id="theme-toggle" type="button" title="Switch light / dark mode" aria-label="Switch light / dark mode" style="margin-left:auto">◐</button>
+</header>
+<div class="ex-wrap">
+<main class="ex-text">
+  <div class="mode-icon mode-explain" role="img" aria-label="Explain: the rationale of a given solution" title="Explain: the rationale of a given solution">
+<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="kind">Explain · design rationale · no design space</div>
+  <h1>Support-ticket routing</h1>
+<p>A software company receives about 20,000 support tickets a day in English, Spanish and Portuguese, by e-mail and web form. Each ticket must reach one of 25 teams. First-line staff currently forward tickets by hand, and a misrouted ticket waits a day on average. Products and their support teams change a few times a year.</p>  <details class="howto"><summary>How to read this page</summary>
+    <p>A coding agent <b>explained</b> an existing solution. It mapped the solution's choices onto decisions
+      (dimensions) and their options (values), and tested which parts of the solution the requirements justify. It
+      contrasted one value at a time to tell whether the requirements <b>force</b> that value or it was chosen
+      <b>freely</b>. Every judgement here is the agent's; the page lays out its rationale file.</p>
+    <ul>
+      <li><b>Decisions (ADRs)</b> shows the solution, then one record per decision: the requirements that drive it,
+        the solution's option, and the options it was contrasted with.</li>
+<li><b>Trajectory</b> shows how the agent got there:
+        <ul>
+          <li>the steps it took (the solution, parts of it called regions, and contrasts), each judged grounded,
+            partial or ungrounded;</li>
+          <li>a view of questions, options and criteria, which shows which values are forced and which free;</li>
+          <li>the regions that justify the solution.</li>
+        </ul></li>    </ul>
+<p>No design space was used. The agent named the decisions and options itself, so nothing was checked
+      against a space and there are no gaps in one.</p>    <p>The graph on the right shows the decisions involved, the design points and the requirements. Select
+      anything, in the text or the graph, to see it in both.</p>
+  </details>
+
+  <h2 class="sec">Requirements</h2>
+  <ul class="chips" id="requirements">
+    <li><button class="chip" type="button" data-requirement="R1" data-node="r:R1"><strong>R1</strong> Assign every new ticket to a team, and let a support agent move it to another team when the assignment is wrong. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="R2" data-node="r:R2"><strong>R2</strong> Learn from the moves that support agents make. <span class="muted">functional</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q1" data-node="r:Q1"><strong>Q1</strong> At the daily peak of 3,000 tickets an hour, a ticket is assigned within 10 seconds of its arrival. <span class="muted">quality: latency</span></button></li>
+    <li><button class="chip" type="button" data-requirement="Q2" data-node="r:Q2"><strong>Q2</strong> When a new team is created for a new product, at least 80% of the tickets meant for it reach it within two weeks. <span class="muted">quality: adaptability</span></button></li>
+    <li><button class="chip" type="button" data-requirement="C1" data-node="r:C1"><strong>C1</strong> Tickets may contain customers&#39; personal data and must not leave the company&#39;s cloud region in the EU. <span class="muted">constraint</span></button></li>
+  </ul>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" type="button" role="tab" data-tab="adrs" aria-selected="true">Decisions (ADRs)</button>
+<button class="tab" type="button" role="tab" data-tab="trajectory" aria-selected="false">Trajectory</button>  </div>
+
+  <section class="panel" data-panel="adrs">
+    <p class="hint">The solution, then its decisions as architecture decision records: each ADR addresses a few related requirements, with the solution's option and the options it was contrasted with. Select an alternative or an option to see it in the graph.</p>
+    <h2 class="sec">The solution</h2>
+    <div class="solution" data-alt="S" tabindex="0"><strong>S · Ticket routing as built</strong>
+<p>A multilingual classifier routes webhook tickets, while a weekly correction-driven training pipeline updates the model and keyword rules cover new teams before training data exists. The service runs in the EU and gives agents prediction context and team-level monitoring.</p>      <p class="muted">Composed of 6 partial design points, one per ADR:</p>
+      <ul class="parts">
+        <li><a href="#adr-ADR1" class="adr-link">ADR1</a> · Weekly supervised retraining with an accuracy gate <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q2">Q2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:7">Learning</span> → <span class="vref" data-node="z:7.1">Weekly supervised retraining on 90 days of final team labels</span></span><span class="pair"><span class="dref" data-node="z:8">Model acceptance</span> → <span class="vref" data-node="z:8.1">Replace only if last-week accuracy is at least current accuracy</span></span><span class="pair"><span class="dref" data-node="z:9">Model rollout</span> → <span class="vref" data-node="z:9.1">Store model file in object storage and load within five minutes</span></span></span></li>
+        <li><a href="#adr-ADR2" class="adr-link">ADR2</a> · Team-lead keyword rules <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q2">Q2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:10">Cold start</span> → <span class="vref" data-node="z:10.1">Team-lead keyword rules until agent corrections create training data</span></span></span></li>
+        <li><a href="#adr-ADR3" class="adr-link">ADR3</a> · Multilingual embeddings with logistic regression <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q2">Q2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:4">Text representation</span> → <span class="vref" data-node="z:4.1">Fixed pretrained multilingual sentence embeddings</span></span><span class="pair"><span class="dref" data-node="z:5">Classifier</span> → <span class="vref" data-node="z:5.1">Logistic regression with one class per team</span></span></span></li>
+        <li><a href="#adr-ADR4" class="adr-link">ADR4</a> · Webhook to two EU Kubernetes replicas <span class="chip small" data-node="r:C1">C1</span><span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q1">Q1</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:1">Ingress</span> → <span class="vref" data-node="z:1.1">Help desk webhook</span></span><span class="pair"><span class="dref" data-node="z:2">Hosting</span> → <span class="vref" data-node="z:2.1">Managed Kubernetes in EU with two replicas and load balancer</span></span></span></li>
+        <li><a href="#adr-ADR5" class="adr-link">ADR5</a> · Attach same-customer, same-subject tickets within one hour <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q1">Q1</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:3">Duplicate handling</span> → <span class="vref" data-node="z:3.1">One-hour customer-and-subject deduplication</span></span></span></li>
+        <li><a href="#adr-ADR6" class="adr-link">ADR6</a> · Show runner-ups and influential words, with moved-share monitoring <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q2">Q2</span>
+          <span class="pairs"><span class="pair"><span class="dref" data-node="z:6">Agent explanation</span> → <span class="vref" data-node="z:6.1">Two runner-up teams and influential words</span></span><span class="pair"><span class="dref" data-node="z:11">Monitoring</span> → <span class="vref" data-node="z:11.1">Per-team moved-ticket share dashboard and alert when share doubles week over week</span></span></span></li>
+      </ul>
+<p class="muted">As a whole: Tickets arrive through the help-desk webhook, are deduplicated for one hour by customer and subject, embedded with a fixed multilingual model, and assigned by team using logistic regression. The service runs on two EU Kubernetes replicas, explains predictions with runner-up teams and influential words, retrains weekly from 90 days of labels, accepts models based on last-week accuracy, and loads approved files from object storage within five minutes; keyword rules cover cold start while dashboards monitor team-share shifts.</p>    </div>
+    <article class="adr" id="adr-ADR1">
+      <h3>ADR1 · Learn routing from agent corrections <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q2">Q2</span></h3>
+<p><strong>Context.</strong> Agent moves must influence later routing, and new teams need to adapt after creation. The solution records final teams, retrains on a rolling 90-day set each week, gates replacement on last-week accuracy, then loads the accepted model within five minutes.</p>      <p><strong>Decision.</strong> Weekly supervised retraining with an accuracy gate.</p>
+      <div class="option chosen" data-option="ADR1:O1" tabindex="0">
+        <div class="head"><strong>Weekly supervised retraining with an accuracy gate</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:7">Learning</span> → <span class="vref" data-node="z:7.1">Weekly supervised retraining on 90 days of final team labels</span></span><span class="pair"><span class="dref" data-node="z:8">Model acceptance</span> → <span class="vref" data-node="z:8.1">Replace only if last-week accuracy is at least current accuracy</span></span><span class="pair"><span class="dref" data-node="z:9">Model rollout</span> → <span class="vref" data-node="z:9.1">Store model file in object storage and load within five minutes</span></span></p>
+<div class="quote">“Every Sunday a scheduled job exports the tickets of the last 90 days with their final teams, retrains the classifier (the embedding model is never retrained)”</div><div class="quote">“If it is at least as accurate as the current model, the job replaces the model file in object storage”</div><div class="quote">“the service loads the new file within five minutes.”</div><ul class="pc"><li class="pro">Uses corrected final team labels as supervised training data.</li><li class="pro">Checks candidate accuracy before replacing the deployed model.</li><li class="pro">Makes an accepted update available within five minutes.</li><li class="con">A correction may wait for the next weekly run to influence the model.</li><li class="con">Last-week accuracy does not establish the new-team two-week target.</li></ul><p>Chosen because it directly learns from agent moves and supports periodic adaptation. R2 requires learning from moves, but does not force weekly batch training, this window, this gate or this storage choice.</p>      </div>
+      <div class="option discarded" data-option="ADR1:O2" tabindex="0">
+        <div class="head"><strong>Online learning after each correction</strong> <span class="badge rejected">discarded</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:12">Learning cadence</span> → <span class="vref" data-node="z:12.1">Update the classifier online after every agent correction</span></span></p>
+<ul class="pc"><li class="pro">Can incorporate a correction before the next weekly cycle.</li><li class="con">A mistaken correction can influence subsequent routing before review.</li></ul><p>This also supports learning from moves and could react faster, so the requirements do not force the selected cadence; it was not chosen in the solution.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR2">
+      <h3>ADR2 · Provide a route for a new team before it has examples <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q2">Q2</span></h3>
+<p><strong>Context.</strong> A new team initially has no training examples. Tickets still need a team assignment, and later agent moves can create labels for learning; Q2 sets a two-week routing target.</p>      <p><strong>Decision.</strong> Team-lead keyword rules.</p>
+      <div class="option chosen" data-option="ADR2:O1" tabindex="0">
+        <div class="head"><strong>Team-lead keyword rules</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:10">Cold start</span> → <span class="vref" data-node="z:10.1">Team-lead keyword rules until agent corrections create training data</span></span></p>
+<div class="quote">“A new team has no training data until agents move tickets to it. Until then, keyword rules written by the team&#39;s lead route its tickets.”</div><ul class="pc"><li class="pro">Provides an initial route without team-specific training data.</li><li class="pro">Can be written by the team lead with product knowledge.</li><li class="con">Accuracy depends on rule coverage and maintenance.</li><li class="con">No evidence establishes the 80% target within two weeks.</li></ul><p>Chosen as an immediate fallback while corrections accumulate. It supports the requirements plausibly, but the problem does not force keyword rules or prove the target.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR3">
+      <h3>ADR3 · Represent ticket text and select a team <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q1">Q1</span><span class="chip small" data-node="r:Q2">Q2</span></h3>
+<p><strong>Context.</strong> Incoming tickets are in English, Spanish and Portuguese and must be assigned to one of 25 teams. A learned classifier can incorporate agent corrections; the latency and new-team targets require operational evidence not included in the solution description.</p>      <p><strong>Decision.</strong> Multilingual embeddings with logistic regression.</p>
+      <div class="option chosen" data-option="ADR3:O1" tabindex="0">
+        <div class="head"><strong>Multilingual embeddings with logistic regression</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:4">Text representation</span> → <span class="vref" data-node="z:4.1">Fixed pretrained multilingual sentence embeddings</span></span><span class="pair"><span class="dref" data-node="z:5">Classifier</span> → <span class="vref" data-node="z:5.1">Logistic regression with one class per team</span></span></p>
+<div class="quote">“Otherwise the service turns the subject and the body into an embedding with a pretrained multilingual sentence-embedding model”</div><div class="quote">“and a logistic-regression classifier with one class per team picks the team.”</div><ul class="pc"><li class="pro">Uses a representation intended for the stated languages.</li><li class="pro">Provides one direct class for each support team.</li><li class="pro">Keeps the classifier simple to retrain.</li><li class="con">Fixed embeddings are not adapted to company-specific language.</li><li class="con">A new team has no learned examples, and no benchmark demonstrates the time target.</li></ul><p>Chosen as the solution&#39;s trainable multilingual classification path. R2 supports having a learning mechanism, but neither the embedding model nor logistic regression is forced.</p>      </div>
+      <div class="option discarded" data-option="ADR3:O2" tabindex="0">
+        <div class="head"><strong>Keyword rules only</strong> <span class="badge rejected">discarded</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:5">Classifier</span> → <span class="vref" data-node="z:5.2">Keyword rules only, with no learned text model</span></span></p>
+<ul class="pc"><li class="pro">Rules are transparent and directly maintainable.</li><li class="con">Does not learn a classifier from agent moves.</li><li class="con">Unmatched wording needs a separate fallback.</li></ul><p>The contrast loses the support for R2. This supports a learned mechanism, but leaves the specific model family open.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR4">
+      <h3>ADR4 · Keep routing and ticket processing in the EU <span class="chip small" data-node="r:C1">C1</span><span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q1">Q1</span></h3>
+<p><strong>Context.</strong> Ticket data can include personal information and must remain in the company&#39;s EU cloud region. The webhook starts routing, and the service needs to handle arrivals at the stated peak, although no performance result is supplied.</p>      <p><strong>Decision.</strong> Webhook to two EU Kubernetes replicas.</p>
+      <div class="option chosen" data-option="ADR4:O1" tabindex="0">
+        <div class="head"><strong>Webhook to two EU Kubernetes replicas</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:1">Ingress</span> → <span class="vref" data-node="z:1.1">Help desk webhook</span></span><span class="pair"><span class="dref" data-node="z:2">Hosting</span> → <span class="vref" data-node="z:2.1">Managed Kubernetes in EU with two replicas and load balancer</span></span></p>
+<div class="quote">“The help desk tool sends every new ticket to the routing service through a webhook.”</div><div class="quote">“The service runs on a managed Kubernetes cluster in the company&#39;s EU cloud region, with two replicas behind a load balancer.”</div><ul class="pc"><li class="pro">The hosting location supports the EU data constraint.</li><li class="pro">The webhook connects ticket arrival to routing.</li><li class="pro">Replicas and a load balancer provide basic distribution and redundancy.</li><li class="con">The solution does not state peak-load measurements against ten seconds.</li><li class="con">The particular platform and replica count add operational choices beyond the residency constraint.</li></ul><p>EU-local hosting is forced by C1; the webhook, Kubernetes and replica arrangement are not forced by the requirements.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR5">
+      <h3>ADR5 · Avoid classifying likely duplicate tickets <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:Q1">Q1</span></h3>
+<p><strong>Context.</strong> Reducing repeated classification could help processing load, but each ticket still needs an appropriate team and the solution gives no evidence about duplicate frequency or latency benefit.</p>      <p><strong>Decision.</strong> Attach same-customer, same-subject tickets within one hour.</p>
+      <div class="option chosen" data-option="ADR5:O1" tabindex="0">
+        <div class="head"><strong>Attach same-customer, same-subject tickets within one hour</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:3">Duplicate handling</span> → <span class="vref" data-node="z:3.1">One-hour customer-and-subject deduplication</span></span></p>
+<div class="quote">“It first looks for duplicates: if the same customer sent a ticket with the same subject in the last hour, the service attaches the new ticket to the earlier one and does not classify it.”</div><ul class="pc"><li class="pro">Avoids repeated classification for likely duplicates.</li><li class="con">Can attach a distinct issue to the earlier ticket&#39;s team.</li><li class="con">No measured latency benefit is given.</li></ul><p>This is a discretionary optimization; no stated requirement forces its matching rule or one-hour window.</p>      </div>
+    </article>
+    <article class="adr" id="adr-ADR6">
+      <h3>ADR6 · Give agents routing context and surface shifts <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q2">Q2</span></h3>
+<p><strong>Context.</strong> Agents can move tickets when assignments are wrong, and their moves are the source of learning. Prediction context and team-level move monitoring may help agents review assignments, but no requirement prescribes these interfaces or alerts.</p>      <p><strong>Decision.</strong> Show runner-ups and influential words, with moved-share monitoring.</p>
+      <div class="option chosen" data-option="ADR6:O1" tabindex="0">
+        <div class="head"><strong>Show runner-ups and influential words, with moved-share monitoring</strong> <span class="badge accepted">chosen</span></div>
+        <p class="values pairs"><span class="pair"><span class="dref" data-node="z:6">Agent explanation</span> → <span class="vref" data-node="z:6.1">Two runner-up teams and influential words</span></span><span class="pair"><span class="dref" data-node="z:11">Monitoring</span> → <span class="vref" data-node="z:11.1">Per-team moved-ticket share dashboard and alert when share doubles week over week</span></span></p>
+<div class="quote">“The service writes the team back to the help desk tool, with the two runner-up teams and the words that weighed most in the decision, which the tool shows to agents next to the ticket.”</div><div class="quote">“A dashboard shows, per team, the share of tickets that agents moved, and sends an alert when that share doubles from one week to the next.”</div><ul class="pc"><li class="pro">Gives agents context near the ticket when reviewing a predicted team.</li><li class="pro">Makes changes in per-team move rates visible.</li><li class="con">A doubling alert is not a direct measure of classification accuracy.</li><li class="con">The interface and threshold do not themselves ensure new-team performance.</li></ul><p>These are useful operational choices around review and monitoring, but they are not forced by the stated requirements.</p>      </div>
+    </article>
+    <h2 class="sec">Requirements not addressed</h2>
+    <p>Every requirement is addressed by an ADR.</p>
+  </section>
+
+  <section class="panel" data-panel="trajectory" hidden>
+    <p class="hint">How the agent explained the solution: 8 points or regions evaluated of a budget of 8. The story follows the agent's thinking step by step; the questions, options and criteria then show which of the solution's choices the requirements force. Select a point anywhere to see it in the graph.</p>
+
+
+
+    <h2 class="sec">The explanation, step by step</h2>
+    <article class="story-step mv-solution" data-step="1">
+      <div class="story-head"><b>#1</b> The solution as one design point <span class="vd-chip vb-partial">partial</span> <span class="alt-chip">the solution</span></div>
+<p><span class="lbl">Thought</span> The complete routing design is intended to assign tickets and incorporate agent corrections while meeting the stated latency, adaptation and EU residency needs.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:1">Ingress</span> → <span class="vref" data-node="z:1.1">Help desk webhook</span></li><li><span class="dref" data-node="z:2">Hosting</span> → <span class="vref" data-node="z:2.1">Managed Kubernetes in EU with two replicas and load balancer</span></li><li><span class="dref" data-node="z:3">Duplicate handling</span> → <span class="vref" data-node="z:3.1">One-hour customer-and-subject deduplication</span></li><li><span class="dref" data-node="z:4">Text representation</span> → <span class="vref" data-node="z:4.1">Fixed pretrained multilingual sentence embeddings</span></li><li><span class="dref" data-node="z:5">Classifier</span> → <span class="vref" data-node="z:5.1">Logistic regression with one class per team</span></li><li><span class="dref" data-node="z:6">Agent explanation</span> → <span class="vref" data-node="z:6.1">Two runner-up teams and influential words</span></li><li><span class="dref" data-node="z:7">Learning</span> → <span class="vref" data-node="z:7.1">Weekly supervised retraining on 90 days of final team labels</span></li><li><span class="dref" data-node="z:8">Model acceptance</span> → <span class="vref" data-node="z:8.1">Replace only if last-week accuracy is at least current accuracy</span></li><li><span class="dref" data-node="z:9">Model rollout</span> → <span class="vref" data-node="z:9.1">Store model file in object storage and load within five minutes</span></li><li><span class="dref" data-node="z:10">Cold start</span> → <span class="vref" data-node="z:10.1">Team-lead keyword rules until agent corrections create training data</span></li><li><span class="dref" data-node="z:11">Monitoring</span> → <span class="vref" data-node="z:11.1">Per-team moved-ticket share dashboard and alert when share doubles week over week</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The design directly supports routing, agent moves, correction-based learning and EU-local hosting. It provides no peak-load measurement against 10 seconds and no new-team result against the 80% in two weeks target, so those targets remain unproven; the latter is especially dependent on initial rules and arriving corrections.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span><span class="j j-meets" data-node="r:C1">C1 meets</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:7.1">Weekly supervised retraining on 90 days of final team labels</span>, <span class="vref" data-node="z:10.1">Team-lead keyword rules until agent corrections create training data</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R2">R2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q2">Q2</span>: <span class="muted">The pipeline learns from corrections, but new-team routing first depends on rules and collected corrections, and model updates wait for a weekly cycle.</span></li></ul><p class="muted">Tickets arrive through the help-desk webhook, are deduplicated for one hour by customer and subject, embedded with a fixed multilingual model, and assigned by team using logistic regression. The service runs on two EU Kubernetes replicas, explains predictions with runner-up teams and influential words, retrains weekly from 90 days of labels, accepts models based on last-week accuracy, and loads approved files from object storage within five minutes; keyword rules cover cold start while dashboards monitor team-share shifts.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This is operationally simple, explainable, and multilingual, but fixed embeddings and weekly retraining may miss new terminology. The acceptance and monitoring rules emphasize recent accuracy and routing shifts, not broader quality or fairness.</p>    </article>
+    <article class="story-step mv-region" data-step="2">
+      <div class="story-head"><b>#2</b> A region of #1: part of the solution <span class="vd-chip vb-grounded">grounded</span></div>
+<p><span class="lbl">Thought</span> R2 calls for learning from agent moves, and Q2 calls for the learned routing to adapt when a new product team appears; the batch, acceptance and rollout choices should support those needs.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:7">Learning</span> → <span class="vref" data-node="z:7.1">Weekly supervised retraining on 90 days of final team labels</span></li><li><span class="dref" data-node="z:8">Model acceptance</span> → <span class="vref" data-node="z:8.1">Replace only if last-week accuracy is at least current accuracy</span></li><li><span class="dref" data-node="z:9">Model rollout</span> → <span class="vref" data-node="z:9.1">Store model file in object storage and load within five minutes</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> This is the clearest mechanism for learning from recorded moves: the final team is the supervised label. Weekly retraining and rapid file loading describe a plausible update cycle, but neither the sample count for a new team nor its resulting routing accuracy is given, so the 80% target is not established.</p><div class="judged"><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:7.1">Weekly supervised retraining on 90 days of final team labels</span>, <span class="vref" data-node="z:8.1">Replace only if last-week accuracy is at least current accuracy</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R2">R2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q2">Q2</span>: <span class="muted">Training on final teams uses agent corrections, while the weekly schedule and accuracy gate can defer when a newly created team&#39;s examples influence the deployed model.</span></li></ul><p class="muted">Weekly, the system retrains a model using the prior 90 days of final team labels. It replaces the current model only when the candidate’s last-week accuracy is at least as high, then stores the accepted model in object storage for loading within five minutes.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides regular adaptation, a simple performance gate, and relatively quick deployment, but it cannot incorporate new labels between weekly retraining cycles and may favor models that perform well on last week’s data while overlooking other periods or conditions.</p>    </article>
+    <article class="story-step mv-contrast" data-step="3">
+      <div class="story-head"><b>#3</b> A contrast on #2: one option changed <span class="vd-chip vb-ungrounded">ungrounded</span></div>
+<p><span class="lbl">Thought</span> Test whether R2 and Q2 force weekly batch learning by comparing it with immediate updates from the same corrections.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>add <span class="dref" data-node="z:12">Learning cadence</span> → <span class="vref" data-node="z:12.1">Update the classifier online after every agent correction</span></li><li>drop <span class="dref" data-node="z:7">Learning</span> <span class="muted">(was <span class="vref" data-node="z:7.1">Weekly supervised retraining on 90 days of final team labels</span>)</span></li><li>drop <span class="dref" data-node="z:8">Model acceptance</span> <span class="muted">(was <span class="vref" data-node="z:8.1">Replace only if last-week accuracy is at least current accuracy</span>)</span></li><li>drop <span class="dref" data-node="z:9">Model rollout</span> <span class="muted">(was <span class="vref" data-node="z:9.1">Store model file in object storage and load within five minutes</span>)</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Online learning also uses agent moves and may react faster, but it trades the weekly validation boundary for immediate influence from each correction. The requirements do not set a model-update cadence or require immediate updates; weekly batching is therefore a free choice among mechanisms that learn from moves. The new-team percentage remains unproven for either cadence.</p><div class="judged"><span class="j j-meets" data-node="r:R2">R2 meets</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:12.1">Update the classifier online after every agent correction</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R2">R2</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q2">Q2</span>: <span class="muted">Immediate updates could expose new-team corrections sooner, but an unreviewed mistaken move could affect subsequent routing and reduce the share of new-team tickets routed correctly.</span></li></ul><p class="muted">The support-ticket classifier routes incoming tickets and updates its model online whenever an agent corrects a routing decision. Those corrections immediately influence subsequent classifications, allowing the system to adapt continuously to changing patterns.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides rapid learning from current agent feedback, but gives up the stability of batched or validated updates. A mistaken correction can therefore affect later routing before it is reviewed.</p>    </article>
+    <article class="story-step mv-region" data-step="4">
+      <div class="story-head"><b>#4</b> A region of #1: part of the solution <span class="vd-chip vb-grounded">grounded</span></div>
+<p><span class="lbl">Thought</span> Q2 calls for new-team routing soon after team creation, so a cold-start route should help before the model has team-specific examples; R1 still calls for tickets to receive an assignment.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:10">Cold start</span> → <span class="vref" data-node="z:10.1">Team-lead keyword rules until agent corrections create training data</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The rules avoid leaving a new team without any route while training data accumulates, and later corrections feed the learning process. Their accuracy and maintenance burden are unknown, and the solution supplies no evidence that they route 80% of intended tickets correctly within two weeks.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-partly" data-node="r:R2">R2 partly</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:10.1">Team-lead keyword rules until agent corrections create training data</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R1">R1</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q2">Q2</span>: <span class="muted">Rules allow routing before examples exist, but their coverage and the speed at which useful corrections accumulate determine whether the new-team target is reached.</span></li></ul><p class="muted">Team leads define keyword rules that route incoming support tickets to appropriate destinations. Agents correct misrouted tickets, and those corrections accumulate as training data for improving the routing approach.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This enables immediate, interpretable routing without requiring an initial dataset, but depends on team leads maintaining useful rules and agents making corrections. Early routing may be limited or inaccurate, and the system gives up some automation until sufficient correction data exists.</p>    </article>
+    <article class="story-step mv-region" data-step="5">
+      <div class="story-head"><b>#5</b> A region of #1: part of the solution <span class="vd-chip vb-grounded">grounded</span></div>
+<p><span class="lbl">Thought</span> R1 calls for assigning tickets across the stated languages, while Q1 calls for a routing path that can operate within the short response target; the multilingual representation and simple classifier should support these requirements.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:4">Text representation</span> → <span class="vref" data-node="z:4.1">Fixed pretrained multilingual sentence embeddings</span></li><li><span class="dref" data-node="z:5">Classifier</span> → <span class="vref" data-node="z:5.1">Logistic regression with one class per team</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The embeddings fit the English, Spanish and Portuguese input, and logistic regression gives a direct team-selection mechanism. These choices do not provide a latency benchmark, and the classifier alone cannot learn a new team&#39;s decision boundary without examples. No requirement singles out this specific embedding model or classifier over other trainable multilingual approaches.</p><div class="judged"><span class="j j-meets" data-node="r:R1">R1 meets</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:4.1">Fixed pretrained multilingual sentence embeddings</span>, <span class="vref" data-node="z:5.1">Logistic regression with one class per team</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:R1">R1</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:Q2">Q2</span>: <span class="muted">A classifier with a class for each team supports routing, but a newly created class has no learned examples and needs the separate cold-start rules or later corrections.</span></li></ul><p class="muted">Each support ticket is converted into a fixed pretrained multilingual sentence embedding. Logistic regression then uses those features to predict the ticket’s team, selecting the class with the highest score for routing.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This provides a simple, efficient classifier that can reuse multilingual semantic representations across teams and languages. It gives up task-specific adaptation and nonlinear decision boundaries, so domain-specific wording or subtle distinctions between teams may be missed.</p>    </article>
+    <article class="story-step mv-contrast" data-step="6">
+      <div class="story-head"><b>#6</b> A contrast on #5: one option changed <span class="vd-chip vb-ungrounded">ungrounded</span></div>
+<p><span class="lbl">Thought</span> Test whether R2 and Q2 require a learned classifier by comparing the selected classifier with keyword rules alone.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li>change <span class="dref" data-node="z:5">Classifier</span>: <span class="vref" data-node="z:5.1">Logistic regression with one class per team</span> → <span class="vref" data-node="z:5.2">Keyword rules only, with no learned text model</span></li><li>drop <span class="dref" data-node="z:4">Text representation</span> <span class="muted">(was <span class="vref" data-node="z:4.1">Fixed pretrained multilingual sentence embeddings</span>)</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Rules can assign tickets that match maintained terms, but the contrasted point has no model that learns from agent moves and needs a separate fallback for unmatched wording. That loses support for R2. The comparison supports having some learning mechanism; it does not show that logistic regression, rather than another trainable model, is required. The Q2 percentage remains unproven.</p><div class="judged"><span class="j j-partly" data-node="r:R1">R1 partly</span><span class="j j-misses" data-node="r:R2">R2 misses</span><span class="j j-partly" data-node="r:Q2">Q2 partly</span></div><p class="muted">Keyword rules would inspect ticket text for predefined terms and route it to the corresponding support queue. Tickets lacking matching keywords would require a fallback handling process, such as manual review.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This is simple, transparent, and easy to control, but it may miss tickets expressed with unfamiliar wording and require ongoing maintenance as terminology changes.</p>    </article>
+    <article class="story-step mv-region" data-step="7">
+      <div class="story-head"><b>#7</b> A region of #1: part of the solution <span class="vd-chip vb-grounded">grounded</span></div>
+<p><span class="lbl">Thought</span> C1 requires personal data to remain within the company&#39;s EU cloud region, so the service&#39;s hosting location should be determined by that constraint.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:2">Hosting</span> → <span class="vref" data-node="z:2.1">Managed Kubernetes in EU with two replicas and load balancer</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> The stated deployment puts the service in the company&#39;s EU cloud region, directly supporting the residency constraint. Two replicas and a load balancer add availability and request distribution, but C1 does not force Kubernetes, two replicas or a load balancer specifically.</p><div class="judged"><span class="j j-meets" data-node="r:C1">C1 meets</span></div><p class="muted">The support-ticket routing service would run on a managed Kubernetes cluster hosted in the EU. Two application replicas would sit behind a load balancer, distributing incoming requests and allowing traffic to continue if one replica is unavailable.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This gains managed orchestration, EU-based hosting, and basic redundancy and traffic distribution. It gives up some capacity and may increase cost and operational complexity compared with a single instance, while two replicas do not provide broad fault tolerance.</p>    </article>
+    <article class="story-step mv-region" data-step="8">
+      <div class="story-head"><b>#8</b> A region of #1: part of the solution <span class="vd-chip vb-partial">partial</span></div>
+<p><span class="lbl">Thought</span> R1 and Q1 might support avoiding duplicate classification work, although no requirement explicitly asks for deduplication.</p>      <div class="lbl-row"><span class="lbl">Move</span>
+        <ul class="moves">
+<li><span class="dref" data-node="z:3">Duplicate handling</span> → <span class="vref" data-node="z:3.1">One-hour customer-and-subject deduplication</span></li>        </ul>
+      </div>
+<p><span class="lbl">Observed</span> Deduplication can reduce repeated work, but the solution gives no latency evidence and identical customer and subject do not prove that two requests have the same intent. This is a discretionary optimization with a risk to independent ticket assignment.</p><div class="judged"><span class="j j-partly" data-node="r:R1">R1 partly</span><span class="j j-partly" data-node="r:Q1">Q1 partly</span></div><ul class="tradeoffs"><li><span class="vref" data-node="z:3.1">One-hour customer-and-subject deduplication</span>: <span class="t-gain">gains</span> <span class="vref" data-node="r:Q1">Q1</span> <span class="t-cost">gives up</span> <span class="vref" data-node="r:R1">R1</span>: <span class="muted">Skipping classification can reduce processing work, but treating a same-subject ticket as a duplicate can attach a genuinely separate issue to the earlier ticket&#39;s team.</span></li></ul><p class="muted">The system would compare each incoming ticket with tickets from the same customer received within the previous hour. If the subjects match, it would classify the incoming ticket as a duplicate and handle it together with the existing ticket rather than as an independent case.</p><p class="own-tradeoff"><span class="lbl">The point's trade-off</span> This reduces repeated work and routing noise, but risks suppressing genuinely separate issues that share a subject and occur within the one-hour window.</p>    </article>
+
+    <h2 class="sec">Questions, options and criteria</h2>
+    <p class="hint">Each question is a dimension the solution settles; its options are the solution's value and the values contrasts tried; each option links to the requirements (criteria), as judged by the most specific point that evaluated it. Links of an option judged only within the whole solution are faint; hover an option to trace its links.</p>
+    <div class="qoc-wrap">
+      <svg class="qoc-links" aria-hidden="true"></svg>
+      <div class="qoc">
+        <div class="qoc-left">
+          <div class="qoc-hdr"><span>Question</span><span>Options</span></div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:1">Ingress</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="0:0" data-step="1"><span class="vref" data-node="z:1.1">Help desk webhook</span> <span class="muted">the solution · judged only within the whole solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:2">Hosting</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="1:0" data-step="7"><span class="vref" data-node="z:2.1">Managed Kubernetes in EU with two replicas and load balancer</span> <span class="muted">the solution · free</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:3">Duplicate handling</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="2:0" data-step="8"><span class="vref" data-node="z:3.1">One-hour customer-and-subject deduplication</span> <span class="muted">the solution · free</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:4">Text representation</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="3:0" data-step="5"><span class="vref" data-node="z:4.1">Fixed pretrained multilingual sentence embeddings</span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:5">Classifier</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="4:0" data-step="5"><span class="vref" data-node="z:5.1">Logistic regression with one class per team</span> <span class="muted">the solution · free</span></div><div class="opt opt-contrast" data-qoc="4:1" data-step="6"><span class="vref" data-node="z:5.2">Keyword rules only, with no learned text model</span> <span class="muted">contrast #6</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:6">Agent explanation</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="5:0" data-step="1"><span class="vref" data-node="z:6.1">Two runner-up teams and influential words</span> <span class="muted">the solution · free · judged only within the whole solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:7">Learning</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="6:0" data-step="2"><span class="vref" data-node="z:7.1">Weekly supervised retraining on 90 days of final team labels</span> <span class="muted">the solution · free</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:8">Model acceptance</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="7:0" data-step="2"><span class="vref" data-node="z:8.1">Replace only if last-week accuracy is at least current accuracy</span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:9">Model rollout</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="8:0" data-step="2"><span class="vref" data-node="z:9.1">Store model file in object storage and load within five minutes</span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:10">Cold start</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="9:0" data-step="4"><span class="vref" data-node="z:10.1">Team-lead keyword rules until agent corrections create training data</span> <span class="muted">the solution</span></div></div>
+          </div>
+          <div class="qoc-row"><div class="q"><span class="dref" data-node="z:11">Monitoring</span></div>
+            <div class="opts"><div class="opt opt-solution" data-qoc="10:0" data-step="1"><span class="vref" data-node="z:11.1">Per-team moved-ticket share dashboard and alert when share doubles week over week</span> <span class="muted">the solution · free · judged only within the whole solution</span></div></div>
+          </div>
+        </div>
+        <div class="qoc-crit">
+          <div class="qoc-hdr"><span>Criteria</span></div>
+<div class="crit" data-crit="R1" data-node="r:R1"><b>R1</b> Assign every new ticket to a team, and let a support agent move it to another team when the assignment is wrong.</div><div class="crit" data-crit="R2" data-node="r:R2"><b>R2</b> Learn from the moves that support agents make.</div><div class="crit" data-crit="Q1" data-node="r:Q1"><b>Q1</b> At the daily peak of 3,000 tickets an hour, a ticket is assigned within 10 seconds of its arrival.</div><div class="crit" data-crit="Q2" data-node="r:Q2"><b>Q2</b> When a new team is created for a new product, at least 80% of the tickets meant for it reach it within two weeks.</div><div class="crit" data-crit="C1" data-node="r:C1"><b>C1</b> Tickets may contain customers&#39; personal data and must not leave the company&#39;s cloud region in the EU.</div>        </div>
+      </div>
+    </div>
+    <div class="legend"><span><b style="color:var(--accepted)">——</b> meets</span><span><b style="color:var(--mixed)">——</b> partly</span><span><b style="color:var(--rejected)">- - -</b> misses</span></div>
+
+    <h2 class="sec">Regions that justify the solution</h2>
+    <div class="region" data-step="2"><strong>G1 · Correction-driven model updates</strong> <span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q2">Q2</span> <span class="muted">investigated at step 2</span>
+      <p><span class="dref" data-node="z:7">Learning</span> → <span class="vref" data-node="z:7.1">Weekly supervised retraining on 90 days of final team labels</span> · <span class="dref" data-node="z:8">Model acceptance</span> → <span class="vref" data-node="z:8.1">Replace only if last-week accuracy is at least current accuracy</span> · <span class="dref" data-node="z:9">Model rollout</span> → <span class="vref" data-node="z:9.1">Store model file in object storage and load within five minutes</span></p>
+<p>Final team labels let agent moves influence the classifier, which directly addresses learning from moves. The update and rollout cycle supports adaptation, though the new-team percentage target is not demonstrated and weekly cadence is not forced.</p>    </div>
+    <div class="region" data-step="4"><strong>G2 · New-team cold start</strong> <span class="chip small" data-node="r:R1">R1</span><span class="chip small" data-node="r:R2">R2</span><span class="chip small" data-node="r:Q2">Q2</span> <span class="muted">investigated at step 4</span>
+      <p><span class="dref" data-node="z:10">Cold start</span> → <span class="vref" data-node="z:10.1">Team-lead keyword rules until agent corrections create training data</span></p>
+<p>The rules provide a route before the new team has examples, and subsequent agent moves contribute labels. This gives Q2 a plausible starting mechanism while leaving its numeric target unverified.</p>    </div>
+    <div class="region" data-step="7"><strong>G3 · EU-local deployment</strong> <span class="chip small" data-node="r:C1">C1</span> <span class="muted">investigated at step 7</span>
+      <p><span class="dref" data-node="z:2">Hosting</span> → <span class="vref" data-node="z:2.1">Managed Kubernetes in EU with two replicas and load balancer</span></p>
+<p>Keeping the service in the company&#39;s EU cloud region directly supports the data-residency constraint. The specific platform and replica count are choices beyond what C1 forces.</p>    </div>
+    <details class="grid-details"><summary>Dimension grid: every point, dimension by dimension</summary>
+    <div class="legend">
+<span><b style="color:var(--dimension)">solution</b> the solution as a point</span><span><b style="color:var(--accent)">region</b> a part of it</span><span><b style="color:var(--novel)">contrast</b> an option changed (outlined)</span>    </div>
+    <div class="scroll traj-wrap">
+      <svg class="lineage" aria-hidden="true"></svg>
+      <table class="traj">
+        <thead><tr><th class="row-h">Dimension</th>
+<th class="band-h" title="Correction-driven model updates">G1</th><th class="band-h" title="New-team cold start">G2</th><th class="band-h" title="EU-local deployment">G3</th><th class="step-h mv-solution" data-step="1" title="The complete routing design is intended to assign tickets and incorporate agent corrections while meeting the stated latency, adaptation and EU residency needs."><b>1</b><span class="mv">solution</span><span class="vd vd-partial">partial</span><span class="alt">→ S</span></th><th class="step-h mv-region" data-step="2" title="R2 calls for learning from agent moves, and Q2 calls for the learned routing to adapt when a new product team appears; the batch, acceptance and rollout choices should support those needs."><b>2</b><span class="mv">region</span><span class="vd vd-grounded">grounded</span></th><th class="step-h mv-contrast" data-step="3" title="Test whether R2 and Q2 force weekly batch learning by comparing it with immediate updates from the same corrections."><b>3</b><span class="mv">contrast</span><span class="vd vd-ungrounded">ungrounded</span></th><th class="step-h mv-region" data-step="4" title="Q2 calls for new-team routing soon after team creation, so a cold-start route should help before the model has team-specific examples; R1 still calls for tickets to receive an assignment."><b>4</b><span class="mv">region</span><span class="vd vd-grounded">grounded</span></th><th class="step-h mv-region" data-step="5" title="R1 calls for assigning tickets across the stated languages, while Q1 calls for a routing path that can operate within the short response target; the multilingual representation and simple classifier should support these requirements."><b>5</b><span class="mv">region</span><span class="vd vd-grounded">grounded</span></th><th class="step-h mv-contrast" data-step="6" title="Test whether R2 and Q2 require a learned classifier by comparing the selected classifier with keyword rules alone."><b>6</b><span class="mv">contrast</span><span class="vd vd-ungrounded">ungrounded</span></th><th class="step-h mv-region" data-step="7" title="C1 requires personal data to remain within the company&#39;s EU cloud region, so the service&#39;s hosting location should be determined by that constraint."><b>7</b><span class="mv">region</span><span class="vd vd-grounded">grounded</span></th><th class="step-h mv-region" data-step="8" title="R1 and Q1 might support avoiding duplicate classification work, although no requirement explicitly asks for deduplication."><b>8</b><span class="mv">region</span><span class="vd vd-partial">partial</span></th>        </tr></thead>
+        <tbody>
+          <tr><th class="row-h"><span class="dref" data-node="z:1">Ingress</span></th>
+<td class="band" title="Correction-driven model updates"></td><td class="band" title="New-team cold start"></td><td class="band" title="EU-local deployment"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:1.1" title="Help desk webhook">Help desk webhook</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:2">Hosting</span></th>
+<td class="band" title="Correction-driven model updates"></td><td class="band" title="New-team cold start"></td><td class="band" title="EU-local deployment"><span></span></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:2.1" title="Managed Kubernetes in EU with two replicas and load balancer">Managed Kubernetes in EU …</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"><span class="vref cell-v " data-node="z:2.1" title="Managed Kubernetes in EU with two replicas and load balancer">Managed Kubernetes in EU …</span></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:3">Duplicate handling</span></th>
+<td class="band" title="Correction-driven model updates"></td><td class="band" title="New-team cold start"></td><td class="band" title="EU-local deployment"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:3.1" title="One-hour customer-and-subject deduplication">One-hour customer-and-sub…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"><span class="vref cell-v " data-node="z:3.1" title="One-hour customer-and-subject deduplication">One-hour customer-and-sub…</span></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:4">Text representation</span></th>
+<td class="band" title="Correction-driven model updates"></td><td class="band" title="New-team cold start"></td><td class="band" title="EU-local deployment"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:4.1" title="Fixed pretrained multilingual sentence embeddings">Fixed pretrained multilin…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"><span class="vref cell-v " data-node="z:4.1" title="Fixed pretrained multilingual sentence embeddings">Fixed pretrained multilin…</span></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:5">Classifier</span></th>
+<td class="band" title="Correction-driven model updates"></td><td class="band" title="New-team cold start"></td><td class="band" title="EU-local deployment"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:5.1" title="Logistic regression with one class per team">Logistic regression with …</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"><span class="vref cell-v " data-node="z:5.1" title="Logistic regression with one class per team">Logistic regression with …</span></td>
+            <td class="c contrast" data-step="6"><span class="vref cell-v " data-node="z:5.2" title="Keyword rules only, with no learned text model">Keyword rules only, with …</span></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:6">Agent explanation</span></th>
+<td class="band" title="Correction-driven model updates"></td><td class="band" title="New-team cold start"></td><td class="band" title="EU-local deployment"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:6.1" title="Two runner-up teams and influential words">Two runner-up teams and i…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:7">Learning</span></th>
+<td class="band" title="Correction-driven model updates"><span></span></td><td class="band" title="New-team cold start"></td><td class="band" title="EU-local deployment"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:7.1" title="Weekly supervised retraining on 90 days of final team labels">Weekly supervised retrain…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:7.1" title="Weekly supervised retraining on 90 days of final team labels">Weekly supervised retrain…</span></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:8">Model acceptance</span></th>
+<td class="band" title="Correction-driven model updates"><span></span></td><td class="band" title="New-team cold start"></td><td class="band" title="EU-local deployment"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:8.1" title="Replace only if last-week accuracy is at least current accuracy">Replace only if last-week…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:8.1" title="Replace only if last-week accuracy is at least current accuracy">Replace only if last-week…</span></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:9">Model rollout</span></th>
+<td class="band" title="Correction-driven model updates"><span></span></td><td class="band" title="New-team cold start"></td><td class="band" title="EU-local deployment"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:9.1" title="Store model file in object storage and load within five minutes">Store model file in objec…</span></td>
+            <td class="c" data-step="2"><span class="vref cell-v " data-node="z:9.1" title="Store model file in object storage and load within five minutes">Store model file in objec…</span></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:10">Cold start</span></th>
+<td class="band" title="Correction-driven model updates"></td><td class="band" title="New-team cold start"><span></span></td><td class="band" title="EU-local deployment"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:10.1" title="Team-lead keyword rules until agent corrections create training data">Team-lead keyword rules u…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"><span class="vref cell-v " data-node="z:10.1" title="Team-lead keyword rules until agent corrections create training data">Team-lead keyword rules u…</span></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:11">Monitoring</span></th>
+<td class="band" title="Correction-driven model updates"></td><td class="band" title="New-team cold start"></td><td class="band" title="EU-local deployment"></td>            <td class="c" data-step="1"><span class="vref cell-v " data-node="z:11.1" title="Per-team moved-ticket share dashboard and alert when share doubles week over week">Per-team moved-ticket sha…</span></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+          <tr><th class="row-h"><span class="dref" data-node="z:12">Learning cadence</span></th>
+<td class="band" title="Correction-driven model updates"></td><td class="band" title="New-team cold start"></td><td class="band" title="EU-local deployment"></td>            <td class="c" data-step="1"></td>
+            <td class="c" data-step="2"></td>
+            <td class="c" data-step="3"><span class="vref cell-v " data-node="z:12.1" title="Update the classifier online after every agent correction">Update the classifier onl…</span></td>
+            <td class="c" data-step="4"></td>
+            <td class="c" data-step="5"></td>
+            <td class="c" data-step="6"></td>
+            <td class="c" data-step="7"></td>
+            <td class="c" data-step="8"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </details>
+  </section>
+
+  <section class="gaps" id="gaps">
+  <h2 class="sec">Gaps in the space</h2>
+  <p>No space was provided: the agent worked zero-shot, naming dimensions and values from its own knowledge, so nothing can fall short of a space.</p>
+  </section>
+</main>
+<div class="splitter-v" role="separator" aria-orientation="vertical" aria-label="Resize the text and the graph" tabindex="0" title="Drag to resize (double-click to reset)"></div>
+<aside class="ex-side">
+  <div id="canvas"><svg id="svg" role="img" aria-label="The dimensions this rationale involves"></svg>
+    <label class="graph-toggle"><input type="checkbox" id="show-all"> Show every value the agent named</label>
+    <div class="zoom-ctl"><button type="button" data-zoom="in" title="Zoom in" aria-label="Zoom in">+</button><button type="button" data-zoom="out" title="Zoom out" aria-label="Zoom out">−</button><button type="button" data-zoom="fit" title="Fit the graph" aria-label="Fit the graph">⤢</button></div></div>
+  <div class="splitter-h" role="separator" aria-orientation="horizontal" aria-label="Resize the graph and its details" tabindex="0" title="Drag to resize (double-click to reset)"></div>
+  <div class="graph-key"><span>from the centre: dimensions, values, <b>design points</b> (▲, one per step, coloured by its rating), requirements (■, linked to each point by how it meets them; coloured by the design point shown)</span><span><b>blue</b>: explored paths</span><span><b>outlined</b>: the design point shown</span><span>select a node: its path to the centre and its direct neighbours; select one of those to go on</span></div>
+  <div id="info"><p class="hint">Select a dimension, value or requirement (in the graph or the text) to see its details.</p></div>
+</aside>
+</div>
+<script type="application/json" id="explainer-data">{"adrs": [{"consequences": "", "context": "Agent moves must influence later routing, and new teams need to adapt after creation. The solution records final teams, retrains on a rolling 90-day set each week, gates replacement on last-week accuracy, then loads the accepted model within five minutes.", "drivers": ["R2", "Q2"], "id": "ADR1", "options": [{"cons": ["A correction may wait for the next weekly run to influence the model.", "Last-week accuracy does not establish the new-team two-week target."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR1:O1", "name": "Weekly supervised retraining with an accuracy gate", "point": {"z:7": "z:7.1", "z:8": "z:8.1", "z:9": "z:9.1"}, "pros": ["Uses corrected final team labels as supervised training data.", "Checks candidate accuracy before replacing the deployed model.", "Makes an accepted update available within five minutes."], "quotes": ["Every Sunday a scheduled job exports the tickets of the last 90 days with their final teams, retrains the classifier (the embedding model is never retrained)", "If it is at least as accurate as the current model, the job replaces the model file in object storage", "the service loads the new file within five minutes."], "reason": "Chosen because it directly learns from agent moves and supports periodic adaptation. R2 requires learning from moves, but does not force weekly batch training, this window, this gate or this storage choice.", "status": "chosen", "step": 2}, {"cons": ["A mistaken correction can influence subsequent routing before review."], "fit": "exact", "fit_note": "", "id": "O2", "in": [], "key": "ADR1:O2", "name": "Online learning after each correction", "point": {"z:12": "z:12.1"}, "pros": ["Can incorporate a correction before the next weekly cycle."], "quotes": [], "reason": "This also supports learning from moves and could react faster, so the requirements do not force the selected cadence; it was not chosen in the solution.", "status": "discarded", "step": 3}], "title": "Learn routing from agent corrections"}, {"consequences": "", "context": "A new team initially has no training examples. Tickets still need a team assignment, and later agent moves can create labels for learning; Q2 sets a two-week routing target.", "drivers": ["R1", "R2", "Q2"], "id": "ADR2", "options": [{"cons": ["Accuracy depends on rule coverage and maintenance.", "No evidence establishes the 80% target within two weeks."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR2:O1", "name": "Team-lead keyword rules", "point": {"z:10": "z:10.1"}, "pros": ["Provides an initial route without team-specific training data.", "Can be written by the team lead with product knowledge."], "quotes": ["A new team has no training data until agents move tickets to it. Until then, keyword rules written by the team's lead route its tickets."], "reason": "Chosen as an immediate fallback while corrections accumulate. It supports the requirements plausibly, but the problem does not force keyword rules or prove the target.", "status": "chosen", "step": 4}], "title": "Provide a route for a new team before it has examples"}, {"consequences": "", "context": "Incoming tickets are in English, Spanish and Portuguese and must be assigned to one of 25 teams. A learned classifier can incorporate agent corrections; the latency and new-team targets require operational evidence not included in the solution description.", "drivers": ["R1", "R2", "Q1", "Q2"], "id": "ADR3", "options": [{"cons": ["Fixed embeddings are not adapted to company-specific language.", "A new team has no learned examples, and no benchmark demonstrates the time target."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR3:O1", "name": "Multilingual embeddings with logistic regression", "point": {"z:4": "z:4.1", "z:5": "z:5.1"}, "pros": ["Uses a representation intended for the stated languages.", "Provides one direct class for each support team.", "Keeps the classifier simple to retrain."], "quotes": ["Otherwise the service turns the subject and the body into an embedding with a pretrained multilingual sentence-embedding model", "and a logistic-regression classifier with one class per team picks the team."], "reason": "Chosen as the solution's trainable multilingual classification path. R2 supports having a learning mechanism, but neither the embedding model nor logistic regression is forced.", "status": "chosen", "step": 5}, {"cons": ["Does not learn a classifier from agent moves.", "Unmatched wording needs a separate fallback."], "fit": "exact", "fit_note": "", "id": "O2", "in": [], "key": "ADR3:O2", "name": "Keyword rules only", "point": {"z:5": "z:5.2"}, "pros": ["Rules are transparent and directly maintainable."], "quotes": [], "reason": "The contrast loses the support for R2. This supports a learned mechanism, but leaves the specific model family open.", "status": "discarded", "step": 6}], "title": "Represent ticket text and select a team"}, {"consequences": "", "context": "Ticket data can include personal information and must remain in the company's EU cloud region. The webhook starts routing, and the service needs to handle arrivals at the stated peak, although no performance result is supplied.", "drivers": ["C1", "R1", "Q1"], "id": "ADR4", "options": [{"cons": ["The solution does not state peak-load measurements against ten seconds.", "The particular platform and replica count add operational choices beyond the residency constraint."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR4:O1", "name": "Webhook to two EU Kubernetes replicas", "point": {"z:1": "z:1.1", "z:2": "z:2.1"}, "pros": ["The hosting location supports the EU data constraint.", "The webhook connects ticket arrival to routing.", "Replicas and a load balancer provide basic distribution and redundancy."], "quotes": ["The help desk tool sends every new ticket to the routing service through a webhook.", "The service runs on a managed Kubernetes cluster in the company's EU cloud region, with two replicas behind a load balancer."], "reason": "EU-local hosting is forced by C1; the webhook, Kubernetes and replica arrangement are not forced by the requirements.", "status": "chosen", "step": 1}], "title": "Keep routing and ticket processing in the EU"}, {"consequences": "", "context": "Reducing repeated classification could help processing load, but each ticket still needs an appropriate team and the solution gives no evidence about duplicate frequency or latency benefit.", "drivers": ["R1", "Q1"], "id": "ADR5", "options": [{"cons": ["Can attach a distinct issue to the earlier ticket's team.", "No measured latency benefit is given."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR5:O1", "name": "Attach same-customer, same-subject tickets within one hour", "point": {"z:3": "z:3.1"}, "pros": ["Avoids repeated classification for likely duplicates."], "quotes": ["It first looks for duplicates: if the same customer sent a ticket with the same subject in the last hour, the service attaches the new ticket to the earlier one and does not classify it."], "reason": "This is a discretionary optimization; no stated requirement forces its matching rule or one-hour window.", "status": "chosen", "step": 8}], "title": "Avoid classifying likely duplicate tickets"}, {"consequences": "", "context": "Agents can move tickets when assignments are wrong, and their moves are the source of learning. Prediction context and team-level move monitoring may help agents review assignments, but no requirement prescribes these interfaces or alerts.", "drivers": ["R1", "R2", "Q2"], "id": "ADR6", "options": [{"cons": ["A doubling alert is not a direct measure of classification accuracy.", "The interface and threshold do not themselves ensure new-team performance."], "fit": "exact", "fit_note": "", "id": "O1", "in": ["S"], "key": "ADR6:O1", "name": "Show runner-ups and influential words, with moved-share monitoring", "point": {"z:11": "z:11.1", "z:6": "z:6.1"}, "pros": ["Gives agents context near the ticket when reviewing a predicted team.", "Makes changes in per-team move rates visible."], "quotes": ["The service writes the team back to the help desk tool, with the two runner-up teams and the words that weighed most in the decision, which the tool shows to agents next to the ticket.", "A dashboard shows, per team, the share of tickets that agents moved, and sends an alert when that share doubles from one week to the next."], "reason": "These are useful operational choices around review and monitoring, but they are not forced by the stated requirements.", "status": "chosen", "step": null}], "title": "Give agents routing context and surface shifts"}], "alternatives": [{"approach": null, "choices": [{"dimension": "z:1", "drivers": ["R1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "The help desk tool sends every new ticket to the routing service through a webhook.", "reason": "The webhook connects ticket arrival to automatic assignment, but R1 does not require this particular integration mechanism.", "value": "z:1.1"}, {"dimension": "z:2", "drivers": ["C1", "Q1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": false, "quote": "The service runs on a managed Kubernetes cluster in the company's EU cloud region, with two replicas behind a load balancer.", "reason": "C1 forces EU-local processing, but the chosen composite value also specifies Kubernetes, two replicas and a load balancer, none of which is individually forced.", "value": "z:2.1"}, {"dimension": "z:3", "drivers": ["R1", "Q1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": false, "quote": "It first looks for duplicates: if the same customer sent a ticket with the same subject in the last hour, the service attaches the new ticket to the earlier one and does not classify it.", "reason": "This may avoid redundant processing, but the requirements do not call for deduplication and the rule can merge distinct requests.", "value": "z:3.1"}, {"dimension": "z:4", "drivers": ["R1", "Q1", "Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "Otherwise the service turns the subject and the body into an embedding with a pretrained multilingual sentence-embedding model", "reason": "A multilingual text representation fits the stated languages and supports classification, but neither this pretrained model nor fixed embeddings are required by the problem; latency is not measured.", "value": "z:4.1"}, {"dimension": "z:5", "drivers": ["R1", "R2", "Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": false, "quote": "and a logistic-regression classifier with one class per team picks the team.", "reason": "R2 calls for a learning mechanism, as the rules-only contrast fails to provide, but it does not force logistic regression over another trainable classifier.", "value": "z:5.1"}, {"dimension": "z:6", "drivers": ["R1"], "evidence": [], "fit": "exact", "fit_note": "", "forced": false, "quote": "The service writes the team back to the help desk tool, with the two runner-up teams and the words that weighed most in the decision, which the tool shows to agents next to the ticket.", "reason": "This gives agents context for reviewing assignments, but no requirement specifies runner-up suggestions or influential words.", "value": "z:6.1"}, {"dimension": "z:7", "drivers": ["R2", "Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": false, "quote": "Every Sunday a scheduled job exports the tickets of the last 90 days with their final teams, retrains the classifier (the embedding model is never retrained)", "reason": "Training from final teams incorporates agent moves and supports adaptation, but online updates are another way to learn from moves. The target does not force a weekly cadence or 90-day window.", "value": "z:7.1"}, {"dimension": "z:8", "drivers": ["R2", "Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "If it is at least as accurate as the current model, the job replaces the model file in object storage", "reason": "The gate avoids deploying a candidate that scores worse on the stated evaluation slice, but no requirement mandates this accuracy comparison and the target metrics are not reported.", "value": "z:8.1"}, {"dimension": "z:9", "drivers": ["R2", "Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "the service loads the new file within five minutes.", "reason": "This distributes approved updates promptly, but the five-minute model-load time is not the ticket-assignment latency target and the storage mechanism is not prescribed.", "value": "z:9.1"}, {"dimension": "z:10", "drivers": ["R1", "R2", "Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": null, "quote": "A new team has no training data until agents move tickets to it. Until then, keyword rules written by the team's lead route its tickets.", "reason": "Rules give a new team an initial route and corrections provide eventual training data, but the 80% target is not established and other cold-start mechanisms could be used.", "value": "z:10.1"}, {"dimension": "z:11", "drivers": ["R2", "Q2"], "evidence": [], "fit": "exact", "fit_note": "", "forced": false, "quote": "A dashboard shows, per team, the share of tickets that agents moved, and sends an alert when that share doubles from one week to the next.", "reason": "Moved-ticket shares can reveal routing problems, but the requirements do not require this dashboard or doubling threshold, and it does not itself prove accuracy or adaptation.", "value": "z:11.1"}], "considered": [], "id": "S", "name": "Ticket routing as built", "open": [], "parts": [{"adr": "ADR1", "drivers": ["R2", "Q2"], "name": "Weekly supervised retraining with an accuracy gate", "option": "O1", "point": {"z:7": "z:7.1", "z:8": "z:8.1", "z:9": "z:9.1"}, "title": "Learn routing from agent corrections"}, {"adr": "ADR2", "drivers": ["R1", "R2", "Q2"], "name": "Team-lead keyword rules", "option": "O1", "point": {"z:10": "z:10.1"}, "title": "Provide a route for a new team before it has examples"}, {"adr": "ADR3", "drivers": ["R1", "R2", "Q1", "Q2"], "name": "Multilingual embeddings with logistic regression", "option": "O1", "point": {"z:4": "z:4.1", "z:5": "z:5.1"}, "title": "Represent ticket text and select a team"}, {"adr": "ADR4", "drivers": ["C1", "R1", "Q1"], "name": "Webhook to two EU Kubernetes replicas", "option": "O1", "point": {"z:1": "z:1.1", "z:2": "z:2.1"}, "title": "Keep routing and ticket processing in the EU"}, {"adr": "ADR5", "drivers": ["R1", "Q1"], "name": "Attach same-customer, same-subject tickets within one hour", "option": "O1", "point": {"z:3": "z:3.1"}, "title": "Avoid classifying likely duplicate tickets"}, {"adr": "ADR6", "drivers": ["R1", "R2", "Q2"], "name": "Show runner-ups and influential words, with moved-share monitoring", "option": "O1", "point": {"z:11": "z:11.1", "z:6": "z:6.1"}, "title": "Give agents routing context and surface shifts"}], "point": "Tickets arrive through the help-desk webhook, are deduplicated for one hour by customer and subject, embedded with a fixed multilingual model, and assigned by team using logistic regression. The service runs on two EU Kubernetes replicas, explains predictions with runner-up teams and influential words, retrains weekly from 90 days of labels, accepts models based on last-week accuracy, and loads approved files from object storage within five minutes; keyword rules cover cold start while dashboards monitor team-share shifts.", "relations": [], "step": 1, "summary": "A multilingual classifier routes webhook tickets, while a weekly correction-driven training pipeline updates the model and keyword rules cover new teams before training data exists. The service runs in the EU and gives agents prediction context and team-level monitoring."}], "approaches": [], "budget": {"max_points": 8, "used": 8}, "context": "A software company receives about 20,000 support tickets a day in English, Spanish and Portuguese, by e-mail and web form. Each ticket must reach one of 25 teams. First-line staff currently forward tickets by hand, and a misrouted ticket waits a day on average. Products and their support teams change a few times a year.", "dimensions": {"z:1": {"core": false, "href": null, "id": "z:1", "label": "Ingress", "question": "", "values": ["z:1.1"]}, "z:10": {"core": false, "href": null, "id": "z:10", "label": "Cold start", "question": "", "values": ["z:10.1"]}, "z:11": {"core": false, "href": null, "id": "z:11", "label": "Monitoring", "question": "", "values": ["z:11.1"]}, "z:12": {"core": false, "href": null, "id": "z:12", "label": "Learning cadence", "question": "", "values": ["z:12.1"]}, "z:2": {"core": false, "href": null, "id": "z:2", "label": "Hosting", "question": "", "values": ["z:2.1"]}, "z:3": {"core": false, "href": null, "id": "z:3", "label": "Duplicate handling", "question": "", "values": ["z:3.1"]}, "z:4": {"core": false, "href": null, "id": "z:4", "label": "Text representation", "question": "", "values": ["z:4.1"]}, "z:5": {"core": false, "href": null, "id": "z:5", "label": "Classifier", "question": "", "values": ["z:5.1", "z:5.2"]}, "z:6": {"core": false, "href": null, "id": "z:6", "label": "Agent explanation", "question": "", "values": ["z:6.1"]}, "z:7": {"core": false, "href": null, "id": "z:7", "label": "Learning", "question": "", "values": ["z:7.1"]}, "z:8": {"core": false, "href": null, "id": "z:8", "label": "Model acceptance", "question": "", "values": ["z:8.1"]}, "z:9": {"core": false, "href": null, "id": "z:9", "label": "Model rollout", "question": "", "values": ["z:9.1"]}}, "fits": [], "graph_changed": false, "id": "tickets-explain-N-r1", "inferred": false, "lanes": null, "links": {"graph": null, "index": null}, "mode": "explain", "qoc": [{"dimension": "z:1", "options": [{"assessment": {"C1": "meets", "Q1": "partly", "Q2": "partly", "R1": "meets", "R2": "meets"}, "forced": null, "kind": "solution", "specific": false, "step": 1, "value": "z:1.1"}]}, {"dimension": "z:2", "options": [{"assessment": {"C1": "meets"}, "forced": false, "kind": "solution", "specific": true, "step": 7, "value": "z:2.1"}]}, {"dimension": "z:3", "options": [{"assessment": {"Q1": "partly", "R1": "partly"}, "forced": false, "kind": "solution", "specific": true, "step": 8, "value": "z:3.1"}]}, {"dimension": "z:4", "options": [{"assessment": {"Q1": "partly", "Q2": "partly", "R1": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 5, "value": "z:4.1"}]}, {"dimension": "z:5", "options": [{"assessment": {"Q1": "partly", "Q2": "partly", "R1": "meets"}, "forced": false, "kind": "solution", "specific": true, "step": 5, "value": "z:5.1"}, {"assessment": {"Q2": "partly", "R1": "partly", "R2": "misses"}, "forced": null, "kind": "contrast", "specific": true, "step": 6, "value": "z:5.2"}]}, {"dimension": "z:6", "options": [{"assessment": {"C1": "meets", "Q1": "partly", "Q2": "partly", "R1": "meets", "R2": "meets"}, "forced": false, "kind": "solution", "specific": false, "step": 1, "value": "z:6.1"}]}, {"dimension": "z:7", "options": [{"assessment": {"Q2": "partly", "R2": "meets"}, "forced": false, "kind": "solution", "specific": true, "step": 2, "value": "z:7.1"}]}, {"dimension": "z:8", "options": [{"assessment": {"Q2": "partly", "R2": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 2, "value": "z:8.1"}]}, {"dimension": "z:9", "options": [{"assessment": {"Q2": "partly", "R2": "meets"}, "forced": null, "kind": "solution", "specific": true, "step": 2, "value": "z:9.1"}]}, {"dimension": "z:10", "options": [{"assessment": {"Q2": "partly", "R1": "meets", "R2": "partly"}, "forced": null, "kind": "solution", "specific": true, "step": 4, "value": "z:10.1"}]}, {"dimension": "z:11", "options": [{"assessment": {"C1": "meets", "Q1": "partly", "Q2": "partly", "R1": "meets", "R2": "meets"}, "forced": false, "kind": "solution", "specific": false, "step": 1, "value": "z:11.1"}]}], "regions": [{"drivers": ["R2", "Q2"], "id": "G1", "name": "Correction-driven model updates", "point": {"z:7": "z:7.1", "z:8": "z:8.1", "z:9": "z:9.1"}, "reason": "Final team labels let agent moves influence the classifier, which directly addresses learning from moves. The update and rollout cycle supports adaptation, though the new-team percentage target is not demonstrated and weekly cadence is not forced.", "step": 2}, {"drivers": ["R1", "R2", "Q2"], "id": "G2", "name": "New-team cold start", "point": {"z:10": "z:10.1"}, "reason": "The rules provide a route before the new team has examples, and subsequent agent moves contribute labels. This gives Q2 a plausible starting mechanism while leaving its numeric target unverified.", "step": 4}, {"drivers": ["C1"], "id": "G3", "name": "EU-local deployment", "point": {"z:2": "z:2.1"}, "reason": "Keeping the service in the company's EU cloud region directly supports the data-residency constraint. The specific platform and replica count are choices beyond what C1 forces.", "step": 7}], "relations": [], "requirements": [{"attribute": "", "id": "R1", "kind": "functional", "text": "Assign every new ticket to a team, and let a support agent move it to another team when the assignment is wrong."}, {"attribute": "", "id": "R2", "kind": "functional", "text": "Learn from the moves that support agents make."}, {"attribute": "latency", "id": "Q1", "kind": "quality", "text": "At the daily peak of 3,000 tickets an hour, a ticket is assigned within 10 seconds of its arrival."}, {"attribute": "adaptability", "id": "Q2", "kind": "quality", "text": "When a new team is created for a new product, at least 80% of the tickets meant for it reach it within two weeks."}, {"attribute": "", "id": "C1", "kind": "constraint", "text": "Tickets may contain customers' personal data and must not leave the company's cloud region in the EU."}], "rows": [{"cells": [{"kind": "choice", "reason": "The webhook connects ticket arrival to automatic assignment, but R1 does not require this particular integration mechanism.", "value": "z:1.1"}], "differs": false, "dimension": "z:1", "note": ""}, {"cells": [{"kind": "choice", "reason": "C1 forces EU-local processing, but the chosen composite value also specifies Kubernetes, two replicas and a load balancer, none of which is individually forced.", "value": "z:2.1"}], "differs": false, "dimension": "z:2", "note": ""}, {"cells": [{"kind": "choice", "reason": "This may avoid redundant processing, but the requirements do not call for deduplication and the rule can merge distinct requests.", "value": "z:3.1"}], "differs": false, "dimension": "z:3", "note": ""}, {"cells": [{"kind": "choice", "reason": "A multilingual text representation fits the stated languages and supports classification, but neither this pretrained model nor fixed embeddings are required by the problem; latency is not measured.", "value": "z:4.1"}], "differs": false, "dimension": "z:4", "note": ""}, {"cells": [{"kind": "choice", "reason": "R2 calls for a learning mechanism, as the rules-only contrast fails to provide, but it does not force logistic regression over another trainable classifier.", "value": "z:5.1"}], "differs": false, "dimension": "z:5", "note": ""}, {"cells": [{"kind": "choice", "reason": "This gives agents context for reviewing assignments, but no requirement specifies runner-up suggestions or influential words.", "value": "z:6.1"}], "differs": false, "dimension": "z:6", "note": ""}, {"cells": [{"kind": "choice", "reason": "Training from final teams incorporates agent moves and supports adaptation, but online updates are another way to learn from moves. The target does not force a weekly cadence or 90-day window.", "value": "z:7.1"}], "differs": false, "dimension": "z:7", "note": ""}, {"cells": [{"kind": "choice", "reason": "The gate avoids deploying a candidate that scores worse on the stated evaluation slice, but no requirement mandates this accuracy comparison and the target metrics are not reported.", "value": "z:8.1"}], "differs": false, "dimension": "z:8", "note": ""}, {"cells": [{"kind": "choice", "reason": "This distributes approved updates promptly, but the five-minute model-load time is not the ticket-assignment latency target and the storage mechanism is not prescribed.", "value": "z:9.1"}], "differs": false, "dimension": "z:9", "note": ""}, {"cells": [{"kind": "choice", "reason": "Rules give a new team an initial route and corrections provide eventual training data, but the 80% target is not established and other cold-start mechanisms could be used.", "value": "z:10.1"}], "differs": false, "dimension": "z:10", "note": ""}, {"cells": [{"kind": "choice", "reason": "Moved-ticket shares can reveal routing problems, but the requirements do not require this dashboard or doubling threshold, and it does not itself prove accuracy or adaptation.", "value": "z:11.1"}], "differs": false, "dimension": "z:11", "note": ""}], "space": null, "title": "Support-ticket routing", "trajectory": [{"alternative": "S", "approach": null, "assessment": {"C1": "meets", "Q1": "partly", "Q2": "partly", "R1": "meets", "R2": "meets"}, "attested_by": [], "changed": [], "description": "Tickets arrive through the help-desk webhook, are deduplicated for one hour by customer and subject, embedded with a fixed multilingual model, and assigned by team using logistic regression. The service runs on two EU Kubernetes replicas, explains predictions with runner-up teams and influential words, retrains weekly from 90 days of labels, accepts models based on last-week accuracy, and loads approved files from object storage within five minutes; keyword rules cover cold start while dashboards monitor team-share shifts.", "diff": [{"after": "z:1.1", "before": null, "dimension": "z:1"}, {"after": "z:2.1", "before": null, "dimension": "z:2"}, {"after": "z:3.1", "before": null, "dimension": "z:3"}, {"after": "z:4.1", "before": null, "dimension": "z:4"}, {"after": "z:5.1", "before": null, "dimension": "z:5"}, {"after": "z:6.1", "before": null, "dimension": "z:6"}, {"after": "z:7.1", "before": null, "dimension": "z:7"}, {"after": "z:8.1", "before": null, "dimension": "z:8"}, {"after": "z:9.1", "before": null, "dimension": "z:9"}, {"after": "z:10.1", "before": null, "dimension": "z:10"}, {"after": "z:11.1", "before": null, "dimension": "z:11"}], "drivers": ["R1", "R2", "Q1", "Q2", "C1"], "move": "solution", "novel": ["z:1", "z:2", "z:3", "z:4", "z:5", "z:6", "z:7", "z:8", "z:9", "z:10", "z:11"], "observation": "The design directly supports routing, agent moves, correction-based learning and EU-local hosting. It provides no peak-load measurement against 10 seconds and no new-team result against the 80% in two weeks target, so those targets remain unproven; the latter is especially dependent on initial rules and arriving corrections.", "own_tradeoff": "This is operationally simple, explainable, and multilingual, but fixed embeddings and weekly retraining may miss new terminology. The acceptance and monitoring rules emphasize recent accuracy and routing shifts, not broader quality or fairness.", "parent": null, "point": {"z:1": "z:1.1", "z:10": "z:10.1", "z:11": "z:11.1", "z:2": "z:2.1", "z:3": "z:3.1", "z:4": "z:4.1", "z:5": "z:5.1", "z:6": "z:6.1", "z:7": "z:7.1", "z:8": "z:8.1", "z:9": "z:9.1"}, "point_id": "P1", "reuses": null, "round": null, "step": 1, "tradeoffs": [{"causes": ["z:7.1", "z:10.1"], "costs": ["Q2"], "gains": ["R2"], "note": "The pipeline learns from corrections, but new-team routing first depends on rules and collected corrections, and model updates wait for a weekly cycle."}], "verdict": "partial", "why": "The complete routing design is intended to assign tickets and incorporate agent corrections while meeting the stated latency, adaptation and EU residency needs."}, {"alternative": null, "approach": null, "assessment": {"Q2": "partly", "R2": "meets"}, "attested_by": [], "changed": ["z:1", "z:10", "z:11", "z:2", "z:3", "z:4", "z:5", "z:6"], "description": "Weekly, the system retrains a model using the prior 90 days of final team labels. It replaces the current model only when the candidate’s last-week accuracy is at least as high, then stores the accepted model in object storage for loading within five minutes.", "diff": [{"after": null, "before": "z:1.1", "dimension": "z:1"}, {"after": null, "before": "z:2.1", "dimension": "z:2"}, {"after": null, "before": "z:3.1", "dimension": "z:3"}, {"after": null, "before": "z:4.1", "dimension": "z:4"}, {"after": null, "before": "z:5.1", "dimension": "z:5"}, {"after": null, "before": "z:6.1", "dimension": "z:6"}, {"after": null, "before": "z:10.1", "dimension": "z:10"}, {"after": null, "before": "z:11.1", "dimension": "z:11"}], "drivers": ["R2", "Q2"], "move": "region", "novel": [], "observation": "This is the clearest mechanism for learning from recorded moves: the final team is the supervised label. Weekly retraining and rapid file loading describe a plausible update cycle, but neither the sample count for a new team nor its resulting routing accuracy is given, so the 80% target is not established.", "own_tradeoff": "This provides regular adaptation, a simple performance gate, and relatively quick deployment, but it cannot incorporate new labels between weekly retraining cycles and may favor models that perform well on last week’s data while overlooking other periods or conditions.", "parent": 1, "point": {"z:7": "z:7.1", "z:8": "z:8.1", "z:9": "z:9.1"}, "point_id": "P2", "reuses": null, "round": null, "step": 2, "tradeoffs": [{"causes": ["z:7.1", "z:8.1"], "costs": ["Q2"], "gains": ["R2"], "note": "Training on final teams uses agent corrections, while the weekly schedule and accuracy gate can defer when a newly created team's examples influence the deployed model."}], "verdict": "grounded", "why": "R2 calls for learning from agent moves, and Q2 calls for the learned routing to adapt when a new product team appears; the batch, acceptance and rollout choices should support those needs."}, {"alternative": null, "approach": null, "assessment": {"Q2": "partly", "R2": "meets"}, "attested_by": [], "changed": ["z:12", "z:7", "z:8", "z:9"], "description": "The support-ticket classifier routes incoming tickets and updates its model online whenever an agent corrects a routing decision. Those corrections immediately influence subsequent classifications, allowing the system to adapt continuously to changing patterns.", "diff": [{"after": "z:12.1", "before": null, "dimension": "z:12"}, {"after": null, "before": "z:7.1", "dimension": "z:7"}, {"after": null, "before": "z:8.1", "dimension": "z:8"}, {"after": null, "before": "z:9.1", "dimension": "z:9"}], "drivers": ["R2", "Q2"], "move": "contrast", "novel": ["z:12"], "observation": "Online learning also uses agent moves and may react faster, but it trades the weekly validation boundary for immediate influence from each correction. The requirements do not set a model-update cadence or require immediate updates; weekly batching is therefore a free choice among mechanisms that learn from moves. The new-team percentage remains unproven for either cadence.", "own_tradeoff": "This provides rapid learning from current agent feedback, but gives up the stability of batched or validated updates. A mistaken correction can therefore affect later routing before it is reviewed.", "parent": 2, "point": {"z:12": "z:12.1"}, "point_id": "P3", "reuses": null, "round": null, "step": 3, "tradeoffs": [{"causes": ["z:12.1"], "costs": ["Q2"], "gains": ["R2"], "note": "Immediate updates could expose new-team corrections sooner, but an unreviewed mistaken move could affect subsequent routing and reduce the share of new-team tickets routed correctly."}], "verdict": "ungrounded", "why": "Test whether R2 and Q2 force weekly batch learning by comparing it with immediate updates from the same corrections."}, {"alternative": null, "approach": null, "assessment": {"Q2": "partly", "R1": "meets", "R2": "partly"}, "attested_by": [], "changed": ["z:1", "z:11", "z:2", "z:3", "z:4", "z:5", "z:6", "z:7", "z:8", "z:9"], "description": "Team leads define keyword rules that route incoming support tickets to appropriate destinations. Agents correct misrouted tickets, and those corrections accumulate as training data for improving the routing approach.", "diff": [{"after": null, "before": "z:1.1", "dimension": "z:1"}, {"after": null, "before": "z:2.1", "dimension": "z:2"}, {"after": null, "before": "z:3.1", "dimension": "z:3"}, {"after": null, "before": "z:4.1", "dimension": "z:4"}, {"after": null, "before": "z:5.1", "dimension": "z:5"}, {"after": null, "before": "z:6.1", "dimension": "z:6"}, {"after": null, "before": "z:7.1", "dimension": "z:7"}, {"after": null, "before": "z:8.1", "dimension": "z:8"}, {"after": null, "before": "z:9.1", "dimension": "z:9"}, {"after": null, "before": "z:11.1", "dimension": "z:11"}], "drivers": ["R1", "R2", "Q2"], "move": "region", "novel": [], "observation": "The rules avoid leaving a new team without any route while training data accumulates, and later corrections feed the learning process. Their accuracy and maintenance burden are unknown, and the solution supplies no evidence that they route 80% of intended tickets correctly within two weeks.", "own_tradeoff": "This enables immediate, interpretable routing without requiring an initial dataset, but depends on team leads maintaining useful rules and agents making corrections. Early routing may be limited or inaccurate, and the system gives up some automation until sufficient correction data exists.", "parent": 1, "point": {"z:10": "z:10.1"}, "point_id": "P4", "reuses": null, "round": null, "step": 4, "tradeoffs": [{"causes": ["z:10.1"], "costs": ["Q2"], "gains": ["R1"], "note": "Rules allow routing before examples exist, but their coverage and the speed at which useful corrections accumulate determine whether the new-team target is reached."}], "verdict": "grounded", "why": "Q2 calls for new-team routing soon after team creation, so a cold-start route should help before the model has team-specific examples; R1 still calls for tickets to receive an assignment."}, {"alternative": null, "approach": null, "assessment": {"Q1": "partly", "Q2": "partly", "R1": "meets"}, "attested_by": [], "changed": ["z:1", "z:10", "z:11", "z:2", "z:3", "z:6", "z:7", "z:8", "z:9"], "description": "Each support ticket is converted into a fixed pretrained multilingual sentence embedding. Logistic regression then uses those features to predict the ticket’s team, selecting the class with the highest score for routing.", "diff": [{"after": null, "before": "z:1.1", "dimension": "z:1"}, {"after": null, "before": "z:2.1", "dimension": "z:2"}, {"after": null, "before": "z:3.1", "dimension": "z:3"}, {"after": null, "before": "z:6.1", "dimension": "z:6"}, {"after": null, "before": "z:7.1", "dimension": "z:7"}, {"after": null, "before": "z:8.1", "dimension": "z:8"}, {"after": null, "before": "z:9.1", "dimension": "z:9"}, {"after": null, "before": "z:10.1", "dimension": "z:10"}, {"after": null, "before": "z:11.1", "dimension": "z:11"}], "drivers": ["R1", "Q1", "Q2"], "move": "region", "novel": [], "observation": "The embeddings fit the English, Spanish and Portuguese input, and logistic regression gives a direct team-selection mechanism. These choices do not provide a latency benchmark, and the classifier alone cannot learn a new team's decision boundary without examples. No requirement singles out this specific embedding model or classifier over other trainable multilingual approaches.", "own_tradeoff": "This provides a simple, efficient classifier that can reuse multilingual semantic representations across teams and languages. It gives up task-specific adaptation and nonlinear decision boundaries, so domain-specific wording or subtle distinctions between teams may be missed.", "parent": 1, "point": {"z:4": "z:4.1", "z:5": "z:5.1"}, "point_id": "P5", "reuses": null, "round": null, "step": 5, "tradeoffs": [{"causes": ["z:4.1", "z:5.1"], "costs": ["Q2"], "gains": ["R1"], "note": "A classifier with a class for each team supports routing, but a newly created class has no learned examples and needs the separate cold-start rules or later corrections."}], "verdict": "grounded", "why": "R1 calls for assigning tickets across the stated languages, while Q1 calls for a routing path that can operate within the short response target; the multilingual representation and simple classifier should support these requirements."}, {"alternative": null, "approach": null, "assessment": {"Q2": "partly", "R1": "partly", "R2": "misses"}, "attested_by": [], "changed": ["z:4", "z:5"], "description": "Keyword rules would inspect ticket text for predefined terms and route it to the corresponding support queue. Tickets lacking matching keywords would require a fallback handling process, such as manual review.", "diff": [{"after": "z:5.2", "before": "z:5.1", "dimension": "z:5"}, {"after": null, "before": "z:4.1", "dimension": "z:4"}], "drivers": ["R1", "R2", "Q2"], "move": "contrast", "novel": ["z:5"], "observation": "Rules can assign tickets that match maintained terms, but the contrasted point has no model that learns from agent moves and needs a separate fallback for unmatched wording. That loses support for R2. The comparison supports having some learning mechanism; it does not show that logistic regression, rather than another trainable model, is required. The Q2 percentage remains unproven.", "own_tradeoff": "This is simple, transparent, and easy to control, but it may miss tickets expressed with unfamiliar wording and require ongoing maintenance as terminology changes.", "parent": 5, "point": {"z:5": "z:5.2"}, "point_id": "P6", "reuses": null, "round": null, "step": 6, "tradeoffs": [], "verdict": "ungrounded", "why": "Test whether R2 and Q2 require a learned classifier by comparing the selected classifier with keyword rules alone."}, {"alternative": null, "approach": null, "assessment": {"C1": "meets"}, "attested_by": [], "changed": ["z:1", "z:10", "z:11", "z:3", "z:4", "z:5", "z:6", "z:7", "z:8", "z:9"], "description": "The support-ticket routing service would run on a managed Kubernetes cluster hosted in the EU. Two application replicas would sit behind a load balancer, distributing incoming requests and allowing traffic to continue if one replica is unavailable.", "diff": [{"after": null, "before": "z:1.1", "dimension": "z:1"}, {"after": null, "before": "z:3.1", "dimension": "z:3"}, {"after": null, "before": "z:4.1", "dimension": "z:4"}, {"after": null, "before": "z:5.1", "dimension": "z:5"}, {"after": null, "before": "z:6.1", "dimension": "z:6"}, {"after": null, "before": "z:7.1", "dimension": "z:7"}, {"after": null, "before": "z:8.1", "dimension": "z:8"}, {"after": null, "before": "z:9.1", "dimension": "z:9"}, {"after": null, "before": "z:10.1", "dimension": "z:10"}, {"after": null, "before": "z:11.1", "dimension": "z:11"}], "drivers": ["C1"], "move": "region", "novel": [], "observation": "The stated deployment puts the service in the company's EU cloud region, directly supporting the residency constraint. Two replicas and a load balancer add availability and request distribution, but C1 does not force Kubernetes, two replicas or a load balancer specifically.", "own_tradeoff": "This gains managed orchestration, EU-based hosting, and basic redundancy and traffic distribution. It gives up some capacity and may increase cost and operational complexity compared with a single instance, while two replicas do not provide broad fault tolerance.", "parent": 1, "point": {"z:2": "z:2.1"}, "point_id": "P7", "reuses": null, "round": null, "step": 7, "tradeoffs": [], "verdict": "grounded", "why": "C1 requires personal data to remain within the company's EU cloud region, so the service's hosting location should be determined by that constraint."}, {"alternative": null, "approach": null, "assessment": {"Q1": "partly", "R1": "partly"}, "attested_by": [], "changed": ["z:1", "z:10", "z:11", "z:2", "z:4", "z:5", "z:6", "z:7", "z:8", "z:9"], "description": "The system would compare each incoming ticket with tickets from the same customer received within the previous hour. If the subjects match, it would classify the incoming ticket as a duplicate and handle it together with the existing ticket rather than as an independent case.", "diff": [{"after": null, "before": "z:1.1", "dimension": "z:1"}, {"after": null, "before": "z:2.1", "dimension": "z:2"}, {"after": null, "before": "z:4.1", "dimension": "z:4"}, {"after": null, "before": "z:5.1", "dimension": "z:5"}, {"after": null, "before": "z:6.1", "dimension": "z:6"}, {"after": null, "before": "z:7.1", "dimension": "z:7"}, {"after": null, "before": "z:8.1", "dimension": "z:8"}, {"after": null, "before": "z:9.1", "dimension": "z:9"}, {"after": null, "before": "z:10.1", "dimension": "z:10"}, {"after": null, "before": "z:11.1", "dimension": "z:11"}], "drivers": ["R1", "Q1"], "move": "region", "novel": [], "observation": "Deduplication can reduce repeated work, but the solution gives no latency evidence and identical customer and subject do not prove that two requests have the same intent. This is a discretionary optimization with a risk to independent ticket assignment.", "own_tradeoff": "This reduces repeated work and routing noise, but risks suppressing genuinely separate issues that share a subject and occur within the one-hour window.", "parent": 1, "point": {"z:3": "z:3.1"}, "point_id": "P8", "reuses": null, "round": null, "step": 8, "tradeoffs": [{"causes": ["z:3.1"], "costs": ["R1"], "gains": ["Q1"], "note": "Skipping classification can reduce processing work, but treating a same-subject ticket as a duplicate can attach a genuinely separate issue to the earlier ticket's team."}], "verdict": "partial", "why": "R1 and Q1 might support avoiding duplicate classification work, although no requirement explicitly asks for deduplication."}], "trajectory_dimensions": ["z:1", "z:2", "z:3", "z:4", "z:5", "z:6", "z:7", "z:8", "z:9", "z:10", "z:11", "z:12"], "unaddressed": [], "uncovered": [], "values": {"z:1.1": {"description": "", "dimension": "z:1", "href": null, "id": "z:1.1", "label": "Help desk webhook", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1]}, "z:10.1": {"description": "", "dimension": "z:10", "href": null, "id": "z:10.1", "label": "Team-lead keyword rules until agent corrections create training data", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 4]}, "z:11.1": {"description": "", "dimension": "z:11", "href": null, "id": "z:11.1", "label": "Per-team moved-ticket share dashboard and alert when share doubles week over week", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1]}, "z:12.1": {"description": "", "dimension": "z:12", "href": null, "id": "z:12.1", "label": "Update the classifier online after every agent correction", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [3]}, "z:2.1": {"description": "", "dimension": "z:2", "href": null, "id": "z:2.1", "label": "Managed Kubernetes in EU with two replicas and load balancer", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 7]}, "z:3.1": {"description": "", "dimension": "z:3", "href": null, "id": "z:3.1", "label": "One-hour customer-and-subject deduplication", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 8]}, "z:4.1": {"description": "", "dimension": "z:4", "href": null, "id": "z:4.1", "label": "Fixed pretrained multilingual sentence embeddings", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 5]}, "z:5.1": {"description": "", "dimension": "z:5", "href": null, "id": "z:5.1", "label": "Logistic regression with one class per team", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 5]}, "z:5.2": {"description": "", "dimension": "z:5", "href": null, "id": "z:5.2", "label": "Keyword rules only, with no learned text model", "passages": [], "roles": {}, "sources": [], "status": "", "steps": [6]}, "z:6.1": {"description": "", "dimension": "z:6", "href": null, "id": "z:6.1", "label": "Two runner-up teams and influential words", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1]}, "z:7.1": {"description": "", "dimension": "z:7", "href": null, "id": "z:7.1", "label": "Weekly supervised retraining on 90 days of final team labels", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 2]}, "z:8.1": {"description": "", "dimension": "z:8", "href": null, "id": "z:8.1", "label": "Replace only if last-week accuracy is at least current accuracy", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 2]}, "z:9.1": {"description": "", "dimension": "z:9", "href": null, "id": "z:9.1", "label": "Store model file in object storage and load within five minutes", "passages": [], "roles": {"S": "chosen"}, "sources": [], "status": "", "steps": [1, 2]}}, "wiki": false, "with_space": true}</script>
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById("theme-toggle");
+    function current() {
+      return root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    }
+    function label() { btn.textContent = current() === "dark" ? "☀" : "☾"; }
+    btn.addEventListener("click", function () {
+      var next = current() === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      try { localStorage.setItem("ddspace-wiki-theme", next); } catch (e) {}
+      label();
+      document.dispatchEvent(new CustomEvent("themechange"));
+    });
+    label();
+  })();
+</script>
+<script src="../assets/d3.min.js"></script>
+<script src="../assets/graph-layout.js"></script>
+<script>
+(function () {
+  const data = JSON.parse(document.getElementById("explainer-data").textContent);
+  const COLOR = {};
+  function readColors() {
+    const cs = getComputedStyle(document.documentElement), get = (name) => cs.getPropertyValue(name).trim();
+    ["dimension", "source", "accepted", "mixed", "rejected", "outcome", "muted", "fg", "accent", "novel"]
+      .forEach((k) => { COLOR[k] = get("--" + k); });
+  }
+  readColors();
+  const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const alts = data.alternatives;
+  const altName = (a) => a.id + " · " + a.name;
+
+  // The subgraph, as a tree from the centre: the domain, the involved dimensions, their values, then the design
+  // points the agent evaluated (one per step), then the requirements on the outer ring, linked to the points
+  // whose assessment judges them.
+  const steps = data.trajectory || [];
+  const pointValues = new Set();  // explored: every value a design point of the page takes (a step's or a choice's)
+  steps.forEach((s) => Object.values(s.point).forEach((v) => pointValues.add(v)));
+  alts.forEach((a) => a.choices.forEach((c) => c.value && pointValues.add(c.value)));
+  const consideredValues = new Set();
+  alts.forEach((a) => a.considered.forEach((c) => c.value && consideredValues.add(c.value)));
+  const options = new Map();  // "ADR:option" -> option, from every ADR
+  (data.adrs || []).forEach((r) => r.options.forEach((o) => {
+    options.set(o.key, o); Object.values(o.point).forEach((v) => consideredValues.add(v)); }));
+  const exploredDims = new Set([...pointValues].map((v) => (data.values[v] || {}).dimension).filter(Boolean));
+  const nodes = [{ id: "domain", kind: "domain", label: data.space ? (data.space.domain || "") : data.title }];
+  const edges = [];
+  Object.values(data.dimensions).forEach((dm) => {
+    nodes.push({ ...dm, kind: "dimension" });
+    edges.push({ source: "domain", target: dm.id, type: "domain" });
+    dm.values.forEach((vid) => edges.push({ source: dm.id, target: vid, type: "has_value" }));
+  });
+  Object.values(data.values).forEach((v) => nodes.push({ ...v, kind: "value" }));
+  const pid = (n) => "p:" + n;
+  steps.forEach((s) => {
+    nodes.push({ id: pid(s.step), kind: "point", step: s.step, verdict: s.verdict, values: Object.values(s.point),
+      label: (s.alternative ? s.alternative + " · " : "") + "#" + s.step, description: s.description });
+    Object.values(s.point).forEach((v) => edges.push({ source: v, target: pid(s.step), type: "member" }));
+    Object.entries(s.assessment || {}).forEach(([r, judged]) =>
+      edges.push({ source: pid(s.step), target: "r:" + r, type: "assess", judged }));
+  });
+  data.relations.forEach((r) => edges.push({ source: r.source, target: r.target, type: "relation", relation: r.type,
+    directed: r.directed, reading: r.reading }));
+  data.requirements.forEach((r) => nodes.push({ ...r, id: "r:" + r.id, req: r.id, kind: "requirement", label: r.id }));
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const links = edges.filter((e) => byId.has(e.source) && byId.has(e.target));
+  const TREE = new Set(["domain", "has_value", "member"]);
+
+  const SYMBOL = { domain: d3.symbolCircle, dimension: d3.symbolCircle, value: d3.symbolDiamond, point: d3.symbolTriangle,
+    requirement: d3.symbolSquare };
+  const radius = (n) => n.kind === "domain" ? 19 : n.kind === "dimension" ? 14 : n.kind === "value" ? 9 : n.kind === "point" ? 12 : 10;
+  const shapePath = (n) => d3.symbol().type(SYMBOL[n.kind] || d3.symbolCircle)
+    .size(Math.PI * radius(n) * radius(n) * (n.kind === "value" ? 1.25 : 1))();
+  const JUDGED = { strong: "accepted", grounded: "accepted", mixed: "mixed", partial: "mixed", weak: "rejected",
+    ungrounded: "rejected", meets: "accepted", partly: "mixed", misses: "rejected" };
+  const nodeColor = (n) => n.kind === "value" ? (COLOR[n.status] || COLOR.accent) : n.kind === "domain" ? COLOR.fg
+    : n.kind === "requirement" ? COLOR.novel : n.kind === "point" ? (COLOR[JUDGED[n.verdict]] || COLOR.accent) : COLOR.dimension;
+
+  // The shared radial layout (graph-layout.js). Dimension labels point inwards, so each dimension sits just inside
+  // its values; the other rings start beyond the longest label of the ring inside them. Points (in step order,
+  // clockwise from the top) and requirements sit evenly around their rings.
+  const LABEL_MAX = 22;  // short labels keep the rings tight, so the graph (and its text) is drawn larger
+  const shortLabel = (s) => { s = String(s ?? ""); return s.length > LABEL_MAX ? s.slice(0, LABEL_MAX - 1).trimEnd() + "…" : s; };
+  const measure = (() => {
+    const ctx = document.createElement("canvas").getContext("2d");
+    ctx.font = "15px " + getComputedStyle(document.body).fontFamily;
+    return (s) => ctx ? ctx.measureText(s).width : s.length * 6.5;
+  })();
+  const labelReach = (ns) => d3.max(ns, (n) => radius(n) + 4 + measure(shortLabel(n.label)) + 3) || 0;
+  const radialTargets = (nodes, links, cx, cy) => DelveLayout.radialTargets(nodes, links, cx, cy, {
+    rings: ["domain", "dimension", "value", "point", "requirement"],
+    spacing: { dimension: 90, value: 30, point: 34, requirement: 40 }, ringGap: 70,
+    labelReach, restJitter: 0.04, inward: ["dimension"], inset: { dimension: 36 }, even: ["point", "requirement"] });
+
+  const svg = d3.select("#svg"), g = svg.append("g");
+  svg.append("defs").append("marker").attr("id", "arrow").attr("viewBox", "0 -5 10 10").attr("refX", 20).attr("refY", 0)
+    .attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto")
+    .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", COLOR.dimension);
+  const zoom = d3.zoom().scaleExtent([0.2, 6]).on("zoom", (ev) => g.attr("transform", ev.transform));
+  svg.call(zoom);
+  const linkLayer = g.append("g"), nodeLayer = g.append("g");
+  const REL_DASH = { requires: null, affects: "7,3", constrains: "2,3", co_occurs_with: "1,5", refines: "9,3,2,3" };
+  function edgeStyle(e) {
+    if (e.type === "relation") return { stroke: COLOR.dimension, width: 2, dash: REL_DASH[e.relation] || null, op: 0.85, arrow: e.directed !== false };
+    if (e.type === "assess") return { stroke: COLOR[JUDGED[e.judged]] || COLOR.muted, width: 1.2, dash: e.judged === "misses" ? "4,3" : null, op: 0.22 };
+    if (e.type === "member") return { stroke: COLOR.muted, width: 1, dash: null, op: 0.12 };
+    if (e.type === "domain") return { stroke: COLOR.muted, width: 0.8, dash: null, op: 0.3 };
+    return { stroke: COLOR.muted, width: 1, dash: null, op: 0.5 };
+  }
+  const width = () => document.getElementById("canvas").clientWidth;
+  const height = () => document.getElementById("canvas").clientHeight;
+  const cx = 0, cy = 0;  // the layout's own frame; fit() maps it onto the canvas
+  const pos = (id) => byId.get(id);
+  const linkSel = linkLayer.selectAll("line").data(links).enter().append("line")
+    .attr("class", (d) => "link" + (TREE.has(d.type) ? " tree" : ""));
+  function styleLinks() {
+    linkSel.each(function (d) { const st = edgeStyle(d); d3.select(this).attr("stroke", st.stroke).attr("stroke-width", st.width)
+      .attr("stroke-dasharray", st.dash).attr("stroke-opacity", st.op).attr("marker-end", st.arrow ? "url(#arrow)" : null); });
+  }
+  styleLinks();
+  linkSel.filter((d) => d.reading).append("title").text((d) => d.reading);
+  linkSel.filter((d) => d.type === "assess").append("title").text((d) => byId.get(d.source).label + " " + d.judged + " " + d.target.slice(2));
+  const nodeSel = nodeLayer.selectAll("g.node").data(nodes).enter().append("g").attr("class", "node")
+    .style("cursor", "pointer").on("click", (ev, d) => { ev.stopPropagation(); select(d.id); });
+  nodeSel.append("circle").attr("r", (d) => Math.max(radius(d), 10)).attr("fill", "transparent");
+  nodeSel.append("path").attr("class", "shape").attr("d", shapePath);
+  nodeSel.append("text").text((d) => d.kind === "domain" ? d.label : shortLabel(d.label));
+  // A selected path shows its nodes' full labels (the rest of the graph is faded); otherwise labels are short.
+  function labels(keep) {
+    nodeSel.select("text").text((d) => d.kind === "domain" || (keep && keep.has(d.id)) ? d.label : shortLabel(d.label));
+  }
+  nodeSel.append("title").text((d) => d.kind === "requirement" ? d.req + ": " + d.text
+    : d.kind === "point" ? "Step " + d.step + " · " + d.verdict + (d.description ? ": " + d.description : "")
+    : d.label + (d.status ? " (" + d.status + ")" : ""));
+  const orientLabels = () => DelveLayout.orientLabels(nodeSel.select("text"), cx, cy, { radius, centreDy: "-1.4em",
+    inward: (d) => d.kind === "dimension" });
+  function fit() {
+    const shown = nodes.filter(visible);
+    const xs = shown.map((d) => d.x), ys = shown.map((d) => d.y), pad = 70;
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const k = Math.min(2.5, 0.95 / Math.max((x1 - x0 + 2 * pad) / (width() || 1), (y1 - y0 + 2 * pad) / (height() || 1)));
+    svg.call(zoom.transform, d3.zoomIdentity.translate(width() / 2, height() / 2).scale(k).translate(-(x0 + x1) / 2, -(y0 + y1) / 2));
+  }
+  // Shown: every node but the values no design point takes and no alternative considered, unless the reader asks
+  // for every value the space offers. The layout is computed over the shown nodes only.
+  let showAll = false;
+  const visible = (d) => d.kind !== "value" || showAll || pointValues.has(d.id) || consideredValues.has(d.id);
+  function layout() {
+    const shown = nodes.filter(visible), ids = new Set(shown.map((n) => n.id));
+    const target = radialTargets(shown, links.filter((l) => ids.has(l.source) && ids.has(l.target)), cx, cy);
+    shown.forEach((n) => { const t = target.get(n.id); n.x = t.x; n.y = t.y; });
+    nodeSel.style("display", (d) => ids.has(d.id) ? null : "none").attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
+    linkSel.style("display", (d) => ids.has(d.source) && ids.has(d.target) ? null : "none")
+      .attr("x1", (d) => pos(d.source).x).attr("y1", (d) => pos(d.source).y)
+      .attr("x2", (d) => pos(d.target).x).attr("y2", (d) => pos(d.target).y);
+    orientLabels();
+    fit();
+  }
+  layout();
+  document.querySelectorAll("[data-zoom]").forEach((b) => b.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (b.dataset.zoom === "fit") fit(); else svg.transition().duration(200).call(zoom.scaleBy, b.dataset.zoom === "in" ? 1.4 : 1 / 1.4);
+  }));
+  // A requirement no design point is judged against: drawn hollow, with a dashed outline.
+  const judgedReqs = new Set(links.filter((e) => e.type === "assess").map((e) => e.target));
+  nodeSel.classed("unjudged", (d) => d.kind === "requirement" && !judgedReqs.has(d.id));
+  nodeSel.filter((d) => d.kind === "requirement" && !judgedReqs.has(d.id)).select("title")
+    .text((d) => d.req + ": " + d.text + " (no design point is judged against it)");
+  const toggle = document.getElementById("show-all");
+  if (toggle) toggle.addEventListener("change", () => { showAll = toggle.checked; layout(); });
+
+  // The active view: the trajectory (every step's point, or the selected step's), one alternative, or the compare
+  // view (every alternative). Explored dimensions and values stay coloured in every view; the point shown is outlined.
+  let view = "adrs", selected = null, selectedStep = null, selectedAlt = null, selectedOption = null;
+  const explored = (d) => d.kind === "value" ? pointValues.has(d.id) : d.kind === "dimension" ? exploredDims.has(d.id) : true;
+  linkSel.classed("explored", (d) => (d.type === "has_value" && pointValues.has(d.target))
+    || (d.type === "domain" && exploredDims.has(d.target)));
+  const stepOf = (n) => steps.find((s) => s.step === n);
+  function shownPoint() {
+    const lit = new Set();
+    const add = (s) => { if (!s) return; lit.add(pid(s.step)); Object.values(s.point).forEach((v) => lit.add(v)); };
+    if (view === "trajectory") { if (selectedStep !== null) add(stepOf(selectedStep)); return lit; }
+    if (view === "adrs" && selectedOption) {
+      const o = options.get(selectedOption); Object.values(o.point).forEach((v) => lit.add(v)); if (o.step) lit.add(pid(o.step));
+      return lit;
+    }
+    alts.filter((a) => view === "compare" || (view === "adrs" && a.id === selectedAlt)).forEach((a) => {
+      add(stepOf(a.step)); a.choices.forEach((c) => c.value && lit.add(c.value)); });
+    return lit;
+  }
+  function applyView() {
+    const lit = shownPoint();
+    // With one design point shown, each requirement is coloured by how that point judges it (grey: not judged).
+    const shownPoints = [...lit].filter((id) => id.startsWith("p:"));
+    const focus = shownPoints.length === 1 ? stepOf(byId.get(shownPoints[0]).step) : null;
+    const reqFill = (d) => COLOR[JUDGED[(focus.assessment || {})[d.req]]] || COLOR.muted;
+    // With nothing selected, every point-to-requirement link is drawn (faint). Once something is selected, only
+    // the links of the selected requirement or of the design point shown remain.
+    const anySelection = selected !== null || lit.size > 0;
+    linkSel.classed("off", (d) => d.type === "assess" && anySelection && d.target !== selected
+      && !(focus && d.source === pid(focus.step)));
+    nodeSel.classed("greyed", (d) => !explored(d)).classed("in-point", (d) => lit.has(d.id))
+      .select("path.shape").attr("fill", (d) => d.kind === "requirement" && focus ? reqFill(d) : explored(d) ? nodeColor(d) : COLOR.muted)
+      .attr("stroke", (d) => d.id === selected || lit.has(d.id) ? COLOR.fg : d.kind === "dimension" ? "#fff" : "none")
+      .attr("stroke-width", (d) => d.id === selected ? 3 : lit.has(d.id) ? 2.2 : 1.5)
+      .attr("transform", (d) => lit.has(d.id) ? "scale(1.45)" : null);
+    // The point shown: its links to its values and to the requirements stand out.
+    linkSel.classed("shown", (d) => (d.type === "member" && lit.has(d.target)) || (d.type === "assess" && lit.has(d.source)));
+    document.querySelectorAll("[data-step]").forEach((el) =>
+      el.classList.toggle("sel", view === "trajectory" && selectedStep !== null && Number(el.dataset.step) === selectedStep));
+    document.querySelectorAll(".solution").forEach((el) => el.classList.toggle("sel", el.dataset.alt === selectedAlt));
+    document.querySelectorAll(".option").forEach((el) => el.classList.toggle("sel", el.dataset.option === selectedOption));
+  }
+  // A selected node's path to the centre (domain -> dimension -> value) and its direct neighbours one ring out,
+  // never further: a dimension lights its explored values; a value, the design points that take it; a design
+  // point, its values and the requirements it is judged against; a requirement, the points judged against it.
+  // Selecting a lit node goes on from there, one step at a time.
+  function lineage(id) {
+    const keep = new Set([id, "domain"]);
+    const up = (vid) => { keep.add(vid); const v = data.values[vid]; if (v) keep.add(v.dimension); };
+    const n = byId.get(id);
+    if (!n) return keep;
+    if (n.kind === "domain") exploredDims.forEach((d) => keep.add(d));
+    else if (n.kind === "dimension") (data.dimensions[id].values || []).filter((v) => pointValues.has(v)).forEach((v) => keep.add(v));
+    else if (n.kind === "value") { up(id); links.filter((e) => e.type === "member" && e.source === id).forEach((e) => keep.add(e.target)); }
+    else if (n.kind === "point") {
+      (n.values || []).forEach(up);
+      links.filter((e) => e.type === "assess" && e.source === id).forEach((e) => keep.add(e.target));
+    }
+    else if (n.kind === "requirement") links.filter((e) => e.type === "assess" && e.target === id).forEach((e) => keep.add(e.source));
+    return keep;
+  }
+  function highlight(id) {
+    const keep = lineage(id);
+    labels(keep);
+    nodeSel.classed("dim-out", (d) => !keep.has(d.id));
+    linkSel.classed("dim-out", (d) => !(keep.has(d.source) && keep.has(d.target)))
+      .classed("on-path", (d) => d.type !== "relation" && keep.has(d.source) && keep.has(d.target));
+  }
+  const HINT = '<p class="hint">Select anything in the graph or the text (a dimension, a value, a design point, a requirement, an alternative or an option) to see what it is and the part it plays in this rationale.</p>';
+  function clearSelection() {
+    selected = null; selectedStep = null; selectedAlt = null; selectedOption = null;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    document.querySelectorAll(".chip.sel").forEach((c) => c.classList.remove("sel"));
+    document.getElementById("info").innerHTML = HINT;
+    applyView();
+  }
+  // The details panel: every kind of element reads the same way: what it is (kind, name, one sentence), then
+  // sections named as on the page (in the decisions, in the alternatives, in the trajectory, requirements, sources).
+  const EXPLAIN = data.mode === "explain";
+  const link = (n) => n.href ? '<p class="info-link"><a class="open-page" href="' + esc(n.href) + '">Open its page in the wiki →</a></p>' : "";
+  const vlabel = (vid) => { const v = data.values[vid]; return v ? '<span data-id="' + esc(v.id) + '" class="vref">' + esc(v.label) + "</span>" : "—"; };
+  const dlabel = (did) => { const x = data.dimensions[did]; return x ? '<span data-id="' + esc(x.id) + '" class="dref">' + esc(x.label) + "</span>" : "—"; };
+  const rlabel = (rid) => '<span data-id="r:' + esc(rid) + '" class="vref">' + esc(rid) + "</span>";
+  const pair = (did, vid) => dlabel(did) + " → " + vlabel(vid);
+  const head = (kind, title, sub) => '<div class="kind">' + kind + "</div><h2>" + title + "</h2>" + (sub ? '<p class="info-sub">' + sub + "</p>" : "");
+  const sec = (title, body) => body ? '<h3 class="info-h">' + esc(title) + "</h3>" + body : "";
+  const list = (items) => items.length ? "<ul>" + items.map((i) => "<li>" + i + "</li>").join("") + "</ul>" : "";
+  const para = (text) => text ? "<p>" + text + "</p>" : "";
+  // A step's trade-off against the requirements, and the one the point's description names.
+  const tradeoffLine = (t) => (t.causes && t.causes.length ? t.causes.map(vlabel).join(", ") + ": " : "") + '<span class="t-gain">gains</span> ' + t.gains.map(rlabel).join(", ")
+    + ' <span class="t-cost">gives up</span> ' + t.costs.map(rlabel).join(", ") + (t.note ? '<br><span class="muted">' + esc(t.note) + "</span>" : "");
+  const tradeoffSecs = (s) => sec("Trade-offs against the requirements", list((s.tradeoffs || []).map(tradeoffLine)))
+    + sec("The point's own trade-off", para(esc(s.own_tradeoff || "")));
+  const judgedChip = (rid, j) => '<span class="j j-' + esc(j) + '" data-id="r:' + esc(rid) + '">' + esc(rid) + " " + esc(j) + "</span>";
+  const judgedWord = (j) => '<span class="j j-' + esc(j) + '">' + esc(j) + "</span>";  // inside a requirement's own panel
+  const chips = (assessment) => { const e = Object.entries(assessment || {}); return e.length ? '<div class="judged">' + e.map(([r, j]) => judgedChip(r, j)).join("") + "</div>" : ""; };
+  const stepChip = (s) => '<span class="node-chip vb-' + esc(s.verdict) + '" data-step-ref="' + s.step + '" title="' + esc(s.verdict) + '">#' + s.step + "</span>";
+  const MEANS = {
+    strong: "it meets every constraint and serves every requirement at least partly",
+    mixed: "good on some requirements, but it misses one or carries a conflict",
+    weak: "it breaks a constraint or misses a key requirement",
+    grounded: "the requirements call for these values and what is known supports them",
+    partial: "only part of that holds: the requirements or what is known support it, not both",
+    ungrounded: "neither the requirements nor what is known support it" };
+  const STATUS = { accepted: "The sources accept this value.", mixed: "The sources are divided on this value.",
+    rejected: "The sources reject this value.", outcome: "The sources report this as an outcome." };
+  const STANCE = { accepts: "accepts it", rejects: "rejects it", supports: "supports it", both: "both accepts and rejects it" };
+  function phrase(s) {
+    const p = s.parent ? "#" + s.parent : "";
+    return { seed: "Seed of approach " + s.approach, exploit: "Refined " + p + (s.approach ? " (approach " + s.approach + ")" : ""),
+      explore: "New approach " + s.approach + (s.parent ? ", started from " + p : ""), ablate: "Ablation of " + p + ": which value made it work?",
+      solution: "The solution as one design point", region: "A region of " + p + ": part of the solution",
+      contrast: "A contrast on " + p + ": one option changed" }[s.move] || s.move;
+  }
+  function moveItems(s) {
+    if (["seed", "solution", "region"].includes(s.move) || !s.parent || !(s.diff || []).length)
+      return Object.entries(s.point).map(([d, v]) => pair(d, v));
+    return s.diff.map((c) => c.before == null ? "add " + pair(c.dimension, c.after)
+      : c.after == null ? "drop " + dlabel(c.dimension) + ' <span class="muted">(was ' + vlabel(c.before) + ")</span>"
+      : "change " + dlabel(c.dimension) + ": " + vlabel(c.before) + " → " + vlabel(c.after));
+  }
+  const adrOptions = [];  // [{r, o}] over every ADR option
+  (data.adrs || []).forEach((r) => r.options.forEach((o) => adrOptions.push({ r, o })));
+  const statusBadge = (o) => o.status === "chosen"
+    ? '<span class="badge accepted">chosen' + (EXPLAIN ? "" : " in " + esc(o.in.join(", "))) + "</span>"
+    : '<span class="badge rejected">discarded</span>';
+  const adrRef = (id, title) => '<a href="#adr-' + esc(id) + '" class="adr-link">' + esc(id) + "</a> · " + esc(title);
+  const optLine = ({ r, o }) => adrRef(r.id, r.title) + ": <b>" + esc(o.name) + "</b> " + statusBadge(o);
+  const altsTitle = EXPLAIN ? "In the solution" : "In the alternatives";
+  const ev = (list) => list.map((e) => esc(e.doc) + (e.stance ? " (" + esc(e.stance) + ")" : "")).join(", ");
+  const taking = (vid) => steps.filter((s) => Object.values(s.point).includes(vid));
+
+  function details(n) {
+    if (n.kind === "dimension") {
+      const dm = data.dimensions[n.id];
+      const explored = (dm.values || []).filter((v) => pointValues.has(v));
+      return head("Dimension · a design concern", esc(n.label), esc(n.question || ""))
+        + sec("In the decisions", list(adrOptions.filter(({ o }) => o.point[n.id]).map((x) => optLine(x) + "<br>" + pair(n.id, x.o.point[n.id]))))
+        + sec(altsTitle, list(alts.map((a) => {
+            const c = a.choices.find((x) => x.dimension === n.id), o = a.open.find((x) => x.dimension === n.id);
+            return "<b>" + esc(a.id) + "</b> " + (c ? vlabel(c.value) + (c.reason ? '<br><span class="muted">' + esc(c.reason) + "</span>" : "")
+              : o ? "leaves it open" + (o.reason ? ': <span class="muted">' + esc(o.reason) + "</span>" : "") : '<span class="muted">does not settle it</span>');
+          })))
+        + sec("In the trajectory", explored.length
+            ? para(explored.length + " of the " + dm.values.length + " values " + (data.wiki ? "the space offers" : "the agent named") + " were taken by some design point:")
+              + list(explored.map((v) => vlabel(v) + " " + taking(v).map(stepChip).join("")))
+            : para('<span class="muted">No design point settled this dimension.</span>'))
+        + sec("Relations", list(data.relations.filter((r) => r.source === n.id || r.target === n.id)
+            .map((r) => dlabel(r.source) + " <em>" + esc(r.type) + "</em> " + dlabel(r.target) + ' <span class="muted">(in the space)</span>')
+            .concat(alts.flatMap((a) => a.relations.filter((r) => r.source === n.id || r.target === n.id).map((r) =>
+              (r.source ? dlabel(r.source) : esc(r.source_label)) + " <em>" + esc(r.type) + "</em> " + (r.target ? dlabel(r.target) : esc(r.target_label))
+              + ' <span class="muted">(' + esc(a.id) + (r.holds ? ": holds" : ": does not hold") + (r.note ? ", " + esc(r.note) : "") + ")</span>")))))
+        + link(n);
+    }
+    if (n.kind === "value") {
+      const points = taking(n.id);
+      const roles = [];
+      alts.forEach((a) => {
+        const c = a.choices.find((x) => x.value === n.id), k = a.considered.find((x) => x.value === n.id);
+        if (c) roles.push("<b>Chosen in " + esc(a.id) + "</b>" + (c.drivers.length ? " for " + c.drivers.map(rlabel).join(", ") : "")
+          + (c.reason ? "<br>" + esc(c.reason) : "") + (c.quote ? '<div class="quote">“' + esc(c.quote) + "”</div>" : "")
+          + (c.evidence.length ? '<br><span class="ev">Cited evidence: ' + ev(c.evidence) + "</span>" : ""));
+        else if (k) roles.push("<b>Weighed and set aside in " + esc(a.id) + "</b>" + (k.reason ? "<br>" + esc(k.reason) : ""));
+      });
+      return head("Value · an option for " + dlabel(n.dimension), esc(n.label), esc(n.description || ""))
+        + (n.status && STATUS[n.status] ? para('<span class="badge ' + esc(n.status) + '">' + esc(n.status) + "</span> " + STATUS[n.status]) : "")
+        + sec("In the decisions", list(adrOptions.filter(({ o }) => Object.values(o.point).includes(n.id)).map(optLine)))
+        + sec(altsTitle, list(roles))
+        + sec("In the trajectory", points.length
+            ? para("Taken by " + points.length + " design point" + (points.length > 1 ? "s" : "") + ": " + points.map(stepChip).join("")
+              + "<br>First tried in #" + points[0].step + ": " + esc(phrase(points[0])) + ".")
+            : para('<span class="muted">No design point took it: ' + (data.wiki ? "the space offers it, but the agent did not try it." : "the agent named it as an option, but did not try it.") + "</span>"))
+        + sec("What the sources say", list(n.sources.map((s) => (s.href ? '<a href="' + esc(s.href) + '">' + esc(s.label) + "</a>" : esc(s.label))
+            + (s.stance ? " " + esc(STANCE[s.stance] || s.stance) : "")))
+            + (n.passages.length ? '<p class="ev">Passages: ' + ev(n.passages) + "</p>" : ""))
+        + link(n);
+    }
+    if (n.kind === "requirement") {
+      const rq = data.requirements.find((r) => r.id === n.req) || {};
+      const adrsFor = (data.adrs || []).filter((r) => r.drivers.includes(n.req));
+      const judged = steps.filter((s) => s.assessment && s.assessment[n.req]);
+      const drives = [];
+      alts.forEach((a) => a.choices.filter((c) => c.drivers.includes(n.req)).forEach((c) =>
+        drives.push("<b>" + esc(a.id) + "</b> " + pair(c.dimension, c.value))));
+      return head("Requirement · " + esc(rq.kind || "requirement") + (rq.attribute ? ": " + esc(rq.attribute) : ""), esc(n.req), esc(n.text))
+        + sec("In the decisions", adrsFor.length
+            ? list(adrsFor.map((r) => adrRef(r.id, r.title) + ": "
+                + r.options.filter((o) => o.status === "chosen").map((o) => "<b>" + esc(o.name) + "</b>" + (EXPLAIN ? "" : " (" + esc(o.in.join(", ")) + ")")).join("; ")))
+            : para('<span class="muted">No ADR addresses it.</span>'))
+        + sec(altsTitle, list(alts.map((a) => { const s = stepOf(a.step), j = s && s.assessment ? s.assessment[n.req] : null;
+            return "<b>" + esc(a.id) + "</b> " + (j ? judgedWord(j) : '<span class="muted">not judged</span>'); })))
+        + sec("In the trajectory", judged.length
+            ? para(judged.length + " design point" + (judged.length > 1 ? "s were" : " was") + " judged against it:")
+              + '<div class="judged">' + judged.map((s) => '<span class="pair-chip">' + stepChip(s) + judgedWord(s.assessment[n.req]) + "</span>").join(" ") + "</div>"
+            : para('<span class="muted">No design point was judged against it.</span>'))
+        + sec("Choices that name it as a driver", list(drives));
+    }
+    return head("Design space", esc(n.label || data.title),
+        data.space ? "The centre of the graph. Around it: the dimensions this rationale involves, their values, the design points the agent evaluated and the requirements."
+          : "The problem. Around it: the dimensions the agent named, their values, the design points it evaluated and the requirements.")
+      + sec("At a glance", list([exploredDims.size + " of " + Object.keys(data.dimensions).length + " dimensions settled by some design point",
+          pointValues.size + " values taken by some design point", steps.length + " design points evaluated"
+          + (data.budget && data.budget.max_points ? " (budget " + data.budget.max_points + ")" : ""),
+          alts.length + (EXPLAIN ? " solution explained" : " alternative" + (alts.length > 1 ? "s" : "") + " proposed"),
+          (data.adrs || []).length + " ADRs"]))
+      + link(n);
+  }
+  function select(id) {
+    const n = byId.get(id); if (!n) return;
+    if (n.kind === "point") { selectStep(n.step); return; }
+    selected = id; applyView(); highlight(id);
+    document.querySelectorAll(".chip.sel").forEach((c) => c.classList.remove("sel"));
+    if (n.kind === "requirement") document.querySelectorAll('[data-requirement="' + n.req + '"]').forEach((c) => c.classList.add("sel"));
+    showInfo(details(n));
+  }
+  svg.on("click", () => clearSelection());
+
+  // The trajectory: selecting a step (its column, its entry or its point in the graph) lights its point and its lineage.
+  function stepInfo(s) {
+    const sub = (s.approach ? "Approach " + esc(s.approach) + (s.round ? ", round " + esc(s.round) : "") + ". " : "") + esc(s.description || "");
+    const inAdrs = adrOptions.filter(({ o }) => o.step === s.step);
+    return head("Design point" + (s.point_id ? " · " + esc(s.point_id) : ""), "#" + s.step + " · " + esc(phrase(s)),
+        sub + (s.reuses ? " The same point as #" + s.reuses + ": reused, not evaluated again." : ""))
+      + para('<span class="vd-chip vb-' + esc(s.verdict) + '">' + esc(s.verdict) + "</span> " + esc(MEANS[s.verdict] || "")
+        + (s.alternative ? '<br><span class="alt-chip">' + (EXPLAIN ? "This is the solution." : "It became alternative " + esc(s.alternative) + ".") + "</span>" : ""))
+      + sec("Thought", para(esc(s.why)))
+      + sec("Move", list(moveItems(s)))
+      + sec("Observed", para(esc(s.observation)))
+      + sec("Requirements", chips(s.assessment))
+      + tradeoffSecs(s)
+      + (["seed", "solution", "region"].includes(s.move) ? "" : sec("The whole point", list(Object.entries(s.point).map(([d, v]) => pair(d, v)))))
+      + sec("In the decisions", list(inAdrs.map(optLine)))
+      + (data.wiki ? sec("What the sources say", s.attested_by.length
+          ? para("Attested by " + s.attested_by.map((a) => a.href ? '<a href="' + esc(a.href) + '">' + esc(a.label) + "</a>" : esc(a.label)).join("; ") + ".")
+          : para('<span class="muted">No source attests this combination.</span>')) : "");
+  }
+  function selectStep(n) {
+    const s = stepOf(n); if (!s) return;
+    selected = null; selectedStep = n;
+    if (view !== "trajectory") document.querySelector('.tab[data-tab="trajectory"]')?.click();
+    selectedStep = n; applyView(); highlight(pid(n));
+    showInfo(stepInfo(s));
+  }
+  document.querySelectorAll(".step-h, .region, .node-chip, .heat-h, td.h, .story-step, .opt").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    selectStep(Number(el.dataset.step));
+  }));
+  // The ADRs tab: an alternative or an option lights its point in the graph.
+  function altInfo(a) {
+    const s = stepOf(a.step);
+    return head(EXPLAIN ? "The solution" : "Alternative" + (a.approach ? " · from approach " + esc(a.approach) : ""), esc(altName(a)), esc(a.summary || ""))
+      + sec("Composed of", list((a.parts || []).map((p) => adrRef(p.adr, p.name)
+          + "<br>" + Object.entries(p.point).map(([d, v]) => pair(d, v)).join("<br>"))))
+      + sec("Requirements", s ? chips(s.assessment) : "")
+      + (s ? tradeoffSecs(s) : "")
+      + sec("Left open", list(a.open.map((o) => dlabel(o.dimension) + (o.reason ? ': <span class="muted">' + esc(o.reason) + "</span>" : ""))))
+      + sec("Each choice", list(a.choices.map((c) => pair(c.dimension, c.value) + (c.drivers.length ? " · for " + c.drivers.map(rlabel).join(", ") : "")
+          + (c.reason ? '<br><span class="muted">' + esc(c.reason) + "</span>" : "")
+          + (c.fit === "approximate" ? '<br><span class="badge mixed approx">approximate fit</span> ' + esc(c.fit_note || "") : "") + (c.quote ? '<div class="quote">“' + esc(c.quote) + "”</div>" : "")
+          + (c.evidence.length ? '<br><span class="ev">Cited evidence: ' + ev(c.evidence) + "</span>" : ""))));
+  }
+  function optionInfo(o) {
+    const { r } = adrOptions.find((x) => x.o === o) || {};
+    return head("Option · " + (r ? esc(r.id) + " " + esc(r.title) : "ADR"), esc(o.name), statusBadge(o) + " " + esc(o.reason || ""))
+      + sec("Values", list(Object.entries(o.point).map(([d, v]) => pair(d, v))))
+      + (o.fit === "approximate" ? sec("Approximate fit", para(esc(o.fit_note || "The values only roughly match this option."))) : "")
+      + sec("Pros", list(o.pros.map(esc))) + sec("Cons", list(o.cons.map(esc)))
+      + (o.quotes && o.quotes.length ? sec("In the solution's words", o.quotes.map((q) => '<div class="quote">“' + esc(q) + "”</div>").join("")) : "")
+      + (r ? sec("The decision it answers", para(esc(r.context)) + '<div class="judged">' + r.drivers.map((d) => '<span class="chip-sm">' + rlabel(d) + "</span>").join(" ") + "</div>") : "");
+  }
+  function showInfo(html) {
+    const info = document.getElementById("info"); info.innerHTML = html; info.scrollTop = 0;
+    info.querySelectorAll("[data-id]").forEach((el) => el.addEventListener("click", () => select(el.dataset.id)));
+    info.querySelectorAll("[data-step-ref]").forEach((el) => el.addEventListener("click", () => selectStep(Number(el.dataset.stepRef))));
+    info.querySelectorAll("a.adr-link").forEach((el) => el.addEventListener("click", () => {
+      if (view !== "adrs") document.querySelector('.tab[data-tab="adrs"]')?.click(); }));
+  }
+  document.querySelectorAll(".solution").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    const a = alts.find((x) => x.id === el.dataset.alt); if (!a) return;
+    selected = null; selectedOption = null; selectedAlt = a.id;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    applyView(); showInfo(altInfo(a));
+  }));
+  document.querySelectorAll(".option").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a") || e.target.closest("[data-node]")) return;
+    const o = options.get(el.dataset.option); if (!o) return;
+    selected = null; selectedAlt = null; selectedOption = o.key;
+    nodeSel.classed("dim-out", false); linkSel.classed("dim-out", false).classed("on-path", false); labels(null);
+    applyView(); showInfo(optionInfo(o));
+  }));
+  // A gap's approximate fit selects its ADR option (or its alternative) in the ADRs tab.
+  document.querySelectorAll("[data-gap-option], [data-gap-alt]").forEach((el) => {
+    const go = () => {
+      if (view !== "adrs") document.querySelector('.tab[data-tab="adrs"]')?.click();
+      const target = el.dataset.gapOption ? document.querySelector('.option[data-option="' + CSS.escape(el.dataset.gapOption) + '"]')
+        : document.querySelector('.solution[data-alt="' + CSS.escape(el.dataset.gapAlt) + '"]');
+      if (target) { target.click(); target.scrollIntoView({ block: "center", behavior: "smooth" }); }
+    };
+    el.addEventListener("click", (e) => { if (!e.target.closest("a") && !e.target.closest("[data-node]")) go(); });
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+  });
+  // The lanes: an arrow from each point's parent to it (refine along a lane, a new approach across lanes,
+  // an ablation dotted).
+  function overlay(wrapSel, svgSel) {
+    const wrap = document.querySelector(wrapSel), svgEl = wrap && wrap.querySelector(svgSel);
+    if (!wrap || !svgEl || !wrap.offsetParent) return null;
+    svgEl.setAttribute("width", wrap.scrollWidth); svgEl.setAttribute("height", wrap.scrollHeight);
+    const box = wrap.getBoundingClientRect();
+    const at = (el, side) => { const r = el.getBoundingClientRect();
+      return [(side === "left" ? r.left : side === "right" ? r.right : r.left + r.width / 2) - box.left + wrap.scrollLeft,
+        r.top + r.height / 2 - box.top]; };
+    return { svgEl, at };
+  }
+  const MOVE_COLOR = (m) => m === "explore" || m === "contrast" ? COLOR.novel : m === "seed" || m === "solution" ? COLOR.dimension : COLOR.accent;
+  function drawLanes() {
+    const o = overlay(".lanes-wrap", "svg.lane-arrows"); if (!o) return;
+    let html = "";
+    steps.forEach((s) => {
+      if (!s.parent) return;
+      const a = document.querySelector('.node-chip[data-step="' + s.parent + '"]'), b = document.querySelector('.node-chip[data-step="' + s.step + '"]');
+      if (!a || !b) return;
+      const [x0, y0] = o.at(a, "right"), [x1, y1] = o.at(b, "left");
+      const mx = (x0 + x1) / 2, dash = s.move === "ablate" ? "2,3" : s.move === "explore" ? "6,4" : null;
+      html += '<path d="M' + x0 + "," + y0 + " C" + mx + "," + y0 + " " + mx + "," + y1 + " " + x1 + "," + y1 + '" fill="none" stroke="'
+        + MOVE_COLOR(s.move) + '" stroke-width="1.8"' + (dash ? ' stroke-dasharray="' + dash + '"' : "") + ' marker-end="url(#lane-arrow)"></path>';
+    });
+    o.svgEl.innerHTML = '<defs><marker id="lane-arrow" viewBox="0 -5 10 10" refX="9" refY="0" markerWidth="6" markerHeight="6" orient="auto">'
+      + '<path d="M0,-5L10,0L0,5" fill="' + COLOR.muted + '"></path></marker></defs>' + html;
+  }
+  // The questions, options and criteria: a link from each option to each requirement its point was judged against.
+  const JUDGE_STYLE = { meets: [() => COLOR.accepted, null], partly: [() => COLOR.mixed, null], misses: [() => COLOR.rejected, "5,4"] };
+  function drawQoc() {
+    const o = overlay(".qoc-wrap", "svg.qoc-links"); if (!o) return;
+    let html = "";
+    document.querySelectorAll(".opt[data-qoc]").forEach((el) => {
+      const [qi, oi] = el.dataset.qoc.split(":").map(Number), opt = (data.qoc[qi] || { options: [] }).options[oi];
+      if (!opt) return;
+      const [x0, y0] = o.at(el, "right");
+      Object.entries(opt.assessment || {}).forEach(([rid, judged]) => {
+        const c = document.querySelector('.crit[data-crit="' + rid + '"]'); if (!c) return;
+        const [x1, y1] = o.at(c, "left"), st = JUDGE_STYLE[judged] || [() => COLOR.muted, null], mx = (x0 + x1) / 2;
+        html += '<path data-from="' + el.dataset.qoc + '" d="M' + x0 + "," + y0 + " C" + mx + "," + y0 + " " + mx + "," + y1 + " " + x1 + "," + y1
+          + '" fill="none" stroke="' + st[0]() + '" stroke-width="1.5" stroke-opacity="' + (opt.specific ? 0.8 : 0.14) + '"'
+          + (st[1] ? ' stroke-dasharray="' + st[1] + '"' : "") + "></path>";
+      });
+    });
+    o.svgEl.innerHTML = html;
+  }
+  document.querySelectorAll(".opt[data-qoc]").forEach((el) => {
+    const mark = (on) => document.querySelectorAll('svg.qoc-links path[data-from="' + el.dataset.qoc + '"]')
+      .forEach((p) => p.classList.toggle("traced", on));
+    el.addEventListener("mouseenter", () => mark(true)); el.addEventListener("mouseleave", () => mark(false));
+  });
+  function drawTrajectory() { drawLanes(); drawQoc(); drawLineage(); }
+  document.querySelector("details.grid-details")?.addEventListener("toggle", drawLineage);
+  // The lineage: an arc from each step's parent column to its own, above the grid.
+  function drawLineage() {
+    const svgL = document.querySelector("svg.lineage"); if (!svgL) return;
+    const box = svgL.getBoundingClientRect(), table = document.querySelector("table.traj");
+    svgL.style.width = table.scrollWidth + "px";
+    const x = (n) => { const th = document.querySelector('.step-h[data-step="' + n + '"]'); if (!th) return null;
+      const r = th.getBoundingClientRect(); return r.left - box.left + r.width / 2; };
+    const colorOf = (m) => m === "explore" || m === "contrast" ? COLOR.novel : m === "exploit" || m === "region" ? COLOR.accent : COLOR.dimension;
+    let html = "";
+    steps.forEach((s) => {
+      const x1 = x(s.step); if (x1 === null) return;
+      html += '<circle cx="' + x1 + '" cy="40" r="3" fill="' + colorOf(s.move) + '"></circle>';
+      const x0 = s.parent ? x(s.parent) : null; if (x0 === null) return;
+      const h = Math.min(36, 10 + Math.abs(x1 - x0) / 8);
+      html += '<path d="M' + x0 + ",40 C" + x0 + "," + (40 - h) + " " + x1 + "," + (40 - h) + " " + x1 + ',40" fill="none" stroke="'
+        + colorOf(s.move) + '" stroke-width="1.6"></path>';
+    });
+    svgL.innerHTML = html;
+  }
+  document.querySelectorAll("main [data-node]").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest("a")) return;  // a wiki link opens its page
+    e.preventDefault(); select(el.dataset.node);
+  }));
+
+  // Tabs: switching shows the tab's panel, re-lights the graph and drops the selection fade.
+  document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => {
+    view = t.dataset.tab;
+    document.querySelectorAll(".tab").forEach((x) => x.setAttribute("aria-selected", x === t ? "true" : "false"));
+    document.querySelectorAll(".panel").forEach((p) => { p.hidden = p.dataset.panel !== view; });
+    clearSelection();
+    if (view === "trajectory") drawTrajectory();
+  }));
+  applyView();
+  drawTrajectory();
+  // The dividers: drag (or use the arrow keys on) the vertical one to share the width between the text and the
+  // graph, the horizontal one to share the height between the graph and its details. Double-click resets. The
+  // split is kept in this browser only (a convenience; the page works without storage).
+  (function splitters() {
+    const KEY = "delve-explainer-split", root = document.documentElement, wrap = document.querySelector(".ex-wrap");
+    const side = document.querySelector(".ex-side");
+    const LIMITS = { left: [20, 80], canvas: [20, 85] }, DEFAULT = { left: 50, canvas: 60 };
+    let split = { ...DEFAULT };
+    try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) split = { ...split, ...s }; } catch (e) { /* no storage */ }
+    const clamp = (k, v) => Math.min(LIMITS[k][1], Math.max(LIMITS[k][0], v));
+    let pending = null;
+    function apply(save) {
+      root.style.setProperty("--split-left", clamp("left", split.left) + "%");
+      root.style.setProperty("--split-canvas", clamp("canvas", split.canvas) + "%");
+      if (!pending) pending = requestAnimationFrame(() => { pending = null; fit(); drawTrajectory(); });
+      if (save) { try { localStorage.setItem(KEY, JSON.stringify(split)); } catch (e) { /* no storage */ } }
+    }
+    function drag(handle, key, axis) {
+      if (!handle) return;
+      handle.addEventListener("pointerdown", (e) => {
+        e.preventDefault(); handle.setPointerCapture(e.pointerId); handle.classList.add("dragging");
+        document.body.classList.add("resizing", axis === "x" ? "col" : "row");
+        const move = (ev) => {
+          if (axis === "x") { const r = wrap.getBoundingClientRect(); split.left = clamp("left", (ev.clientX - r.left) / r.width * 100); }
+          else { const r = side.getBoundingClientRect(); split.canvas = clamp("canvas", (ev.clientY - r.top) / r.height * 100); }
+          apply(false);
+        };
+        const up = () => { handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up);
+          handle.classList.remove("dragging"); document.body.classList.remove("resizing", "col", "row"); apply(true); };
+        handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up);
+      });
+      handle.addEventListener("keydown", (e) => {
+        const step = e.shiftKey ? 10 : 2;
+        const delta = { ArrowLeft: -step, ArrowUp: -step, ArrowRight: step, ArrowDown: step }[e.key];
+        if (delta === undefined) return;
+        e.preventDefault(); split[key] = clamp(key, split[key] + delta); apply(true);
+      });
+      handle.addEventListener("dblclick", () => { split[key] = DEFAULT[key]; apply(true); });
+    }
+    drag(document.querySelector(".splitter-v"), "left", "x");
+    drag(document.querySelector(".splitter-h"), "canvas", "y");
+    apply(false);
+  })();
+
+  let lastSize = width() + "x" + height(), timer = null;
+  window.addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(() => {
+    const size = width() + "x" + height(); if (size !== lastSize) { lastSize = size; fit(); drawTrajectory(); } }, 200); });
+  document.addEventListener("themechange", () => { readColors(); styleLinks(); applyView(); drawTrajectory(); });
+})();
+</script>
+</body>
+</html>
