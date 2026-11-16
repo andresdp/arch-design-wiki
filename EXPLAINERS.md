@@ -158,11 +158,19 @@ The right column is a radial graph, read from the centre outwards:
 
 - the dimensions involved, then their values;
 - one design-point node (▲) per step, coloured by its rating;
-- the requirements (■), each linked to every point by how that point judged it.
+- the requirements (■). When one design point is shown (a step, an alternative or an option you selected), each
+  requirement is coloured by how that point judges it: meets, partly or misses, and grey when it does not judge it.
 
 Explored paths are blue, and the point being shown is outlined. Selecting a node lights its path to the centre and
-its paths to design points and requirements, and shows its details below the graph. *Show every value* adds the
-values that no point took. With a space, every dimension and value links to its page in the space's wiki.
+its direct neighbours one ring out, and shows its details below the graph:
+
+- a dimension lights its explored values;
+- a value lights the design points that take it;
+- a design point lights its values and the requirements it is judged on;
+- a requirement lights the points judged on it, each linked by how it judges the requirement.
+
+Select a lit node to go on from there, one step at a time. *Show every value* adds the values that no point took.
+With a space, every dimension and value links to its page in the space's wiki.
 
 ## 3. How an explainer is built
 
