@@ -1,14 +1,14 @@
 {
-  "id": "20261116_090901",
+  "id": "20261116_091208",
   "kind": "import-model",
-  "started_at": "2026-11-16T09:09:01",
+  "started_at": "2026-11-16T09:12:08",
   "status": "ok",
-  "finished_at": "2026-11-16T09:09:01",
+  "finished_at": "2026-11-16T09:12:08",
   "seed_run": null,
   "feedback": null,
   "source_ids": [],
   "new_source_ids": [],
   "passages": 0,
-  "taxonomy": "gt_model_taxonomy_20261116_090901.json",
+  "taxonomy": "gt_model_taxonomy_20261116_091208.json",
   "argv": []
 }
