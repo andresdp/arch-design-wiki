@@ -158,11 +158,14 @@ The right column is a radial graph, read from the centre outwards:
 
 - the dimensions involved, then their values;
 - one design-point node (▲) per step, coloured by its rating;
-- the requirements (■). When one design point is shown (a step, an alternative or an option you selected), each
-  requirement is coloured by how that point judges it: meets, partly or misses, and grey when it does not judge it.
+- the requirements (■). With nothing selected, every design point is linked to the requirements it is judged on,
+  each link coloured meets, partly or misses. When one design point is shown (a step, an alternative or an option
+  you selected), each requirement is also coloured by how that point judges it, and grey when it does not judge
+  it.
 
-Explored paths are blue, and the point being shown is outlined. Selecting a node lights its path to the centre and
-its direct neighbours one ring out, and shows its details below the graph:
+Explored paths are blue, and the point being shown is outlined. Selecting a node declutters the graph. It hides
+the other points' links to requirements, lights the node's path to the centre and its direct neighbours one ring
+out, and shows its details below the graph:
 
 - a dimension lights its explored values;
 - a value lights the design points that take it;
