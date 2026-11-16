@@ -53,7 +53,8 @@
   th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
   tr:last-child td { border-bottom: 0; }
   th { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
-  td .mode { display: block; color: var(--muted); font-size: 13px; }
+  td.num { width: 1%; color: var(--muted); font-variant-numeric: tabular-nums; }
+td .mode { display: block; color: var(--muted); font-size: 13px; }
   .runs a { display: inline-block; margin: 0 8px 4px 0; text-decoration: none; padding: 2px 8px; border-radius: 6px;
             font-size: 14px; border: 1px solid var(--line); }
   .runs.e a { color: var(--e); } .runs.n a { color: var(--n); }
@@ -113,72 +114,62 @@
   <section id="explainers">
     <h2>Explainers</h2>
     <p class="sub">Every session of the study, with the expert space (E) and without a space (N), two repetitions each.
-      An explainer shows the design points the agent examined, its assessment of each requirement, the trade-offs it
-      recorded, the alternatives or the explained solution, and the gaps: unaddressed requirements and uncovered
-      decisions. <a href="https://github.com/andresdp/arch-design-wiki/blob/main/EXPLAINERS.md">How to read an
+      Long cases state nine requirements; short cases state five and ran after the study with a later version of the
+      skills. An explainer shows the design points the agent examined, its assessment of each requirement, the
+      trade-offs it recorded, the alternatives or the explained solution, and the gaps: unaddressed requirements and
+      uncovered decisions. <a href="https://github.com/andresdp/arch-design-wiki/blob/main/EXPLAINERS.md">How to read an
       explainer</a>.</p>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Case</th><th>With the expert space (E)</th><th>Without a space (N)</th></tr></thead>
+        <thead><tr><th>#</th><th>Case</th><th>With the expert space (E)</th><th>Without a space (N)</th></tr></thead>
         <tbody>
-          <tr><td>Card-fraud scoring service<span class="mode">search</span></td>
+          <tr><td class="num">1</td><td>Card-fraud scoring service<span class="mode">search, long</span></td>
             <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/fraud-search-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/fraud-search-E-r2.html">rep. 2</a></td>
             <td class="runs n"><a href="spaces/no-space/explainers/fraud-search-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/fraud-search-N-r2.html">rep. 2</a></td></tr>
-          <tr><td>On-device visual inspection<span class="mode">search</span></td>
+          <tr><td class="num">2</td><td>On-device visual inspection<span class="mode">search, long</span></td>
             <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/vision-search-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/vision-search-E-r2.html">rep. 2</a></td>
             <td class="runs n"><a href="spaces/no-space/explainers/vision-search-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/vision-search-N-r2.html">rep. 2</a></td></tr>
-          <tr><td>Retail demand forecasting<span class="mode">search</span></td>
+          <tr><td class="num">3</td><td>Retail demand forecasting<span class="mode">search, long</span></td>
             <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/forecast-search-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/forecast-search-E-r2.html">rep. 2</a></td>
             <td class="runs n"><a href="spaces/no-space/explainers/forecast-search-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/forecast-search-N-r2.html">rep. 2</a></td></tr>
-          <tr><td>Large-scale document classification<span class="mode">search</span></td>
+          <tr><td class="num">4</td><td>Large-scale document classification<span class="mode">search, long</span></td>
             <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/documents-search-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/documents-search-E-r2.html">rep. 2</a></td>
             <td class="runs n"><a href="spaces/no-space/explainers/documents-search-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/documents-search-N-r2.html">rep. 2</a></td></tr>
-          <tr><td>Card-fraud scoring service<span class="mode">explain</span></td>
+          <tr><td class="num">5</td><td>Pump failure prediction<span class="mode">search, short</span></td>
+            <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/pumps-search-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/pumps-search-E-r2.html">rep. 2</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/pumps-search-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/pumps-search-N-r2.html">rep. 2</a></td></tr>
+          <tr><td class="num">6</td><td>Card-fraud scoring service<span class="mode">explain, long</span></td>
             <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/fraud-explain-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/fraud-explain-E-r2.html">rep. 2</a></td>
             <td class="runs n"><a href="spaces/no-space/explainers/fraud-explain-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/fraud-explain-N-r2.html">rep. 2</a></td></tr>
-          <tr><td>Large-scale document classification<span class="mode">explain</span></td>
+          <tr><td class="num">7</td><td>Large-scale document classification<span class="mode">explain, long</span></td>
             <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/documents-explain-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/documents-explain-E-r2.html">rep. 2</a></td>
             <td class="runs n"><a href="spaces/no-space/explainers/documents-explain-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/documents-explain-N-r2.html">rep. 2</a></td></tr>
+          <tr><td class="num">8</td><td>Support-ticket routing<span class="mode">explain, short</span></td>
+            <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/tickets-explain-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/tickets-explain-E-r2.html">rep. 2</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/tickets-explain-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/tickets-explain-N-r2.html">rep. 2</a></td></tr>
         </tbody>
       </table>
     </div>
     <div class="legend"><span><b class="e">E</b>: pages inside the expert wiki, linked to its dimensions and values</span>
       <span><b class="n">N</b>: standalone pages; the agent named its own decisions</span></div>
 
-    <h3 style="margin:28px 0 10px">Short cases</h3>
-    <p class="sub">Two further cases with five requirements each instead of nine, run after the study in the same way
-      (E and N, two repetitions each) with a later version of the skills. They are not part of the study's table.</p>
-    <div class="table-scroll">
-      <table>
-        <thead><tr><th>Case</th><th>With the expert space (E)</th><th>Without a space (N)</th></tr></thead>
-        <tbody>
-          <tr><td>Pump failure prediction<span class="mode">search</span></td>
-            <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/pumps-search-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/pumps-search-E-r2.html">rep. 2</a></td>
-            <td class="runs n"><a href="spaces/no-space/explainers/pumps-search-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/pumps-search-N-r2.html">rep. 2</a></td></tr>
-          <tr><td>Support-ticket routing<span class="mode">explain</span></td>
-            <td class="runs e"><a href="spaces/ml-workflow-expert/site/explainers/tickets-explain-E-r1.html">rep. 1</a><a href="spaces/ml-workflow-expert/site/explainers/tickets-explain-E-r2.html">rep. 2</a></td>
-            <td class="runs n"><a href="spaces/no-space/explainers/tickets-explain-N-r1.html">rep. 1</a><a href="spaces/no-space/explainers/tickets-explain-N-r2.html">rep. 2</a></td></tr>
-        </tbody>
-      </table>
-    </div>
-
     <h3 style="margin:28px 0 10px">Running example</h3>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Case</th><th>With the sample space</th><th>Without a space</th></tr></thead>
+        <thead><tr><th>#</th><th>Case</th><th>With the sample space</th><th>Without a space</th></tr></thead>
         <tbody>
-          <tr><td>Git hosting for a growing engineering organization<span class="mode">search</span></td>
+          <tr><td class="num">1</td><td>Git hosting for a growing engineering organization<span class="mode">search, long</span></td>
             <td class="runs e"><a href="spaces/git-hosting-sample/site/explainers/hosting-search.html">explainer</a></td>
             <td class="runs n"><a href="spaces/no-space/explainers/sample-hosting-search.html">explainer</a></td></tr>
-          <tr><td>Replicated Git file servers<span class="mode">explain</span></td>
+          <tr><td class="num">2</td><td>Replicated Git file servers<span class="mode">explain, long</span></td>
             <td class="runs e"><a href="spaces/git-hosting-sample/site/explainers/spokes-explain.html">explainer</a></td>
             <td class="runs n"><a href="spaces/no-space/explainers/sample-spokes-explain.html">explainer</a></td></tr>
-          <tr><td>Hosting an open-source monorepo<span class="mode">search, short</span></td>
-            <td class="runs e"><a href="spaces/git-hosting-sample/site/explainers/monorepo-search-r1.html">rep. 1</a><a href="spaces/git-hosting-sample/site/explainers/monorepo-search-r2.html">rep. 2</a></td>
-            <td class="runs n"><a href="spaces/no-space/explainers/sample-monorepo-search-r1.html">rep. 1</a><a href="spaces/no-space/explainers/sample-monorepo-search-r2.html">rep. 2</a></td></tr>
-          <tr><td>Monorepo hosting as built<span class="mode">explain, short</span></td>
-            <td class="runs e"><a href="spaces/git-hosting-sample/site/explainers/monorepo-explain-r1.html">rep. 1</a><a href="spaces/git-hosting-sample/site/explainers/monorepo-explain-r2.html">rep. 2</a></td>
-            <td class="runs n"><a href="spaces/no-space/explainers/sample-monorepo-explain-r1.html">rep. 1</a><a href="spaces/no-space/explainers/sample-monorepo-explain-r2.html">rep. 2</a></td></tr>
+          <tr><td class="num">3</td><td>Hosting an open-source monorepo<span class="mode">search, short</span></td>
+            <td class="runs e"><a href="spaces/git-hosting-sample/site/explainers/monorepo-search.html">explainer</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/sample-monorepo-search.html">explainer</a></td></tr>
+          <tr><td class="num">4</td><td>Monorepo hosting as built<span class="mode">explain, short</span></td>
+            <td class="runs e"><a href="spaces/git-hosting-sample/site/explainers/monorepo-explain.html">explainer</a></td>
+            <td class="runs n"><a href="spaces/no-space/explainers/sample-monorepo-explain.html">explainer</a></td></tr>
         </tbody>
       </table>
     </div>

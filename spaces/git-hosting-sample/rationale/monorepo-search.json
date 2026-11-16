@@ -1,6 +1,6 @@
 {
  "schema": "ddspace-rationale/6",
- "id": "monorepo-search-r1",
+ "id": "monorepo-search",
  "mode": "search",
  "space": {
   "workspace": "toy-git-hosting",

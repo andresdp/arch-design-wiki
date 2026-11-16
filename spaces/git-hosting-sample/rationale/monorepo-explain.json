@@ -1,6 +1,6 @@
 {
  "schema": "ddspace-rationale/6",
- "id": "monorepo-explain-r1",
+ "id": "monorepo-explain",
  "mode": "explain",
  "space": {
   "workspace": "toy-git-hosting",
