@@ -1,5 +1,5 @@
 # Log
 
-## 2026-11-16
+## 2026-11-21
 
-- **Creation** Wiki built from run 20261116_135009 (import-model): 28 dimensions, 124 values.
+- **Creation** Wiki built from run 20261121_142449 (import-model): 28 dimensions, 124 values.

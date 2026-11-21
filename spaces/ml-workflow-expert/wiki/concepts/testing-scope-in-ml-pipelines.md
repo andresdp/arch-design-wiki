@@ -18,7 +18,7 @@ tags:
 - core
 generated:
   by: delvedspace/0.1.0.dev0
-  at: '2026-11-16T13:50:09-03:00'
+  at: '2026-11-21T14:24:49-03:00'
 ---
 
 # Testing scope in ML pipelines
